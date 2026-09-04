@@ -18,6 +18,7 @@ defmodule PlannerWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    resources "/tasks", TaskController
   end
 
   # Other scopes may use custom stacks.
