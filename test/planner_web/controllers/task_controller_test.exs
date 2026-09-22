@@ -3,8 +3,20 @@ defmodule PlannerWeb.TaskControllerTest do
 
   import Planner.TasksFixtures
 
-  @create_attrs %{label: "some label", name: "some name", kind: :action, scheduled_for: ~D[2026-09-03], completed_on: ~D[2026-09-03]}
-  @update_attrs %{label: "some updated label", name: "some updated name", kind: :commitment, scheduled_for: ~D[2026-09-04], completed_on: ~D[2026-09-04]}
+  @create_attrs %{
+    label: "some label",
+    name: "some name",
+    kind: :action,
+    scheduled_for: ~D[2026-09-03],
+    completed_on: ~D[2026-09-03]
+  }
+  @update_attrs %{
+    label: "some updated label",
+    name: "some updated name",
+    kind: :commitment,
+    scheduled_for: ~D[2026-09-04],
+    completed_on: ~D[2026-09-04]
+  }
   @invalid_attrs %{label: nil, name: nil, kind: nil, scheduled_for: nil, completed_on: nil}
 
   describe "index" do

@@ -21,7 +21,13 @@ defmodule Planner.TasksTest do
     end
 
     test "create_task/1 with valid data creates a task" do
-      valid_attrs = %{label: "some label", name: "some name", kind: :action, scheduled_for: ~D[2026-09-03], completed_on: ~D[2026-09-03]}
+      valid_attrs = %{
+        label: "some label",
+        name: "some name",
+        kind: :action,
+        scheduled_for: ~D[2026-09-03],
+        completed_on: ~D[2026-09-03]
+      }
 
       assert {:ok, %Task{} = task} = Tasks.create_task(valid_attrs)
       assert task.label == "some label"
@@ -37,7 +43,14 @@ defmodule Planner.TasksTest do
 
     test "update_task/2 with valid data updates the task" do
       task = task_fixture()
-      update_attrs = %{label: "some updated label", name: "some updated name", kind: :commitment, scheduled_for: ~D[2026-09-04], completed_on: ~D[2026-09-04]}
+
+      update_attrs = %{
+        label: "some updated label",
+        name: "some updated name",
+        kind: :commitment,
+        scheduled_for: ~D[2026-09-04],
+        completed_on: ~D[2026-09-04]
+      }
 
       assert {:ok, %Task{} = task} = Tasks.update_task(task, update_attrs)
       assert task.label == "some updated label"
