@@ -30,6 +30,7 @@ Abra [localhost:4000](http://localhost:4000). Para usar o console interativo, ex
 | `mix db.up` | Inicia apenas o PostgreSQL e aguarda sua disponibilidade. |
 | `mix ecto.setup` | Inicia o banco, cria a base, aplica migrations e seeds. |
 | `mix test` | Inicia o banco e executa os testes. |
+| `mix ci` | Verifica compilação, formatação, Credo estrito e testes com cobertura informativa. |
 | `mix precommit` | Compila com warnings como erros, verifica dependências, formata e testa. |
 | `mix ecto.reset` | Apaga e recria a base do ambiente atual. |
 | `docker compose stop postgres` | Para o banco sem apagar o volume. |
@@ -47,3 +48,9 @@ Alterar credenciais no `.env` não altera um volume já inicializado: ajuste tam
 O fluxo planejado é selecionar tarefas do backlog para hoje, ordenar prioridades e registrar conclusões. As regras ainda estão em definição no [PRD](docs/prd.md). A troca entre português do Brasil e inglês será implementada com Gettext; ainda não está disponível.
 
 Consulte as [decisões de arquitetura](docs/design.md), o [vocabulário do domínio](docs/ddd.md) e as [tarefas planejadas](docs/tasks/README.md) para acompanhar a evolução.
+
+## CI
+
+O workflow `CI` executa o check **quality** em PRs para `main` e pushes na `main`, usando Elixir 1.20.3, OTP 29 e o Compose existente. Para reproduzir localmente, execute `mix ci` com Docker ativo e `.env` configurado. O comando verifica formatação sem corrigir arquivos; cobertura é informativa, sem percentual mínimo bloqueante.
+
+Após a primeira execução no GitHub, selecione **quality** como check obrigatório na proteção da `main` e exija PR. A proteção é configurada separadamente pelo responsável pelo repositório.

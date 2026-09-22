@@ -42,3 +42,7 @@ Registre aqui o link do PR/check e confirme que a proteção foi ativada. Se a o
 ## Confirmação
 
 Pendente de execução e confirmação pelo responsável humano. Agentes não devem executar esta tarefa.
+
+## Preparação autorizada do CI
+
+O usuário autorizou explicitamente o agente a preparar o workflow e o alias CI. Foram adicionados `.github/workflows/ci.yml`, `mix ci`, Credo e cobertura informativa. Esta autorização é limitada à preparação local; ativação das regras no GitHub permanece humana e a tarefa continua pendente. O check a exigir é `quality`. A execução remota ainda depende de publicar as alterações.

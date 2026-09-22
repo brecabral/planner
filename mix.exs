@@ -6,6 +6,7 @@ defmodule Planner.MixProject do
       app: :planner,
       version: "0.1.0",
       elixir: "~> 1.17",
+      test_coverage: [summary: [threshold: 70]],
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
@@ -27,7 +28,7 @@ defmodule Planner.MixProject do
 
   def cli do
     [
-      preferred_envs: [precommit: :test]
+      preferred_envs: [precommit: :test, ci: :test]
     ]
   end
 
@@ -41,6 +42,7 @@ defmodule Planner.MixProject do
   defp deps do
     [
       {:phoenix, "~> 1.8.13"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.13"},
       {:postgrex, ">= 0.0.0"},
@@ -112,6 +114,12 @@ defmodule Planner.MixProject do
         "tailwind planner --minify",
         "esbuild planner --minify",
         "phx.digest"
+      ],
+      ci: [
+        "compile --warnings-as-errors",
+        "format --check-formatted",
+        "credo --strict",
+        "test --warnings-as-errors --cover"
       ],
       precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"]
     ]

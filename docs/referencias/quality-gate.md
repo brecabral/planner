@@ -1,6 +1,6 @@
 # Quality gate: verificações e limites
 
-Avaliação em 22/09/2026. O alias atual `precommit` executa compilação com warnings como erros, limpeza de dependências não usadas, formatação e testes. Não inclui Credo, análise de clones ou evals específicos. Esta referência propõe opções; nenhuma ferramenta foi instalada nesta entrega.
+Avaliação em 22/09/2026. O alias atual `precommit` executa compilação com warnings como erros, limpeza de dependências não usadas, formatação e testes. Não inclui Credo, análise de clones ou evals específicos. Credo foi posteriormente adicionado ao alias `ci`, junto da checagem de formato e testes com cobertura informativa. As demais ferramentas abaixo continuam opcionais.
 
 ## Opções
 
