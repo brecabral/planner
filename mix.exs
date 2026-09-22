@@ -82,12 +82,30 @@ defmodule Planner.MixProject do
   #     $ mix setup
   #
   # See the documentation for `Mix` for more info on aliases.
+  defp start_database(_) do
+    if Mix.env() in [:dev, :test] and System.get_env("PLANNER_SKIP_COMPOSE") != "true" do
+      Mix.Task.run("cmd", [
+        "docker",
+        "compose",
+        "--project-directory",
+        __DIR__,
+        "up",
+        "--wait",
+        "--wait-timeout",
+        "60",
+        "postgres"
+      ])
+    end
+  end
+
   defp aliases do
     [
       setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
-      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
-      "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
+      "db.up": [&start_database/1],
+      "phx.server": ["db.up", "phx.server"],
+      "ecto.setup": ["db.up", "ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+      "ecto.reset": ["db.up", "ecto.drop", "ecto.setup"],
+      test: ["db.up", "ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
       "assets.build": ["compile", "tailwind planner", "esbuild planner"],
       "assets.deploy": [
