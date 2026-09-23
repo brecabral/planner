@@ -1,24 +1,18 @@
 ---
 id: "TASK-012"
-status: "planned"
+status: "done"
 execution_level: "human"
-execution_rationale: "O responsável declarou que fará o reset; operação exclusivamente humana."
+execution_rationale: "Preparação do banco realizada pelo responsável humano."
 specs: []
-depends_on: ["TASK-002"]
+depends_on: []
 provides: ["clean-database"]
-consumes: ["experimental-crud-removed"]
+consumes: []
 write_scope: []
 blockers: []
 ---
 
-# 012 — Reinicializar o banco após remover o experimento
+# 012 — Preparar a base limpa
 
-## Ação humana
+## Aceite humano
 
-Após integrar a remoção do experimento, reinicializar o banco de desenvolvimento para começar com base limpa. O responsável assumiu essa ação ao autorizar a remoção da migration. Procedimento operacional: seção de banco no [README](../../README.md).
-
-## Aceite
-
-Confirmar execução do reset e preparação da base com as migrations remanescentes, sem a tabela experimental. Registrar confirmação e resultado antes de marcar `done`.
-
-As consumidoras aguardam essa confirmação. Esta tarefa não inclui reset de produção.
+Em 23/09/2026, o responsável confirmou: “o db esta limpo”. Base limpa aceita; nenhum reset adicional deve ser executado por esta tarefa. A remoção do código/migration experimental permanece na TASK-002.

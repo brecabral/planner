@@ -1,30 +1,21 @@
 # Linguagem de domínio e fronteiras
 
-## Conceitos
-
-| Termo | Significado |
+| Termo | Significado no MVP |
 | --- | --- |
-| Usuário | Titular de conta, tarefas, labels, fuso e planejamento privados. |
+| Usuário padrão | Identidade persistente usada por todas as visitas de teste, sem login. |
 | Tarefa | Ação com título obrigatório e zero ou várias labels do proprietário. |
 | Backlog | Tarefas disponíveis, cadastradas ou retiradas manualmente de hoje. |
-| Hoje (`today`) | Tarefas selecionadas para a data corrente do usuário, ordenadas por prioridade. |
-| Retry | Tarefas que permaneceram em hoje sem conclusão na virada do dia; podem ser selecionadas novamente. |
-| Escolha | Consumo de uma das três vagas diárias ao selecionar uma tarefa. Retirada manual restitui; conclusão mantém o consumo. |
-| Prioridade | Posição relativa entre as pendências de hoje. |
-| Conclusão | Registro persistente da execução da tarefa, com a data local original. |
-| Histórico | Coleção de tarefas concluídas do usuário. |
-| Label | Classificação reutilizável do catálogo privado do usuário; não representa uma entidade de projeto. |
-| Dia do usuário | Data calculada no servidor a partir do instante atual e do fuso da conta. |
+| Hoje (`today`) | Pendências selecionadas para a data corrente, em ordem de prioridade. |
+| Retry | Tarefas que ficaram em hoje sem conclusão na mudança de data; selecionáveis novamente. |
+| Escolha | Consumo de uma das três vagas da data. Retirada manual restitui; conclusão mantém consumo. |
+| Prioridade | Posição entre as pendências de hoje. |
+| Conclusão | Registro persistente da execução com data, sem horário. |
+| Histórico | Tarefas concluídas ordenadas por data e desempate estável. |
+| Label | Classificação reutilizável, sem criar uma entidade de projeto. |
+| Dia corrente | Date.utc_today() no servidor; sem preferência de fuso. |
 
-`kind` expressa a classificação backlog/today/retry solicitada pelo produto. Conclusão e data de escolha precisam ser representadas sem tornar tarefa concluída também pendente; o schema definitivo deve preservar essa distinção. Não transportar automaticamente os campos do experimento.
+## Fronteiras e nomes
 
-## Fronteiras
+`Planner.Accounts` fornece o usuário padrão. `Planner.Tasks` possui tarefas, cotas, transições, histórico e vínculos com labels. `Planner.Labels` fornece o catálogo; o cadastro composto é coordenado por Tasks. `PlannerWeb` apresenta dados e eventos, sem decidir proprietário ou cota. Persistência em `Planner.Repo`.
 
-- Contas: identidade, sessão, configurações e escopo autenticado.
-- Planejamento: tarefas, escolhas diárias, ordem, transições e histórico.
-- Labels: catálogo privado; planejamento possui os vínculos com tarefas e compõe o cadastro atômico.
-- Interface: apresenta dados autorizados e traduz eventos em comandos; não decide proprietário, cota ou dia.
-
-## Nomes
-
-Aplicação `:planner`; namespaces `Planner` e `PlannerWeb`; persistência `Planner.Repo`. Contextos previstos: `Planner.Accounts`, `Planner.Tasks` e `Planner.Labels`. Módulos em PascalCase; campos, funções e arquivos em snake_case. Operações públicas expressam intenção e recebem escopo autenticado. Detalhes físicos de tabelas e assinaturas ficam na entrega produtora, sem criar sinônimos para os conceitos acima.
+`kind` classifica pendências como backlog/today/retry; a data de conclusão distingue concluídas das pendências. Módulos em PascalCase; campos, arquivos e funções em snake_case. Operações públicas expressam intenção e recebem o usuário definido no servidor. IDs de sessão ou formulário não são autoridade para trocar esse usuário.

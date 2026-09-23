@@ -15,7 +15,7 @@ blockers: []
 
 ## Objetivo e decisão
 
-Remover integralmente a geração experimental de Task, inclusive a migration original do Ecto, conforme autorização do responsável em 23/09/2026. Não migrar dados experimentais nem criar migration compensatória. O responsável fará o reset após a remoção, na [TASK-012](012-reset-banco.md).
+Remover integralmente a geração experimental de Task, inclusive a migration original do Ecto, conforme autorização do responsável em 23/09/2026. Não migrar dados experimentais nem criar migration compensatória. O responsável confirmou a base limpa na [TASK-012](012-reset-banco.md); não há novo reset pendente.
 
 ## Escopo e contrato
 

@@ -2,35 +2,26 @@
 id: "TASK-001"
 status: "planned"
 execution_level: "standard"
-execution_rationale: "Integra sessão e Gettext no ciclo HTTP, com fallback e isolamento definidos."
+execution_rationale: "Configura pt-BR fixo no Gettext existente e traduz a interface base."
 specs: ["SPEC-001"]
 depends_on: ["TASK-002"]
-provides: ["http-locale"]
+provides: ["ptbr-interface"]
 consumes: ["experimental-crud-removed"]
-write_scope: ["lib/planner_web/plugs/locale.ex", "lib/planner_web/router.ex", "config/config.exs", "test/planner_web/plugs/locale_test.exs"]
-blockers: ["Confirmar padrão, persistência em sessão e fallback da SPEC-001."]
+write_scope: ["config/config.exs", "lib/planner_web/components/layouts*", "priv/gettext/", "test/planner_web/"]
+blockers: []
 ---
 
-# 001 — Aplicar locale na sessão HTTP
+# 001 — Fixar a interface base em pt-BR via Gettext
 
-## Entrada e limite
+## Objetivo e entrada
 
-[SPEC-001](../specs/001-idiomas.md) RN02–RN05; entrada: base sem CRUD. Referência Gettext.
+Aplicar [SPEC-001](../specs/001-idiomas.md) na infraestrutura existente: locale padrão fixo pt_BR, HTML pt-BR e traduções da interface base, com msgids em inglês. Não criar seletor, preferência em sessão, rota de idioma ou hook de troca. Cada tela futura traduz seus próprios textos. Referência Gettext.
 
-## Scaffold
+## Aceite
 
-Não executar gerador: adaptar o recurso produzido pelas dependências, sem recriar seu scaffold.
-
-## Ajustes desta entrega
-
-Criar plug de locale usando Gettext existente. Ler preferência de sessão, validar allowlist e aplicar fallback aprovado. Não criar seletor nem hook LiveView.
-
-## Aceite e teste de intenção
-
-1. CA-I01/03/04 no HTTP: padrão, duas sessões independentes e locale inválido sem erro 500.
-
-Escrever o teste de intenção antes dos ajustes; preservar testes gerados pertinentes e finalizar com `mix precommit`.
+1. Abrir e recarregar mantém pt-BR em HTTP/LiveView sem seletor.
+2. Mensagens usadas na base são traduzidas; conteúdo digitado é preservado.
 
 ## Evidência e revisão
 
-Pendentes. Registrar teste antes/depois, precommit, revisor independente, alvo/base, critérios, achados e integração. Não liberar consumidora antes de revisão aprovada e integração.
+Pendentes. Registrar teste de intenção, precommit e CI com cobertura mínima de 70%, revisor independente, alvo/base, critérios, achados e integração.

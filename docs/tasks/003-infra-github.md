@@ -15,7 +15,7 @@ blockers: []
 
 ## Entrega
 
-Workflow com check `quality` e alias `mix ci`, verificando compilação, formatação, testes e Credo. Proteção da `main` exige PR com CI aprovado e impede force push e exclusão indevidos. Cobertura inicial informativa.
+Workflow com check `quality` e alias `mix ci`, verificando compilação, formatação, testes e Credo. Proteção da `main` exige PR com CI aprovado e impede force push e exclusão indevidos. Cobertura mínima obrigatória de 70%, já configurada no CI e confirmada pelo responsável.
 
 ## Aceite humano
 

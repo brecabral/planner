@@ -30,7 +30,7 @@ Abra [localhost:4000](http://localhost:4000). Para usar o console interativo, ex
 | `mix db.up` | Inicia apenas o PostgreSQL e aguarda sua disponibilidade. |
 | `mix ecto.setup` | Inicia o banco, cria a base, aplica migrations e seeds. |
 | `mix test` | Inicia o banco e executa os testes. |
-| `mix ci` | Verifica compilação, formatação, Credo estrito e testes com cobertura informativa. |
+| `mix ci` | Verifica compilação, formatação, Credo estrito e testes com cobertura mínima de 70%. |
 | `mix precommit` | Compila com warnings como erros, verifica dependências, formata e testa. |
 | `mix ecto.reset` | Apaga e recria a base do ambiente atual. |
 | `docker compose stop postgres` | Para o banco sem apagar o volume. |
@@ -45,12 +45,12 @@ Alterar credenciais no `.env` não altera um volume já inicializado: ajuste tam
 
 ## Sobre o projeto
 
-O fluxo planejado é selecionar tarefas do backlog para hoje, ordenar prioridades e registrar conclusões. As regras ainda estão em definição no [PRD](docs/prd.md). A troca entre português do Brasil e inglês será implementada com Gettext; ainda não está disponível.
+O fluxo planejado é selecionar tarefas do backlog para hoje, ordenar prioridades e registrar conclusões. O escopo mínimo está no [PRD](docs/prd.md): usuário padrão sem login, interface pt-BR com Gettext, data corrente sem configuração de fuso e recarga manual. Essas mudanças ainda serão implementadas.
 
 Consulte as [decisões de arquitetura](docs/design.md), o [vocabulário do domínio](docs/ddd.md) e as [tarefas planejadas](docs/tasks/README.md) para acompanhar a evolução.
 
 ## CI
 
-O workflow `CI` executa o check **quality** em PRs para `main` e pushes na `main`, usando Elixir 1.20.3, OTP 29 e o Compose existente. Para reproduzir localmente, execute `mix ci` com Docker ativo e `.env` configurado. O comando verifica formatação sem corrigir arquivos; cobertura é informativa, sem percentual mínimo bloqueante.
+O workflow `CI` executa o check **quality** em PRs para `main` e pushes na `main`, usando Elixir 1.20.3, OTP 29 e o Compose existente. Para reproduzir localmente, execute `mix ci` com Docker ativo e `.env` configurado. O comando verifica formatação sem corrigir arquivos; a cobertura deve atingir pelo menos 70%, conforme o limiar já configurado em `mix.exs`.
 
-Após a primeira execução no GitHub, selecione **quality** como check obrigatório na proteção da `main` e exija PR. A proteção é configurada separadamente pelo responsável pelo repositório.
+O responsável confirmou a configuração da proteção da `main` e do check obrigatório **quality**.

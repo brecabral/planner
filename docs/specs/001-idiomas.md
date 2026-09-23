@@ -1,47 +1,27 @@
 ---
 id: "SPEC-001"
-status: draft
+status: ready
 requirements: ["CA10"]
 ---
 
-# 001 — Idiomas da interface
+# 001 — Interface pt-BR com Gettext
 
-Origem: suporte a pt-BR e inglês solicitado pelo usuário; [design D09](../design.md#d09--idiomas-com-gettext).
+## Escopo e arquitetura
 
-## Arquitetura e casos de uso
+O MVP exibe somente português do Brasil, por decisão do responsável em 23/09/2026. Reutilizar `PlannerWeb.Gettext` e as convenções Phoenix: mensagens-base em inglês e traduções no catálogo `pt_BR`. Locale fixo para toda a aplicação; sem preferência, sessão de idioma, seletor ou detecção do navegador.
 
-Internacionalização é uma capacidade transversal de apresentação: mesma política para navegação HTTP, montagem/reconexão LiveView, formulários, erros e nomes acessíveis. `PlannerWeb.Gettext` é o backend único. Locale pertence à sessão/processo, não ao estado global da aplicação; identidade de conta e conteúdo do usuário não são traduzidos.
+## Regras e casos de uso
 
-O contrato abrange escolher idioma, persistir preferência, aplicar fallback e manter isolamento. Plug HTTP, hook LiveView e seletor são entregas separadas que implementam a mesma spec.
-
-## Escopo e regras
-
-- RN01 (confirmada): a interface oferece português do Brasil e inglês, com seletor acessível por teclado. Locales internos `pt_BR`/`en`; identificação HTML `pt-BR`/`en`.
-- RN02 (proposta): sem preferência válida, usar pt-BR.
-- RN03 (proposta): a escolha é persistida na sessão e mantida em navegação, recarga e reconexão; não depende de cadastro. Não sincronizar entre dispositivos ou detectar idioma do navegador nesta entrega.
-- RN04 (confirmada): uma sessão não altera o idioma de outra; conteúdo digitado pelo usuário não é traduzido.
-- RN05 (proposta): entrada de locale desconhecido não altera a preferência válida existente; sem preferência válida, aplicar RN02. Não falhar com erro 500.
-- RN06 (confirmada): textos da interface preservada, flashes, acessibilidade, erros e plurais utilizados têm versões pt-BR e inglês. Não traduzir o CRUD que será removido.
+- RN01: páginas, formulários, erros, plurais e nomes acessíveis aparecem em pt-BR. HTML usa `lang="pt-BR"`.
+- RN02: HTTP e LiveView usam o mesmo locale fixo, inclusive após recarga. Configurar o backend/aplicação existente; não criar infraestrutura de troca de idiomas.
+- RN03: títulos e labels digitados permanecem exatamente no idioma do conteúdo informado.
 
 ## Cenários de aceite
 
-| ID | Dado / Quando / Então | Regras |
-| --- | --- | --- |
-| CA-I01 | Sem escolha anterior, abrir uma página mostra pt-BR e o seletor disponível. | RN01, RN02 |
-| CA-I02 | Escolher inglês atualiza os textos e `lang`; navegar, recarregar e reconectar preservam inglês. Voltar a pt-BR funciona da mesma maneira. | RN01, RN03 |
-| CA-I03 | Duas sessões escolhem idiomas diferentes e mantêm seus próprios textos; valores informados pelo usuário permanecem idênticos. | RN04 |
-| CA-I04 | Enviar locale inválido mantém a escolha anterior; sem escolha válida, utiliza o padrão, sem erro 500. | RN02, RN05 |
-| CA-I05 | Provocar uma validação e exibir singular/plural usados pela interface resulta em mensagens corretas nos dois idiomas. | RN06 |
-| CA-I06 | Operar o seletor por teclado permite identificar, escolher e confirmar a opção. | RN01 |
-
-## Dados e implementação
-
-Persistir somente a preferência de idioma conforme RN03. A integração reutiliza Gettext, aplica locale em HTTP e LiveView e protege a atualização de sessão com CSRF. Procedimentos e origem técnica: [Gettext](../referencias/gettext.md). Não criar novas entidades de domínio para essa funcionalidade.
-
-## Dúvidas bloqueantes
-
-Confirmar pt-BR como padrão, persistência em sessão e política de locale inválido (RN02, RN03, RN05). Manter `draft` até essas decisões serem confirmadas.
+- CA-I01: abrir e recarregar o painel apresenta interface pt-BR e lang correto, sem seletor.
+- CA-I02: cadastro inválido, limite de escolhas e demais erros usados no fluxo aparecem traduzidos via Gettext.
+- CA-I03: singular/plural e nomes acessíveis usados no painel estão em pt-BR, sem traduzir conteúdo do usuário.
 
 ## Implementação
 
-Distribuída em tarefas pequenas; consultar o [mapa de entregas](../tasks/README.md). Esta spec permanece o contrato comum dos casos de uso acima.
+Configuração base e traduções das telas são passos distintos no [mapa de tarefas](../tasks/README.md). Suporte a outros idiomas fica fora deste contrato do MVP.

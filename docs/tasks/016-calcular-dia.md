@@ -2,36 +2,26 @@
 id: "TASK-016"
 status: "planned"
 execution_level: "standard"
-execution_rationale: "Converte instante em data por fuso com relógio isolado nos testes e contrato de erro definido."
+execution_rationale: "Fornece Date.utc_today() com data controlável nos testes, sem estado global."
 specs: ["SPEC-003"]
-depends_on: ["TASK-004"]
-provides: ["user-day-contract"]
-consumes: ["user-timezone-storage"]
-write_scope: ["lib/planner/day.ex", "config/config.exs", "mix.exs", "mix.lock", "test/planner/day_test.exs"]
+depends_on: ["TASK-009"]
+provides: ["current-day"]
+consumes: ["default-user"]
+write_scope: ["lib/planner/day.ex", "test/planner/day_test.exs"]
 blockers: []
 ---
 
-# 016 — Calcular a data a partir do fuso do usuário
+# 016 — Fornecer a data corrente do planejamento
 
-## Entrada e limite
+## Objetivo e entrada
 
-[SPEC-003](../specs/003-dia-e-historico.md) RN01–RN03; consumir user-timezone-storage. Referências Elixir e testes.
+[SPEC-003](../specs/003-dia-e-historico.md) RN01. Entregar pequena função que use Date.utc_today() por padrão e permita data controlada nos testes, sem relógio global mutável. O contexto captura uma data por consulta/comando. Não converter fuso nem armazenar horário.
 
-## Scaffold
+## Aceite
 
-Não executar gerador: adaptar o recurso produzido pelas dependências, sem recriar seu scaffold.
-
-## Ajustes desta entrega
-
-Implementar uma função de cálculo de data por usuário/instante, com relógio controlável por teste sem estado global. Usar suporte de fuso existente; justificar biblioteca somente se necessário. Não alterar tarefas nem adicionar timer.
-
-## Aceite e teste de intenção
-
-1. CA-003-06: mesmo instante produz datas corretas em dois fusos e nas fronteiras UTC.
-2. Ausência de fuso segue a política aprovada; testes não dependem da hora real.
-
-Escrever o teste de intenção antes dos ajustes; preservar testes gerados pertinentes e finalizar com `mix precommit`.
+1. Resultado é Date; teste controlado troca o dia sem esperar a hora real.
+2. Duas execuções de teste não contaminam a data uma da outra.
 
 ## Evidência e revisão
 
-Pendentes. Registrar teste antes/depois, precommit, revisor independente, alvo/base, critérios, achados e integração. Não liberar consumidora antes de revisão aprovada e integração.
+Pendentes. Registrar teste de intenção, precommit e CI com cobertura mínima de 70%, revisor independente, alvo/base, critérios, achados e integração.

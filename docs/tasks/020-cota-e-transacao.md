@@ -6,36 +6,30 @@ execution_rationale: "Define bloqueio e contrato atômico reutilizado por todos 
 specs: ["SPEC-002", "SPEC-003"]
 depends_on: ["TASK-019"]
 provides: ["daily-quota-transaction"]
-consumes: ["user-day-contract", "task-scaffold", "authenticated-user-scope"]
+consumes: ["current-day", "task-scaffold", "default-user"]
 write_scope: ["lib/planner/tasks/daily_plan.ex", "lib/planner/user_transaction.ex", "priv/repo/migrations/", "test/planner/user_transaction_test.exs"]
 blockers: []
 ---
 
 # 020 — Criar cota diária e fronteira transacional
 
-## Entrada e limite
+## Objetivo e entrada
 
-[SPEC-002](../specs/002-planejamento-diario.md) RN06/RN07 e [SPEC-003](../specs/003-dia-e-historico.md) RN03; consumir user-day-contract e task-scaffold. Referência Ecto.
+[SPEC-002](../specs/002-planejamento-diario.md) RN06/RN07 e [SPEC-003](../specs/003-dia-e-historico.md) RN01/RN03. Usar current-day e default-user. Ajustar migration: proprietário/data únicos, consumo 0–3, zero inicial e campos obrigatórios. Bloquear a linha do usuário antes de obter a cota da data capturada, protegendo também o conjunto vazio. Publicar fronteira para seleção, devolução, ordem e conclusão; não expor CRUD do contador nem implementar política de fuso.
 
 ## Scaffold
 
 ```sh
-mix phx.gen.schema Tasks.DailyPlan daily_plans day:date used_choices:integer --scope user
+mix phx.gen.schema Tasks.DailyPlan daily_plans day:date used_choices:integer user_id:references:users --no-scope
 ```
 
-Consultar `mix help` antes de executar. O comando pertence à implementação desta tarefa; não foi executado no planejamento.
+Consultar `mix help` antes de executar; adaptar o resultado conforme o contrato acima.
 
-## Ajustes desta entrega
+## Aceite
 
-Ajustar migration: unicidade usuário/data, contador entre 0 e 3 e inicial zero. Criar fronteira interna que bloqueie a linha do usuário antes de reler fuso/dia e localizar/criar a cota, protegendo também dia sem registro. Publicar operação transacional comum para seleção, retorno, ordem, conclusão e mudança de fuso. Não expor CRUD livre do contador.
-
-## Aceite e teste de intenção
-
-1. Transações concorrentes do mesmo usuário serializam mesmo com plano vazio; usuários diferentes mantêm cotas independentes.
-2. Rollback reverte contador; reinício não zera consumo; restrições rejeitam valores fora do intervalo.
-
-Escrever o teste de intenção antes dos ajustes; preservar testes gerados pertinentes e finalizar com `mix precommit`.
+1. Transações concorrentes serializam criação da cota vazia; rollback reverte consumo.
+2. Reinício não zera registros; valores fora de 0–3 são rejeitados.
 
 ## Evidência e revisão
 
-Pendentes. Registrar teste antes/depois, precommit, revisor independente, alvo/base, critérios, achados e integração. Não liberar consumidora antes de revisão aprovada e integração.
+Pendentes. Registrar teste de intenção, precommit e CI com cobertura mínima de 70%, revisor independente, alvo/base, critérios, achados e integração.

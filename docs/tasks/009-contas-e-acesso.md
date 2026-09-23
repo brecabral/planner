@@ -2,40 +2,34 @@
 id: "TASK-009"
 status: "planned"
 execution_level: "standard"
-execution_rationale: "Integra o scaffold de autenticação, migrations e scope do Phoenix ao projeto existente."
+execution_rationale: "Gera identidade mínima e preparação idempotente do usuário padrão, sem autenticação."
 specs: ["SPEC-005"]
-depends_on: ["TASK-014", "TASK-012"]
-provides: ["auth-scaffold"]
-consumes: ["clean-database", "interface-locale-switching"]
-write_scope: ["lib/planner/accounts*", "lib/planner_web/user_auth.ex", "lib/planner_web/controllers/user_session_controller.ex", "lib/planner_web/live/user_live/", "lib/planner_web/router.ex", "lib/planner_web/components/layouts*", "priv/repo/migrations/", "config/", "mix.exs", "mix.lock", "test/"]
-blockers: ["Resolver mecanismo e política de cadastro na SPEC-005; o comando pressupõe a base de autenticação por e-mail do Phoenix."]
+depends_on: ["TASK-001", "TASK-012"]
+provides: ["default-user"]
+consumes: ["ptbr-interface", "clean-database"]
+write_scope: ["lib/planner/accounts.ex", "lib/planner/accounts/", "priv/repo/migrations/", "priv/repo/seeds.exs", "test/planner/accounts_test.exs", "test/support/fixtures/accounts_fixtures.ex", "README.md"]
+blockers: []
 ---
 
-# 009 — Gerar a base de autenticação Phoenix
+# 009 — Gerar e preparar o usuário padrão do MVP
 
-## Entrada e limite
+## Objetivo e entrada
 
-[SPEC-005](../specs/005-contas-e-acesso.md) RN01–RN04; base limpa e locale integrado. Referências Phoenix, Ecto e LiveView.
+[SPEC-005](../specs/005-contas-e-acesso.md). Manter schema/migration gerados e reduzir Accounts à criação idempotente e consulta do usuário com identifier fixo default. Seeds preparam esse usuário; testes usam fixture isolada. Remover CRUD de edição/exclusão não necessário. Não executar phx.gen.auth, criar contas interativas, senha, tokens ou Accounts.Scope. Fornecer o usuário resolvido para os contextos; instruções de preparação ficam no README.
 
 ## Scaffold
 
 ```sh
-mix phx.gen.auth Accounts User users --live --scope user
+mix phx.gen.context Accounts User users identifier:string:unique --no-scope
 ```
 
-Consultar `mix help` antes de executar. O comando pertence à implementação desta tarefa; não foi executado no planejamento.
+Consultar `mix help` antes de executar; adaptar o resultado conforme o contrato acima.
 
-## Ajustes desta entrega
+## Aceite
 
-Integrar instruções emitidas pelo gerador, dependências exigidas, rotas e mailer existente. Preservar User, UserToken, Accounts.Scope, helpers e testes gerados. Configurar user como scope padrão; não duplicar user_id manualmente nas próximas gerações. Não customizar fuso nem criar tarefas/labels.
-
-## Aceite e teste de intenção
-
-1. Migrations em base limpa e testes gerados passam; sessão entrega current_scope com usuário autenticado.
-2. Visitante não entra nas rotas geradas de gerenciamento. Scaffold não aprova publicação do cadastro.
-
-Escrever o teste de intenção antes dos ajustes; preservar testes gerados pertinentes e finalizar com `mix precommit`.
+1. Executar seeds duas vezes mantém um único usuário default e seus dados.
+2. Função de consulta fornece identidade persistida; fixtures não dependem do seed global.
 
 ## Evidência e revisão
 
-Pendentes. Registrar teste antes/depois, precommit, revisor independente, alvo/base, critérios, achados e integração. Não liberar consumidora antes de revisão aprovada e integração.
+Pendentes. Registrar teste de intenção, precommit e CI com cobertura mínima de 70%, revisor independente, alvo/base, critérios, achados e integração.

@@ -1,15 +1,15 @@
-# Especificações da solução
+# Especificações do MVP
 
-Cada spec agrega uma capacidade da solução: fronteiras arquiteturais, invariantes, diferentes casos de uso e decisões pendentes. Uma spec é implementada por várias tarefas pequenas, sem criar uma spec por passo técnico. Leia somente a spec pertinente; o status no cabeçalho determina sua prontidão.
+Specs agregam arquitetura, invariantes e casos de uso; tarefas entregam passos pequenos. As seis specs abaixo descrevem o MVP definido, sem decisões de login, idioma alternativo, fuso ou atualização automática. Evoluções estão separadas no índice de tarefas e exigem revisão de contrato antes da execução.
 
-| Spec | Assunto |
+| Spec | Capacidade |
 | --- | --- |
-| [001 — Idiomas da interface](001-idiomas.md) | Seleção, persistência e fallback do idioma. |
-| [002 — Backlog, retry e três escolhas diárias](002-planejamento-diario.md) | Cadastro, estados, seleção, devolução e cota. |
-| [003 — Dia do usuário, retry e histórico](003-dia-e-historico.md) | Fuso individual, virada e conclusão. |
-| [004 — Experiência do painel](004-experiencia-e-acesso.md) | Listas, formulários, erros e acessibilidade. |
-| [005 — Contas e isolamento de dados](005-contas-e-acesso.md) | Identidade, sessão e autorização. |
-| [006 — Labels reutilizáveis por usuário](006-labels.md) | Catálogo privado e associação de várias labels. |
+| [001 — Interface pt-BR com Gettext](001-idiomas.md) | Contrato do MVP; implementação em várias tarefas. |
+| [002 — Backlog, retry e três escolhas diárias](002-planejamento-diario.md) | Contrato do MVP; implementação em várias tarefas. |
+| [003 — Data corrente, retry e histórico](003-dia-e-historico.md) | Contrato do MVP; implementação em várias tarefas. |
+| [004 — Experiência do painel](004-experiencia-e-acesso.md) | Contrato do MVP; implementação em várias tarefas. |
+| [005 — Usuário padrão do MVP](005-contas-e-acesso.md) | Contrato do MVP; implementação em várias tarefas. |
+| [006 — Labels reutilizáveis por usuário](006-labels.md) | Contrato do MVP; implementação em várias tarefas. |
 
 ## Como escrever
 

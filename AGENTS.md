@@ -40,11 +40,11 @@ Comece pela tarefa solicitada. Leia apenas os documentos e trechos necessários;
 ## Regras essenciais
 
 - Código, identificadores, comentários, docstrings e mensagens técnicas em inglês; documentação `.md` em português.
-- Interface via `PlannerWeb.Gettext`, com mensagens-base em inglês e catálogos `pt_BR`/`en`. Não traduzir conteúdo do usuário automaticamente.
+- Interface via `PlannerWeb.Gettext`, com mensagens-base em inglês e catálogo `pt_BR` no MVP; outros idiomas são evolução futura. Não traduzir conteúdo do usuário automaticamente.
 - Primeiro especificar regras e resolver dúvidas bloqueantes; depois implementar. O CRUD experimental não é o modelo do produto.
 - Tarefas usam Markdown com metadados YAML. Antes de iniciar, conferir `depends_on`, bloqueios e escopo. Um recurso compartilhado deve ter uma tarefa produtora única; consumidoras dependem dela.
 - Não considerar specs ou tarefas concluídas por estarem documentadas. Atualizar estados e registrar evidências reais; conclusão exige integração das dependências na base de trabalho.
-- Aplicar TDD enxuto para comportamento. Ler `mix help` antes de usar tarefas; finalizar alterações com `mix precommit` e corrigir problemas relevantes.
+- Aplicar TDD enxuto para comportamento. Ler `mix help` antes de usar tarefas; finalizar alterações com `mix precommit` e corrigir problemas relevantes. O CI exige cobertura mínima de 70%; não reduzir esse limiar para aprovar mudanças.
 - Usar dependências existentes: HTTP com `Req`. Não adicionar ferramentas ou camadas sem necessidade concreta.
 - Registrar descobertas reutilizáveis nas referências do conceito, decisões em `design.md` e progresso no arquivo da tarefa. Não duplicar uma memória de conversa.
 - Manter instruções operacionais somente no README. Ao mover documentos, corrigir os links e índices afetados.

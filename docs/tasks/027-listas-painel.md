@@ -23,7 +23,7 @@ Não executar gerador: adaptar o recurso produzido pelas dependências, sem recr
 
 ## Ajustes desta entrega
 
-Adaptar Index gerado ao snapshot com três streams e contadores/estados vazios próprios. Numerar prioridades e mostrar escolhas disponíveis. Ao receber atualização scoped, se mantida a assinatura gerada, reconstruir snapshot em vez de inserir task arbitrariamente em uma lista. Não implementar botões de transição ainda.
+Adaptar Index gerado ao snapshot com três streams e contadores/estados vazios próprios. Numerar prioridades e mostrar escolhas disponíveis. Ler snapshot na montagem/recarga e após ações próprias; não manter assinatura de eventos para sincronizar abas. Não implementar botões de transição ainda.
 
 ## Aceite e teste de intenção
 
@@ -34,4 +34,4 @@ Escrever o teste de intenção antes dos ajustes; preservar testes gerados perti
 
 ## Evidência e revisão
 
-Pendentes. Registrar teste antes/depois, precommit, revisor independente, alvo/base, critérios, achados e integração. Não liberar consumidora antes de revisão aprovada e integração.
+Pendentes. Registrar teste antes/depois, precommit e CI com cobertura mínima de 70%, revisor independente, alvo/base, critérios, achados e integração. Não liberar consumidora antes de revisão aprovada e integração.

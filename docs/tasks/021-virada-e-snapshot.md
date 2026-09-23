@@ -4,34 +4,24 @@ status: "planned"
 execution_level: "advanced"
 execution_rationale: "Virada, normalização e snapshot precisam compartilhar atomicidade e data com comandos concorrentes."
 specs: ["SPEC-002", "SPEC-003"]
-depends_on: ["TASK-017"]
+depends_on: ["TASK-020"]
 provides: ["planning-snapshot"]
-consumes: ["user-day-contract", "daily-quota-transaction", "timezone-settings"]
+consumes: ["current-day", "daily-quota-transaction"]
 write_scope: ["lib/planner/tasks.ex", "lib/planner/user_transaction.ex", "test/planner/tasks_test.exs"]
 blockers: []
 ---
 
-# 021 — Normalizar a virada e consultar o planejamento
+# 021 — Normalizar a virada ao consultar ou executar comandos
 
-## Entrada e limite
+## Objetivo e entrada
 
-[SPEC-003](../specs/003-dia-e-historico.md) RN02/RN03 e [SPEC-002](../specs/002-planejamento-diario.md) RN02/RN07; consumir timezone-settings e daily-quota-transaction. Referência Ecto.
+[SPEC-003](../specs/003-dia-e-historico.md) RN02/RN03/RN07 e [SPEC-002](../specs/002-planejamento-diario.md) RN02/RN07. Consumir current-day e daily-quota-transaction. Normalizar pendências vencidas para retry e limpar posições antes do snapshot/comando. Entregar listas de backlog/hoje/retry, data e cota do usuário padrão. Não usar timer, scheduler ou atualização automática de tela.
 
-## Scaffold
+## Aceite
 
-Não executar gerador: adaptar o recurso produzido pelas dependências, sem recriar seu scaffold.
-
-## Ajustes desta entrega
-
-Na fronteira transacional, mover pendências vencidas para retry e limpar posições correntes. Entregar snapshot scoped de backlog/hoje/retry, dia e cota, sem histórico ainda. A normalização é reutilizada pelos próximos comandos e não depende de timer. Comandos de tela antiga recebem conflito quando aplicável.
-
-## Aceite e teste de intenção
-
-1. CA-003-01/04/06: virar o dia move somente pendências daquele usuário para retry sem conclusão; nova leitura é idempotente.
-2. Parada/reinício e datas já usadas preservam cota; snapshot não mostra task em duas coleções.
-
-Escrever o teste de intenção antes dos ajustes; preservar testes gerados pertinentes e finalizar com `mix precommit`.
+1. Mudar a data controlada e consultar move pendências anteriores para retry sem concluir; repetição é idempotente.
+2. Depois de reinício, snapshot mantém cota e coleções coerentes; comando antigo é revalidado.
 
 ## Evidência e revisão
 
-Pendentes. Registrar teste antes/depois, precommit, revisor independente, alvo/base, critérios, achados e integração. Não liberar consumidora antes de revisão aprovada e integração.
+Pendentes. Registrar teste de intenção, precommit e CI com cobertura mínima de 70%, revisor independente, alvo/base, critérios, achados e integração.

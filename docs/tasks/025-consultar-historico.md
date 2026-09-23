@@ -2,7 +2,7 @@
 id: "TASK-025"
 status: "planned"
 execution_level: "standard"
-execution_rationale: "Combina consulta scoped, preload e desempate estável sem modificar o histórico."
+execution_rationale: "Consulta conclusões do proprietário com preload e desempate estável."
 specs: ["SPEC-003", "SPEC-006"]
 depends_on: ["TASK-007"]
 provides: ["history-query"]
@@ -23,7 +23,7 @@ Não executar gerador: adaptar o recurso produzido pelas dependências, sem recr
 
 ## Ajustes desta entrega
 
-Adicionar consulta histórica scoped com preload de labels e ordenação por data/ID decrescentes. Não criar edição/reabertura/exclusão nem recalcular datas com o fuso atual.
+Adicionar consulta histórica com proprietário explícito com preload de labels e ordenação por data/ID decrescentes. Não criar edição/reabertura/exclusão nem recalcular datas originais de conclusão.
 
 ## Aceite e teste de intenção
 
@@ -34,4 +34,4 @@ Escrever o teste de intenção antes dos ajustes; preservar testes gerados perti
 
 ## Evidência e revisão
 
-Pendentes. Registrar teste antes/depois, precommit, revisor independente, alvo/base, critérios, achados e integração. Não liberar consumidora antes de revisão aprovada e integração.
+Pendentes. Registrar teste antes/depois, precommit e CI com cobertura mínima de 70%, revisor independente, alvo/base, critérios, achados e integração. Não liberar consumidora antes de revisão aprovada e integração.

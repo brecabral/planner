@@ -21,7 +21,7 @@ Expandir para funções chamadoras, contratos, configurações e testes quando n
 
 ## Gate e relatório
 
-O gate considera aderência aos critérios, testes relevantes, verificações obrigatórias, política de cobertura existente e ausência de achados bloqueantes. Não há percentual de cobertura aprovado no projeto até que uma decisão o estabeleça. Usar métricas como evidência e investigar caminhos críticos descobertos.
+O gate considera aderência aos critérios, testes relevantes, verificações obrigatórias, política de cobertura existente e ausência de achados bloqueantes. O mínimo aprovado é 70% de cobertura, já bloqueante no CI. Não reduzir o limiar nem excluir código apenas para passar no gate. Usar métricas como evidência e investigar caminhos críticos descobertos.
 
 Entregar: alvo/base; critérios atendidos ou não verificados; comandos e resultados; cobertura/evals com limites; achados por gravidade; conclusão `approved`, `changes_requested` ou `blocked`. Para cada achado, informar arquivo/linha, condição que dispara o erro, impacto e correção esperada. Separar sugestões não bloqueantes de defeitos reproduzíveis. Ausência de achados não equivale a teste executado.
 

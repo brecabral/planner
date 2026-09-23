@@ -23,7 +23,7 @@ Não executar gerador: adaptar o recurso produzido pelas dependências, sem recr
 
 ## Ajustes desta entrega
 
-Adicionar ações trazer para hoje no backlog/retry e devolver ao backlog em hoje. Recarregar snapshot após sucesso/conflito; mostrar processamento, limite e falha sem falso sucesso. IDs em eventos não substituem scope.
+Adicionar ações trazer para hoje no backlog/retry e devolver ao backlog em hoje. Recarregar snapshot após sucesso/conflito; mostrar processamento, limite e falha sem falso sucesso. IDs em eventos não substituem usuário passado pelo servidor.
 
 ## Aceite e teste de intenção
 
@@ -34,4 +34,4 @@ Escrever o teste de intenção antes dos ajustes; preservar testes gerados perti
 
 ## Evidência e revisão
 
-Pendentes. Registrar teste antes/depois, precommit, revisor independente, alvo/base, critérios, achados e integração. Não liberar consumidora antes de revisão aprovada e integração.
+Pendentes. Registrar teste antes/depois, precommit e CI com cobertura mínima de 70%, revisor independente, alvo/base, critérios, achados e integração. Não liberar consumidora antes de revisão aprovada e integração.

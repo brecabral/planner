@@ -23,7 +23,7 @@ Não executar gerador: adaptar o recurso produzido pelas dependências, sem recr
 
 ## Ajustes desta entrega
 
-Implementar conclusão corrente com data local persistida, retirada da pendência e compactação da ordem, sem restituir cota. Repetir preserva a data original. Não criar consulta histórica ou interface nesta tarefa.
+Implementar conclusão corrente com data corrente persistida, retirada da pendência e compactação da ordem, sem restituir cota. Repetir preserva a data original. Não criar consulta histórica ou interface nesta tarefa.
 
 ## Aceite e teste de intenção
 
@@ -35,4 +35,4 @@ Escrever o teste de intenção antes dos ajustes; preservar testes gerados perti
 
 ## Evidência e revisão
 
-Pendentes. Registrar teste antes/depois, precommit, revisor independente, alvo/base, critérios, achados e integração. Não liberar consumidora antes de revisão aprovada e integração.
+Pendentes. Registrar teste antes/depois, precommit e CI com cobertura mínima de 70%, revisor independente, alvo/base, critérios, achados e integração. Não liberar consumidora antes de revisão aprovada e integração.
