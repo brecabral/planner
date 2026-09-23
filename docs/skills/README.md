@@ -2,6 +2,14 @@
 
 | Skill | Quando carregar |
 | --- | --- |
+| [review-plan-alignment](review-plan-alignment/SKILL.md) | Revisar aderência entre decisões, specs e tarefas, sem replanejar ou implementar. |
+| [review-code-diff](review-code-diff/SKILL.md) | Revisar commits e diffs, atribuir falhas e conferir evidências e gates. |
+| [coordinate-dispatch](coordinate-dispatch/SKILL.md) | Selecionar e delegar tarefas elegíveis, com capacidade e escopos compatíveis. |
+| [coordinate-delivery](coordinate-delivery/SKILL.md) | Conduzir aceite, revisão independente, integração e commit da entrega. |
+| [coordinate-blockers](coordinate-blockers/SKILL.md) | Interromper, encaminhar impedimentos ao planejador e retomar com evidências. |
+| [scope-mvp](scope-mvp/SKILL.md) | Delimitar o produto mínimo e retirar dependências de capacidades futuras. |
+| [reconcile-plan](reconcile-plan/SKILL.md) | Incorporar decisões, entregas e reviews sem duplicar contexto entre documentos. |
+| [plan-unblocking](plan-unblocking/SKILL.md) | Planejar uma correção e sua condição de retomada a partir de um impedimento. |
 | [specify-feature](specify-feature/SKILL.md) | Converter requisitos em regras e cenários, sem implementar. |
 | [plan-task-graph](plan-task-graph/SKILL.md) | Decompor uma spec em entregas sem duplicação e dependências explícitas. |
 

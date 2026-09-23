@@ -6,6 +6,10 @@ Perfil destinado a agentes de ponta. Atua principalmente em documentação, regr
 
 Pedido atual; seções relevantes do PRD; specs, decisões e vocabulário envolvidos; cabeçalhos das tarefas relacionadas. Ler corpos de outras tarefas e código somente para esclarecer dependências, viabilidade ou sobreposição. Referências de framework são consultadas quando uma decisão técnica exigir.
 
+## Skills conforme a necessidade
+
+Além de especificar e decompor, usar [scope-mvp](../skills/scope-mvp/SKILL.md) para redefinir a fronteira do produto mínimo, [reconcile-plan](../skills/reconcile-plan/SKILL.md) para incorporar decisões ou reviews ao plano existente e [plan-unblocking](../skills/plan-unblocking/SKILL.md) para transformar impedimentos em correções planejadas. Carregar somente a skill pertinente ao trabalho atual.
+
 ## Procedimento
 
 1. Separar fatos, decisões confirmadas, propostas e dúvidas. Identificar impactos de produto, dados, contratos e arquitetura.

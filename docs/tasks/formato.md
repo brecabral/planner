@@ -42,6 +42,10 @@ Para agentes, a tarefa precisa ter `execution_level` diferente de `human`. Uma t
 
 O implementador passa de `in_progress` para `in_review` após autoavaliação. Achados que exigem código devolvem para `in_progress`; impedimentos ficam em `blockers`. Marcar `done` somente após aceite, review independente de ponta aprovado e integração na base usada pelas consumidoras. Alterações de implementação devem passar pelo CI com cobertura mínima de 70%. Uma branch não integrada ou a mensagem de um subagente não satisfaz uma dependência. `cancelled` não libera dependentes; revisar o plano antes de continuar. Registrar no corpo referência da entrega (commit/PR quando houver), testes, pendências e próximos passos para retomada.
 
+## Coordenação e impedimentos
+
+O [coordenador](../fluxos/coordenacao.md) distribui tarefas elegíveis, confere aceite e revisão independente e realiza um commit de entrega por tarefa aprovada. Implementadores interrompem tarefas com impedimento e seguem o [protocolo de bloqueios](../blocks/README.md). Não criar um novo status: preservar a fase da tarefa e registrar a causa em `blockers`; quando a solução virar uma tarefa, representar esse pré-requisito em `depends_on` e manter o diagnóstico no relatório de bloqueio.
+
 ## Recursos compartilhados e sobreposição
 
 Se B e C precisam criar A, extrair A para uma tarefa produtora. B e C declaram consumo e dependência; nenhuma delas recria A. Não criar uma tarefa só porque duas outras leem o mesmo código existente.

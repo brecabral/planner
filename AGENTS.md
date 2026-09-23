@@ -2,10 +2,11 @@
 
 ## Perfis de atuação
 
-São condutas de trabalho, não permissões de filesystem, credenciais ou troca automática de modelo. Respeitar sempre o escopo autorizado. Usar o perfil pedido pelo usuário; na ausência dele, classificar pela intenção: definir solução → planejador; verificar código → revisor; executar tarefa pronta → implementador. Em pedidos mistos, separar as etapas e declarar a mudança de perfil.
+São condutas de trabalho, não permissões de filesystem, credenciais ou troca automática de modelo. Respeitar sempre o escopo autorizado. Usar o perfil pedido pelo usuário; na ausência dele, classificar pela intenção: definir solução → planejador; verificar código → revisor; executar tarefa pronta → implementador; distribuir e acompanhar tarefas → coordenador. Em pedidos mistos, separar as etapas e declarar a mudança de perfil.
 
 | Perfil | Capacidade esperada | Contexto inicial obrigatório | Fluxo |
 | --- | --- | --- | --- |
+| Coordenador | Agente de ponta | Pedido, cabeçalhos das tarefas, impedimentos abertos pertinentes e estado da base; carregar o pacote completo apenas das tarefas selecionadas | [Coordenação](docs/fluxos/coordenacao.md) |
 | Planejador | Agente de ponta | Pedido, seções pertinentes do PRD, specs/design/DDD relacionados e cabeçalhos das tarefas afetadas | [Planejamento](docs/fluxos/planejamento.md) |
 | Revisor | Agente de ponta | Alvo e base da revisão, diff/commits, tarefa, critérios/specs e evidências de testes | [Review](docs/fluxos/review.md) |
 | Implementador | Nível mínimo declarado na tarefa: `basic`, `standard` ou `advanced` | Tarefa completa, regras de spec indicadas, contratos das dependências, arquivos de entrada e referências técnicas aplicáveis | [Implementação](docs/fluxos/implementacao.md) |
@@ -29,8 +30,10 @@ Comece pela tarefa solicitada. Leia apenas os documentos e trechos necessários;
 | Definir comportamento e regras de negócio | [Specs](docs/specs/README.md) |
 | Nomear e modelar conceitos | [DDD](docs/ddd.md) |
 | Consultar decisões de arquitetura | [Design](docs/design.md) |
+| Registrar e resolver impedimentos | [Bloqueios](docs/blocks/README.md) |
 | Selecionar trabalho e dependências | [Tarefas](docs/tasks/README.md) |
 | Criar specs ou decompor trabalho | [Skills](docs/skills/README.md) |
+| Revisar alinhamento ou diffs | [Skills de revisão](docs/skills/README.md) |
 | Elixir, rotas ou persistência | [Elixir](docs/referencias/elixir.md), [Phoenix](docs/referencias/phoenix.md), [Ecto](docs/referencias/ecto.md) |
 | Templates ou formulários | [HEEx](docs/referencias/heex.md), [formulários](docs/referencias/formularios.md) |
 | LiveView ou hooks | [LiveView](docs/referencias/liveview.md), [interop JS](docs/referencias/liveview-javascript.md) |
@@ -43,6 +46,7 @@ Comece pela tarefa solicitada. Leia apenas os documentos e trechos necessários;
 - Interface via `PlannerWeb.Gettext`, com mensagens-base em inglês e catálogo `pt_BR` no MVP; outros idiomas são evolução futura. Não traduzir conteúdo do usuário automaticamente.
 - Primeiro especificar regras e resolver dúvidas bloqueantes; depois implementar. O CRUD experimental não é o modelo do produto.
 - Tarefas usam Markdown com metadados YAML. Antes de iniciar, conferir `depends_on`, bloqueios e escopo. Um recurso compartilhado deve ter uma tarefa produtora única; consumidoras dependem dela.
+- Ao encontrar impedimento, parar a tarefa, preservar o trabalho e registrar evidências em `docs/blocks`, conforme o [protocolo](docs/blocks/README.md). Comunicar ao coordenador; não ampliar o escopo para contornar o bloqueio.
 - Não considerar specs ou tarefas concluídas por estarem documentadas. Atualizar estados e registrar evidências reais; conclusão exige integração das dependências na base de trabalho.
 - Aplicar TDD enxuto para comportamento. Ler `mix help` antes de usar tarefas; finalizar alterações com `mix precommit` e corrigir problemas relevantes. O CI exige cobertura mínima de 70%; não reduzir esse limiar para aprovar mudanças.
 - Usar dependências existentes: HTTP com `Req`. Não adicionar ferramentas ou camadas sem necessidade concreta.
