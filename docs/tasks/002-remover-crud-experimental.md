@@ -1,6 +1,6 @@
 ---
 id: "TASK-002"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Remoção delimitada de código gerado e migration; estratégia decidida, sem migração de dados."
 specs: []
@@ -40,3 +40,11 @@ Remover contexto/schema, controller/templates, rota `/tasks`, testes e fixtures 
 - Critério 4: não foram executados `mix ecto.reset`, `ecto.drop`, remoção de volume ou a TASK-012 humana; a única base criada foi `planner_task002_fresh_20260923` para validação, além da base isolada do teste inicial. O diff não adiciona modelo substituto.
 - Cobertura e gate adicional: `POSTGRES_TEST_DB=planner_task002_fresh_20260923 mix ci` passou compilação, formatação, Credo estrito (69 checks, nenhum problema) e 7 testes, mas retornou erro pelo limiar de cobertura: total 35,18% contra 70% em `mix.exs`. A TASK-003 descreve a cobertura como informativa; a configuração atual é bloqueante. `mix.exs` pertence à TASK-003 humana e está fora do escopo desta tarefa. Cobertura de linhas não demonstra os caminhos removidos; o teste de intenção e a inspeção do diff são a evidência principal.
 - Autoavaliação pelo [fluxo de review](../fluxos/review.md): critérios 1 a 4 atendidos, `git diff --check` sem problemas, nenhuma dependência residual ou alteração fora do escopo detectada. Achado para o revisor: descompasso do gate de cobertura acima; aprovação independente e integração permanecem pendentes. Não considerar `mix ci` aprovado.
+
+### Revisão independente e integração — 23/09/2026
+
+Revisor: coordenador `/root`, independente da implementação original. Resultado: `approved`. Alvo: remoção `f757265` contra `1ae3ac8`, conferida na base integrada `952d05a`, que incorpora os testes da TASK-036 (`8c6d655`). Nenhum achado bloqueante no diff; alterações de planejamento preexistentes foram preservadas fora deste commit de aceite.
+
+Critérios 1 e 2: teste de intenção cobre os oito métodos/caminhos removidos e GET `/`; inspeção confirmou ausência do contexto, schema, controller/templates, fixtures e migration experimental, sem referências residuais em produção ou seeds. Critério 3 reproduzido: `MIX_ENV=test POSTGRES_TEST_DB=planner_task002_accept_20260923 mix ecto.setup` criou base nova e executou seeds, saída 0; `POSTGRES_TEST_DB=planner_task002_accept_20260923 mix precommit` passou com 21 testes. Gate da mesma árvore executável: `POSTGRES_TEST_DB=planner_coord_20260923 mix ci`, saída 0 e 75,38% de cobertura. Critério 4: nenhum modelo substituto no diff; esta revisão não executou reset. A ausência de reset na implementação original é evidência relatada pelo implementador, não deduzida do diff.
+
+TASK-036 concluída e integrada; BLOCK-001 resolvido. Remoção original `f757265` confirmada na ancestralidade da base e aprovada sem reescrever seu commit. TASK-002 concluída; liberação da TASK-001 após o commit deste aceite.

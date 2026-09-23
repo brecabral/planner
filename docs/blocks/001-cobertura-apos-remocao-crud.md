@@ -25,3 +25,7 @@ A decisão deve esclarecer se esse trabalho pertence à correção da TASK-002 o
 A TASK-002 continua sem CI aprovado e sem revisão independente aprovada. A [TASK-001](../tasks/001-troca-de-idiomas.md) depende de sua conclusão; a liberação da TASK-012, isoladamente, não libera a cadeia do MVP.
 
 Retomar somente após a decisão do planejador e a atualização dos contratos afetados. Em seguida, executar a solução autorizada, registrar evidências do gate e encaminhar ao revisor independente. Este registro não marca tarefas como concluídas nem modifica o grafo.
+
+### Encerramento — 23/09/2026
+
+Estado final: resolvido. TASK-036 aprovada por revisão independente do coordenador `/root` e integrada no commit `8c6d655`, com conclusão registrada em `952d05a`. Gate reproduzido pelo revisor: `POSTGRES_TEST_DB=planner_coord_20260923 mix ci`, saída 0, 21 testes aprovados e cobertura 75,38%, sem mudanças na política de medição. A revisão separada da TASK-002 também foi concluída e registrada na tarefa.
