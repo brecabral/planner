@@ -17,15 +17,15 @@ jobs:
     env:
       MIX_ENV: test
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Configure test database
         run: |
           cp .env.example .env
           sed -i "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=$(openssl rand -hex 24)/" .env
       - uses: erlef/setup-beam@v1
         with:
-          otp-version: '29'
-          elixir-version: '1.20.3'
+          otp-version: "29"
+          elixir-version: "1.20.3"
       - name: Install dependencies
         run: mix deps.get --check-locked
       - name: Run quality gate

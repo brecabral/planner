@@ -1,13 +1,14 @@
 ---
 id: "TASK-003"
-status: planned
+status: done
 execution_level: human
 execution_rationale: "Configuração do GitHub e escolha dos gates reservadas ao responsável humano pelo repositório."
 specs: []
 depends_on: []
 provides: ["github-quality-gate"]
 consumes: []
-write_scope: [".github/workflows/", "mix.exs", "mix.lock", ".credo.exs", "README.md"]
+write_scope:
+  [".github/workflows/", "mix.exs", "mix.lock", ".credo.exs", "README.md"]
 blockers: []
 ---
 
