@@ -1,12 +1,15 @@
 # Especificações da solução
 
-Specs transformam requisitos do PRD em comportamento verificável. São contratos duráveis do produto; tarefas descrevem as mudanças necessárias para entregá-los. Referências ensinam a usar tecnologias e não substituem regras de negócio.
+Cada spec agrega uma capacidade da solução: fronteiras arquiteturais, invariantes, diferentes casos de uso e decisões pendentes. Uma spec é implementada por várias tarefas pequenas, sem criar uma spec por passo técnico. Leia somente a spec pertinente; o status no cabeçalho determina sua prontidão.
 
 | Spec | Assunto |
 | --- | --- |
-| [001 — Idiomas](001-idiomas.md) | Comportamento de seleção e persistência; ainda há decisões propostas. |
-
-O planejamento diário ainda depende das respostas do PRD §12. Não criar sua modelagem definitiva antes dessas respostas.
+| [001 — Idiomas da interface](001-idiomas.md) | Seleção, persistência e fallback do idioma. |
+| [002 — Backlog, retry e três escolhas diárias](002-planejamento-diario.md) | Cadastro, estados, seleção, devolução e cota. |
+| [003 — Dia do usuário, retry e histórico](003-dia-e-historico.md) | Fuso individual, virada e conclusão. |
+| [004 — Experiência do painel](004-experiencia-e-acesso.md) | Listas, formulários, erros e acessibilidade. |
+| [005 — Contas e isolamento de dados](005-contas-e-acesso.md) | Identidade, sessão e autorização. |
+| [006 — Labels reutilizáveis por usuário](006-labels.md) | Catálogo privado e associação de várias labels. |
 
 ## Como escrever
 

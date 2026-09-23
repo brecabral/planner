@@ -18,6 +18,10 @@ Qual requisito é atendido e como o usuário observa o resultado.
 
 Comportamentos incluídos, atores e exclusões.
 
+## Arquitetura e casos de uso
+
+Definir fronteiras, contratos entre componentes, propriedade dos dados e invariantes transversais. Agrupar os casos de uso da capacidade; não descrever comandos de scaffold nem transformar cada etapa técnica em outra spec.
+
 ## Regras de negócio
 
 - RN01: condição, ação permitida e efeito observável; indicar se é confirmada ou proposta.

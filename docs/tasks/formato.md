@@ -78,6 +78,12 @@ Os níveis são requisitos de capacidade, sem vinculação a fabricante/modelo f
 
 No corpo, listar contexto de entrada (arquivos/contratos), critérios numerados e claros, casos de teste necessários e limites. Cada critério deve permitir observar resultado sem ler a conversa: estado inicial, ação/condição e resultado, incluindo rejeições relevantes. Pode referenciar IDs estáveis da spec com links diretos, desde que não deixe decisões implícitas. Preservar a spec como fonte do comportamento.
 
+## Granularidade e scaffold
+
+Uma spec agrega arquitetura, invariantes e vários casos de uso; uma tarefa entrega um incremento pequeno e verificável desse contrato. Separar geração inicial, adaptação das regras e integração das ações quando puderem ficar verdes independentemente. Não criar uma tarefa para “todo o domínio” ou “toda a interface” quando existirem passos concretos menores.
+
+Quando houver gerador adequado, a tarefa informa comando exato, recursos produzidos, ajustes posteriores e o que fica fora da etapa. Gerar cada recurso uma única vez; consumidoras adaptam o scaffold ou usam opções que evitem regenerar contexto/schema. Sem gerador pertinente, identificar o recurso existente a editar. Os comandos de scaffold ficam nas tarefas; operação da aplicação continua no README.
+
 ## Registro de revisão
 
 Cada tarefa contém uma seção de revisão com: estado pendente/aprovado/alterações solicitadas/bloqueado; identidade do revisor e se independente; alvo/base do diff; critérios e evidências; achados; cobertura/evals aplicáveis; referência da integração. Não duplicar status da tarefa no índice. Revisão pendente e integração pendente não liberam dependentes. Ver [fluxo de review](../fluxos/review.md).

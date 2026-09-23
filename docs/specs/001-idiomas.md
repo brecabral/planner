@@ -1,12 +1,18 @@
 ---
 id: "SPEC-001"
 status: draft
-requirements: ["PRD-9", "CA10"]
+requirements: ["CA10"]
 ---
 
 # 001 — Idiomas da interface
 
-Origem: suporte a pt-BR e inglês solicitado pelo usuário; [design D09](../design.md#d09--idiomas-com-gettext). Substitui como fonte de comportamento a descrição antes incorporada à tarefa 001.
+Origem: suporte a pt-BR e inglês solicitado pelo usuário; [design D09](../design.md#d09--idiomas-com-gettext).
+
+## Arquitetura e casos de uso
+
+Internacionalização é uma capacidade transversal de apresentação: mesma política para navegação HTTP, montagem/reconexão LiveView, formulários, erros e nomes acessíveis. `PlannerWeb.Gettext` é o backend único. Locale pertence à sessão/processo, não ao estado global da aplicação; identidade de conta e conteúdo do usuário não são traduzidos.
+
+O contrato abrange escolher idioma, persistir preferência, aplicar fallback e manter isolamento. Plug HTTP, hook LiveView e seletor são entregas separadas que implementam a mesma spec.
 
 ## Escopo e regras
 
@@ -34,8 +40,8 @@ Persistir somente a preferência de idioma conforme RN03. A integração reutili
 
 ## Dúvidas bloqueantes
 
-Confirmar pt-BR como padrão, persistência em sessão e política de locale inválido (RN02, RN03, RN05). São propostas anteriores agora explicitadas; o suporte aos dois idiomas já foi solicitado. Manter `draft` até essas decisões serem confirmadas.
+Confirmar pt-BR como padrão, persistência em sessão e política de locale inválido (RN02, RN03, RN05). Manter `draft` até essas decisões serem confirmadas.
 
-## Entrega
+## Implementação
 
-[Tarefa 001](../tasks/001-troca-de-idiomas.md), após [remoção do experimento](../tasks/002-remover-crud-experimental.md). Implementação e validação ainda pendentes.
+Distribuída em tarefas pequenas; consultar o [mapa de entregas](../tasks/README.md). Esta spec permanece o contrato comum dos casos de uso acima.
