@@ -1,97 +1,23 @@
-defmodule PlannerWeb.TaskControllerTest do
+defmodule PlannerWeb.TaskRoutesTest do
   use PlannerWeb.ConnCase
 
-  import Planner.TasksFixtures
-
-  @create_attrs %{
-    label: "some label",
-    name: "some name",
-    kind: :action,
-    scheduled_for: ~D[2026-09-03],
-    completed_on: ~D[2026-09-03]
-  }
-  @update_attrs %{
-    label: "some updated label",
-    name: "some updated name",
-    kind: :commitment,
-    scheduled_for: ~D[2026-09-04],
-    completed_on: ~D[2026-09-04]
-  }
-  @invalid_attrs %{label: nil, name: nil, kind: nil, scheduled_for: nil, completed_on: nil}
-
-  describe "index" do
-    test "lists all tasks", %{conn: conn} do
-      conn = get(conn, ~p"/tasks")
-      assert html_response(conn, 200) =~ "Listing Tasks"
+  test "experimental task routes are unavailable" do
+    for {method, path} <- [
+          {"GET", "/tasks"},
+          {"GET", "/tasks/new"},
+          {"POST", "/tasks"},
+          {"GET", "/tasks/1"},
+          {"GET", "/tasks/1/edit"},
+          {"PUT", "/tasks/1"},
+          {"PATCH", "/tasks/1"},
+          {"DELETE", "/tasks/1"}
+        ] do
+      assert Phoenix.Router.route_info(PlannerWeb.Router, method, path, "localhost") == :error
     end
   end
 
-  describe "new task" do
-    test "renders form", %{conn: conn} do
-      conn = get(conn, ~p"/tasks/new")
-      assert html_response(conn, 200) =~ "New Task"
-    end
-  end
-
-  describe "create task" do
-    test "redirects to show when data is valid", %{conn: conn} do
-      conn = post(conn, ~p"/tasks", task: @create_attrs)
-
-      assert %{id: id} = redirected_params(conn)
-      assert redirected_to(conn) == ~p"/tasks/#{id}"
-
-      conn = get(conn, ~p"/tasks/#{id}")
-      assert html_response(conn, 200) =~ "Task #{id}"
-    end
-
-    test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, ~p"/tasks", task: @invalid_attrs)
-      assert html_response(conn, 200) =~ "New Task"
-    end
-  end
-
-  describe "edit task" do
-    setup [:create_task]
-
-    test "renders form for editing chosen task", %{conn: conn, task: task} do
-      conn = get(conn, ~p"/tasks/#{task}/edit")
-      assert html_response(conn, 200) =~ "Edit Task"
-    end
-  end
-
-  describe "update task" do
-    setup [:create_task]
-
-    test "redirects when data is valid", %{conn: conn, task: task} do
-      conn = put(conn, ~p"/tasks/#{task}", task: @update_attrs)
-      assert redirected_to(conn) == ~p"/tasks/#{task}"
-
-      conn = get(conn, ~p"/tasks/#{task}")
-      assert html_response(conn, 200) =~ "some updated name"
-    end
-
-    test "renders errors when data is invalid", %{conn: conn, task: task} do
-      conn = put(conn, ~p"/tasks/#{task}", task: @invalid_attrs)
-      assert html_response(conn, 200) =~ "Edit Task"
-    end
-  end
-
-  describe "delete task" do
-    setup [:create_task]
-
-    test "deletes chosen task", %{conn: conn, task: task} do
-      conn = delete(conn, ~p"/tasks/#{task}")
-      assert redirected_to(conn) == ~p"/tasks"
-
-      assert_error_sent 404, fn ->
-        get(conn, ~p"/tasks/#{task}")
-      end
-    end
-  end
-
-  defp create_task(_) do
-    task = task_fixture()
-
-    %{task: task}
+  test "home page remains available", %{conn: conn} do
+    conn = get(conn, "/")
+    assert html_response(conn, 200) =~ "Peace of mind from prototype to production"
   end
 end

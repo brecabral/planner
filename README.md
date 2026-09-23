@@ -1,6 +1,6 @@
 # Planner
 
-Planner pessoal para escolher prioridades do dia, manter um backlog e consultar tarefas concluídas. O produto está em especificação; o CRUD de tarefas atual é um experimento do gerador Phoenix e será removido antes da implementação do domínio.
+Planner pessoal para escolher prioridades do dia, manter um backlog e consultar tarefas concluídas. O produto está em especificação; a implementação do domínio ainda não começou.
 
 A aplicação usa Phoenix, Elixir e PostgreSQL. O servidor roda na máquina; o banco local roda em Docker, com dados persistidos em volume.
 
