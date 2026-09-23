@@ -1,6 +1,6 @@
 ---
 id: "TASK-036"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Testes de contratos de renderização existentes em Phoenix, sem nova regra de produto ou alteração de infraestrutura."
 specs: []
@@ -66,3 +66,5 @@ Autoavaliação: critérios 1–3 atendidos, sem achados bloqueantes identificad
 Revisor: coordenador `/root`, independente da implementação. Resultado: `approved`. Alvo: os dois arquivos novos de testes e este registro sobre `d25f6c9`; alterações preexistentes de outros documentos excluídas da entrega. Asserções conferidas contra os componentes existentes, incluindo erros, valores, escape e estrutura da página; nenhum achado bloqueante.
 
 Validação independente: `POSTGRES_TEST_DB=planner_coord_20260923 mix ci`, saída 0, 21 testes aprovados, cobertura total 75,38%, Credo sem achados. Banco isolado preparado pelo alias, sem reset. `mix precommit` aprovado conforme evidência do implementador; não repetido por não haver alteração posterior de código. Critérios 1–3 atendidos; revisão do critério 4 aprovada, aguardando registro do commit para conclusão. Limites de cobertura e ausência de execução JavaScript em navegador permanecem os registrados acima.
+
+Integração confirmada em `feat/mvp`: commit `8c6d655`, presente em HEAD, com o mesmo código validado. Critério 4 atendido; TASK-036 concluída. A revisão da TASK-002 permanece um aceite separado.
