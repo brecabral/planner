@@ -1,6 +1,6 @@
 ---
 id: "TASK-009"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Gera identidade mínima e preparação idempotente do usuário padrão, sem autenticação."
 specs: ["SPEC-005"]
@@ -12,6 +12,8 @@ blockers: []
 ---
 
 # 009 — Gerar e preparar o usuário padrão do MVP
+
+Integração confirmada pelo coordenador `/root` em `feat/mvp`, commit `0b19c83`, em 24/09/2026. Árvore aprovada pelo revisor independente `/root/review_task001`, CI com 29 testes e cobertura 82,78%, sem mudanças executáveis após a revisão. Contrato `default-user` liberado para consumidoras.
 
 ## Objetivo e entrada
 
