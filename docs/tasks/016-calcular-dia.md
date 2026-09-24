@@ -1,6 +1,6 @@
 ---
 id: "TASK-016"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Fornece Date.utc_today() com data controlável nos testes, sem estado global."
 specs: ["SPEC-003"]
@@ -12,6 +12,8 @@ blockers: []
 ---
 
 # 016 — Fornecer a data corrente do planejamento
+
+Integração confirmada pelo coordenador `/root` em `feat/mvp`, commit `ae9c56e`, em 24/09/2026. Revisão independente `/root/review_task001` aprovada; CI com 32 testes e cobertura 82,86%, sem mudanças executáveis após a revisão. Contrato `current-day` liberado.
 
 ## Objetivo e entrada
 
