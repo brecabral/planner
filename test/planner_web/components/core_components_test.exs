@@ -36,7 +36,7 @@ defmodule PlannerWeb.CoreComponentsTest do
       render_component(&input/1, field: form[:title], label: "Title") |> LazyHTML.from_fragment()
 
     assert exists?(html, "input#entry_title.input-error[name='entry[title]'][value=ab]")
-    assert text(html, "p.text-error") == "should be at least 3 character(s)"
+    assert text(html, "p.text-error") == "deve ter pelo menos 3 caracteres"
   end
 
   test "unused form fields suppress validation errors" do
@@ -66,7 +66,7 @@ defmodule PlannerWeb.CoreComponentsTest do
       |> LazyHTML.from_fragment()
 
     assert exists?(html, "#custom-title[name=title][value=replacement]")
-    assert text(html, "p.text-error") == "can't be blank"
+    assert text(html, "p.text-error") == "não pode ficar em branco"
   end
 
   test "hidden fields carry their value without a visible label" do
@@ -190,7 +190,7 @@ defmodule PlannerWeb.CoreComponentsTest do
     assert text(html, "p.font-semibold") == "Success"
     assert text(html, "#flash-info") =~ "Saved <entry>"
     refute exists?(html, "entry")
-    assert exists?(html, "button[type=button][aria-label=close]")
+    assert exists?(html, "button[type=button][aria-label=fechar]")
     [command] = attribute(html, "#flash-info", "phx-click")
 
     assert [

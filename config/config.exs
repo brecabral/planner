@@ -11,6 +11,8 @@ config :planner,
   ecto_repos: [Planner.Repo],
   generators: [timestamp_type: :utc_datetime]
 
+config :planner, PlannerWeb.Gettext, default_locale: "pt_BR"
+
 # Configure the endpoint
 config :planner, PlannerWeb.Endpoint,
   url: [host: "localhost"],

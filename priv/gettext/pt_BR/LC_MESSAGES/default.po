@@ -1,0 +1,108 @@
+## "msgid"s in this file come from POT (.pot) files.
+###
+### Do not add, change, or remove "msgid"s manually here as
+### they're tied to the ones in the corresponding POT file
+### (with the same domain).
+###
+### Use "mix gettext.extract --merge" or "mix gettext.merge"
+### to merge POT files into PO files.
+msgid ""
+msgstr ""
+"Language: pt_BR\n"
+"Plural-Forms: nplurals=2; plural=(n>1);\n"
+
+#: lib/planner_web/components/core_components.ex:376
+#, elixir-autogen, elixir-format
+msgid "Actions"
+msgstr "Ações"
+
+#: lib/planner_web/components/layouts.ex:102
+#: lib/planner_web/components/layouts.ex:117
+#, elixir-autogen, elixir-format
+msgid "Attempting to reconnect"
+msgstr "Tentando reconectar"
+
+#: lib/planner_web/controllers/page_html/home.html.heex:63
+#, elixir-autogen, elixir-format
+msgid "Build rich, interactive web applications quickly, with less code and fewer moving parts. Join our growing community of developers using Phoenix to craft APIs, HTML5 apps and more, for fun or at scale."
+msgstr "Crie aplicações web ricas e interativas rapidamente, com menos código e menos componentes. Junte-se à nossa crescente comunidade de desenvolvedores que usam Phoenix para criar APIs, aplicações HTML5 e muito mais, por diversão ou em escala."
+
+#: lib/planner_web/controllers/page_html/home.html.heex:132
+#, elixir-autogen, elixir-format
+msgid "Changelog"
+msgstr "Histórico de alterações"
+
+#: lib/planner_web/components/layouts.ex:156
+#, elixir-autogen, elixir-format
+msgid "Dark theme"
+msgstr "Tema escuro"
+
+#: lib/planner_web/controllers/page_html/home.html.heex:194
+#, elixir-autogen, elixir-format
+msgid "Deploy your application"
+msgstr "Publique sua aplicação"
+
+#: lib/planner_web/controllers/page_html/home.html.heex:149
+#, elixir-autogen, elixir-format
+msgid "Discuss on the Elixir Forum"
+msgstr "Converse no Elixir Forum"
+
+#: lib/planner_web/components/layouts.ex:58
+#, elixir-autogen, elixir-format
+msgid "Get Started"
+msgstr "Comece aqui"
+
+#: lib/planner_web/controllers/page_html/home.html.heex:86
+#, elixir-autogen, elixir-format
+msgid "Guides & Docs"
+msgstr "Guias e documentação"
+
+#: lib/planner_web/controllers/page_html/home.html.heex:164
+#, elixir-autogen, elixir-format
+msgid "Join our Discord server"
+msgstr "Entre no nosso servidor do Discord"
+
+#: lib/planner_web/controllers/page_html/home.html.heex:179
+#, elixir-autogen, elixir-format
+msgid "Join us on Slack"
+msgstr "Junte-se a nós no Slack"
+
+#: lib/planner_web/components/layouts.ex:147
+#, elixir-autogen, elixir-format
+msgid "Light theme"
+msgstr "Tema claro"
+
+#: lib/planner_web/controllers/page_html/home.html.heex:60
+#, elixir-autogen, elixir-format
+msgid "Peace of mind from prototype to production."
+msgstr "Tranquilidade do protótipo à produção."
+
+#: lib/planner_web/components/layouts.ex:109
+#, elixir-autogen, elixir-format
+msgid "Something went wrong!"
+msgstr "Algo deu errado!"
+
+#: lib/planner_web/controllers/page_html/home.html.heex:103
+#, elixir-autogen, elixir-format
+msgid "Source Code"
+msgstr "Código-fonte"
+
+#: lib/planner_web/components/layouts.ex:138
+#, elixir-autogen, elixir-format
+msgid "System theme"
+msgstr "Tema do sistema"
+
+#: lib/planner_web/components/layouts.ex:94
+#, elixir-autogen, elixir-format
+msgid "We can't find the internet"
+msgstr "Não foi possível conectar à internet"
+
+#: lib/planner_web/components/layouts.ex:48
+#, elixir-autogen, elixir-format
+msgid "Website"
+msgstr "Site"
+
+#: lib/planner_web/components/core_components.ex:82
+#, elixir-autogen, elixir-format
+msgid "close"
+msgstr "fechar"
