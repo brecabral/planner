@@ -1,6 +1,6 @@
 ---
 id: "TASK-010"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Restringe catálogo gerado ao proprietário e oferece criação componível em transação."
 specs: ["SPEC-006"]
@@ -12,6 +12,8 @@ blockers: []
 ---
 
 # 010 — Gerar o catálogo de labels do usuário padrão
+
+Integração confirmada pelo coordenador `/root` em `feat/mvp`, commit `00ffe5e`, em 24/09/2026. Revisão independente `/root/review_task001` aprovada; CI com 39 testes e cobertura 82,65%, sem mudanças executáveis após a revisão. Contrato `user-label-catalog` liberado. Por solicitação do responsável, a coordenação encerrou esta rodada ao concluir esta tarefa, sem iniciar a TASK-005.
 
 ## Entrada e limite
 
