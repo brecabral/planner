@@ -32,6 +32,7 @@ Abra [localhost:4000](http://localhost:4000). Para usar o console interativo, ex
 | `mix test` | Inicia o banco e executa os testes. |
 | `mix ci` | Verifica compilação, formatação, Credo estrito e testes com cobertura mínima de 70%. |
 | `mix precommit` | Compila com warnings como erros, verifica dependências, formata e testa. |
+| `mix run priv/repo/seeds.exs` | Prepara o usuário padrão; repetir preserva sua identidade e dados. |
 | `mix ecto.reset` | Apaga e recria a base do ambiente atual. |
 | `docker compose stop postgres` | Para o banco sem apagar o volume. |
 
@@ -42,6 +43,12 @@ Mix e Compose leem o `.env`, ignorado pelo Git. Variáveis exportadas no process
 O Compose usa PostgreSQL 17, publica a porta apenas em `127.0.0.1` e preserva dados no volume `postgres_data`. Os aliases aguardam o healthcheck por até 60 segundos e interrompem a execução se o banco falhar. Desenvolvimento e testes usam bases distintas (`POSTGRES_DB` e `POSTGRES_TEST_DB`); testes paralelos acrescentam `MIX_TEST_PARTITION` ao nome da base.
 
 Alterar credenciais no `.env` não altera um volume já inicializado: ajuste também o usuário no banco existente. Para CI ou banco externo, exporte `PLANNER_SKIP_COMPOSE=true` e as variáveis de conexão de `.env.example`. Produção usa `config/runtime.exs` e não inicia Compose automaticamente.
+
+## Usuário padrão do MVP
+
+Depois de preparar o banco com `mix ecto.setup` (também chamado por `mix setup`), os seeds garantem uma identidade persistente com identificador `default`. Para repetir somente essa preparação em um banco já migrado, execute `mix run priv/repo/seeds.exs`. Isso não duplica o usuário nem substitui seus dados.
+
+O servidor consulta essa identidade por `Planner.Accounts.get_default_user!/0`; `Planner.Accounts.ensure_default_user!/0` a cria de forma idempotente durante a preparação. Não há autenticação ou escolha de conta. Os testes criam usuários isolados por fixture, sem depender dos seeds globais.
 
 ## Sobre o projeto
 
