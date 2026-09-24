@@ -1,6 +1,6 @@
 ---
 id: "TASK-001"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Configura pt-BR fixo no Gettext existente e traduz a interface base."
 specs: ["SPEC-001"]
@@ -12,6 +12,8 @@ blockers: []
 ---
 
 # 001 — Fixar a interface base em pt-BR via Gettext
+
+Entrega integrada em `feat/mvp` no commit `5b178f5`, em 24/09/2026. Coordenador `/root` confirmou o commit da árvore aprovada pelo revisor independente `/root/review_task001`: CI com 23 testes e 79,10% de cobertura. TASK-001 concluída; dependência `ptbr-interface` liberada. BLOCK-002 resolvido por conferência documental, com implementação e aceite registrados nesta entrega.
 
 ## Objetivo e entrada
 
