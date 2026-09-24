@@ -18,6 +18,6 @@ defmodule PlannerWeb.TaskRoutesTest do
 
   test "home page remains available", %{conn: conn} do
     conn = get(conn, "/")
-    assert html_response(conn, 200) =~ "Peace of mind from prototype to production"
+    assert html_response(conn, 200) =~ "Tranquilidade do protótipo à produção"
   end
 end
