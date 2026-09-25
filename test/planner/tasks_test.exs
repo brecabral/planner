@@ -1,10 +1,15 @@
 defmodule Planner.TasksTest do
   use Planner.DataCase
 
+  alias Ecto.Adapters.SQL
+  alias Planner.Labels
+  alias Planner.Labels.Label
   alias Planner.Tasks
   alias Planner.Tasks.Task
+  alias Planner.Tasks.TaskLabel
 
   import Planner.AccountsFixtures
+  import Planner.LabelsFixtures
   import Planner.TasksFixtures
 
   setup do
@@ -19,6 +24,7 @@ defmodule Planner.TasksTest do
     assert is_nil(task.scheduled_for)
     assert is_nil(task.completed_on)
     assert is_nil(task.position)
+    assert Repo.preload(task, :labels).labels == []
     assert Tasks.get_task!(user, task.id) == task
     assert {:ok, duplicate} = Tasks.create_task(user, %{title: task.title})
     refute duplicate.id == task.id
@@ -107,5 +113,139 @@ defmodule Planner.TasksTest do
       assert {:error, changeset} = Tasks.create_task(owner, %{title: "some title"})
       assert errors_on(changeset).user_id
     end
+  end
+
+  test "create_task/2 associates distinct owned labels and accepts repeated IDs", %{user: user} do
+    first = label_fixture(user, %{name: "First"})
+    second = label_fixture(user, %{name: "Second"})
+
+    assert {:ok, task} =
+             Tasks.create_task(user, %{
+               title: "With labels",
+               label_ids: [first.id, Integer.to_string(first.id), second.id]
+             })
+
+    assert Enum.sort(Enum.map(Repo.preload(task, :labels).labels, & &1.id)) ==
+             Enum.sort([first.id, second.id])
+
+    assert Repo.aggregate(TaskLabel, :count) == 2
+  end
+
+  test "create_task/2 creates new labels alongside existing ones in one registration", %{
+    user: user
+  } do
+    existing = label_fixture(user, %{name: "Existing"})
+
+    assert {:ok, task} =
+             Tasks.create_task(user, %{
+               "title" => "Mixed",
+               "label_ids" => [Integer.to_string(existing.id)],
+               "new_label_names" => ["  New one  ", "New two"]
+             })
+
+    assert Enum.sort(Enum.map(Repo.preload(task, :labels).labels, & &1.name)) ==
+             ["Existing", "New one", "New two"]
+
+    assert Enum.sort(Enum.map(Labels.list_labels(user), & &1.name)) ==
+             ["Existing", "New one", "New two"]
+  end
+
+  test "create_task/2 rolls back a task and all new labels after an invalid label name", %{
+    user: user
+  } do
+    existing = label_fixture(user, %{name: "Existing"})
+
+    assert {:error, changeset} =
+             Tasks.create_task(user, %{
+               title: "Must roll back",
+               label_ids: [existing.id],
+               new_label_names: ["First new", "  "]
+             })
+
+    assert errors_on(changeset).new_label_names
+    assert Tasks.list_tasks(user) == []
+    assert Labels.list_labels(user) == [existing]
+    assert Repo.aggregate(TaskLabel, :count) == 0
+  end
+
+  test "create_task/2 rolls back requested labels when title is invalid", %{user: user} do
+    assert {:error, changeset} =
+             Tasks.create_task(user, %{title: "  ", new_label_names: ["New"]})
+
+    assert errors_on(changeset).title
+    assert Tasks.list_tasks(user) == []
+    assert Repo.aggregate(Label, :count) == 0
+  end
+
+  test "create_task/2 rolls back task and new labels after a link write fails", %{
+    user: user
+  } do
+    existing = label_fixture(user, %{name: "Existing"})
+
+    SQL.query!(
+      Repo,
+      "ALTER TABLE task_labels ADD CONSTRAINT reject_test_links CHECK (false) NOT VALID"
+    )
+
+    assert_raise Ecto.ConstraintError, fn ->
+      Tasks.create_task(user, %{
+        title: "Must roll back",
+        label_ids: [existing.id],
+        new_label_names: ["New"]
+      })
+    end
+
+    assert Tasks.list_tasks(user) == []
+    assert Labels.list_labels(user) == [existing]
+    assert Repo.aggregate(TaskLabel, :count) == 0
+  end
+
+  test "create_task/2 rejects foreign and missing labels without partial records", %{
+    user: user
+  } do
+    existing = label_fixture(user, %{name: "Existing"})
+    foreign = label_fixture(user_fixture(), %{name: "Private"})
+
+    for invalid_id <- [foreign.id, -1] do
+      assert {:error, changeset} =
+               Tasks.create_task(user, %{
+                 title: "Must roll back",
+                 label_ids: [existing.id, invalid_id],
+                 new_label_names: ["New"]
+               })
+
+      assert errors_on(changeset).label_ids
+    end
+
+    assert Tasks.list_tasks(user) == []
+    assert Labels.list_labels(user) == [existing]
+    assert Repo.aggregate(TaskLabel, :count) == 0
+  end
+
+  test "create_task/2 rejects malformed label input without partial records", %{user: user} do
+    for label_ids <- [["not-an-id"], [nil], "1"] do
+      assert {:error, changeset} =
+               Tasks.create_task(user, %{
+                 title: "Invalid IDs",
+                 label_ids: label_ids,
+                 new_label_names: ["New"]
+               })
+
+      assert errors_on(changeset).label_ids
+    end
+
+    for new_label_names <- [[42], "New"] do
+      assert {:error, changeset} =
+               Tasks.create_task(user, %{
+                 title: "Invalid names",
+                 new_label_names: new_label_names
+               })
+
+      assert errors_on(changeset).new_label_names
+    end
+
+    assert Tasks.list_tasks(user) == []
+    assert Labels.list_labels(user) == []
+    assert Repo.aggregate(TaskLabel, :count) == 0
   end
 end
