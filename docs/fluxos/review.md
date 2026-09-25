@@ -8,6 +8,18 @@ Identificar alvo exato e base de comparação: PR, intervalo de commits, branch 
 
 Expandir para funções chamadoras, contratos, configurações e testes quando necessário para verificar efeitos. Consultar DDD/design e referências somente dos conceitos atingidos. Uma revisão estreita não autoriza reescrever a arquitetura inteira.
 
+## Marco persistente de revisão
+
+Em revisões incrementais das entregas, consultar o front matter YAML de [docs/review.md](../review.md). Manter `review_base_commit`, `reviewed_commit`, `last_approved_commit`, `reviewed_at`, `reviewer`, `status` e `reviewed_tasks`, com SHAs completos e escopo explícito no relatório.
+
+- Sem base expressamente solicitada, usar `last_approved_commit` como base, após conferir que existe e é ancestral do alvo. Avaliar o diff base → alvo e os contratos afetados; separar alterações locais. Uma base explícita do usuário prevalece.
+- Se o marco estiver ausente, inválido ou fora da ancestralidade, reconstruir uma base justificada pelo histórico e registrar a limitação. Um commit que apenas limpou o relatório não representa aprovação anterior.
+- Atualizar `reviewed_commit` e `status` em toda revisão. Avançar `last_approved_commit` somente com `approved` independente e gates aplicáveis satisfeitos para todo o escopo declarado. Em `changes_requested` ou `blocked`, preservar o último aprovado; usar `null` se ainda não existir aprovação comprovada. Autoavaliação não avança o marco independente.
+- O SHA aponta para o código commitado efetivamente avaliado, nunca para um futuro commit do relatório. Alterações locais não recebem aprovação implícita por esse SHA; se afetarem o código, validar o alvo isoladamente ou registrar a impossibilidade de avançar o marco.
+- O marco vale apenas para o escopo documentado. Tarefas ou áreas não revisadas não podem ser ignoradas em revisões futuras por terem commits anteriores ao marco. Preservar pendências e evidências ao atualizar ou limpar o relatório.
+
+Conferir a regra com estes casos: entrega aprovada avança o marco; falha de gate mantém o anterior; código local divergente não é atribuído a HEAD; histórico reescrito exige reconstrução da base; tarefa fora do escopo exige revisão própria mesmo antes do marco.
+
 ## Procedimento
 
 1. Relacionar cada critério de aceite a implementação e evidência. Procurar comportamento faltante, inventado ou incompatível com a spec; hipótese de produto não é fato para reprovar código.

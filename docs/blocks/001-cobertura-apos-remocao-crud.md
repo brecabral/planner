@@ -2,9 +2,10 @@
 
 ## Situação
 
-Em 23/09/2026, a continuação da TASK-002 foi interrompida por solicitação do responsável. A decisão sobre como tratar a lacuna cabe ao planejador. Não há autorização para prosseguir com a ampliação da suíte proposta nesta investigação.
+Estado: resolvido. Tarefa de origem: TASK-002. Registro em 23/09/2026.
 
-Base inspecionada: `03e8d31`, contendo a remoção do CRUD no commit `f757265`. A [TASK-002](../tasks/002-remover-crud-experimental.md) permanece `in_review`. A [TASK-012](../tasks/012-reset-banco.md) está `done`, com confirmação humana de base limpa; nenhum novo reset é necessário.
+A execução anterior foi interrompida antes de ampliar a suíte. O planejamento atribuiu a correção à [TASK-036](../tasks/036-cobertura-base.md), sem autorizar mudanças na configuração humana do CI.
+Base inspecionada no diagnóstico: `03e8d31`, contendo a remoção do CRUD no commit `f757265`. A [TASK-002](../tasks/002-remover-crud-experimental.md) estava `in_review`. A [TASK-012](../tasks/012-reset-banco.md) está `done`, com confirmação humana de base limpa; nenhum novo reset é necessário.
 
 ## Evidências
 
@@ -14,17 +15,17 @@ Base inspecionada: `03e8d31`, contendo a remoção do CRUD no commit `f757265`. 
 - A política atual exige 70% de cobertura. A descrição histórica de cobertura informativa no registro da TASK-002 não corresponde à política vigente; o limiar não deve ser reduzido e código não deve ser excluído da medição apenas para aprovar o gate.
 - Após interromper o subagente, a árvore de trabalho estava limpa: nenhum teste ou alteração de implementação desta tentativa ficou pendente.
 
-## Decisão necessária
+## Decisão e critérios de retomada (histórico)
 
-O planejador deve definir o escopo e a tarefa responsável pela cobertura dos comportamentos preservados, com critérios de aceite e dependências explícitos. A hipótese investigada foi acrescentar testes de HTML renderizado para componentes de apresentação, formulários e página inicial. Essa hipótese não foi implementada nem aprovada como solução.
+A TASK-036 cobre os comportamentos da base Phoenix preservada e deve entregar o gate com pelo menos 70%, sem reduzir o limiar ou excluir módulos. A configuração da TASK-003 permanece concluída; o impedimento é a ausência de testes suficientes.
 
-A decisão deve esclarecer se esse trabalho pertence à correção da TASK-002 ou a uma entrega própria, sem alterar a reserva humana da configuração do gate na [TASK-003](../tasks/003-infra-github.md).
+A TASK-002 passou a depender dessa correção para retomar seu aceite. Sua remoção já está na base, portanto a TASK-036 não depende da conclusão da TASK-002. Até o aceite, as consumidoras ficaram impedidas transitivamente pelas dependências do grafo.
 
-## Impacto e retomada
+Encerrar este registro somente após revisão independente e integração da TASK-036 com evidência de `mix ci` aprovado e cobertura mínima de 70%. Depois, retomar a revisão independente da TASK-002; resolver a cobertura não equivale a aprovar sua entrega.
 
-A TASK-002 continua sem CI aprovado e sem revisão independente aprovada. A [TASK-001](../tasks/001-troca-de-idiomas.md) depende de sua conclusão; a liberação da TASK-012, isoladamente, não libera a cadeia do MVP.
+## Resolução
 
-Retomar somente após a decisão do planejador e a atualização dos contratos afetados. Em seguida, executar a solução autorizada, registrar evidências do gate e encaminhar ao revisor independente. Este registro não marca tarefas como concluídas nem modifica o grafo.
+Concluída conforme as evidências de encerramento abaixo. A atualização do planejamento definiu a correção; sua execução e revisão ocorreram posteriormente.
 
 ### Encerramento — 23/09/2026
 

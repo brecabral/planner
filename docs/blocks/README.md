@@ -19,3 +19,4 @@ O coordenador só encerra o relatório quando a condição de retomada estiver c
 ## Registros
 
 - [BLOCK-001 — Cobertura após a remoção do CRUD experimental](001-cobertura-apos-remocao-crud.md).
+- [BLOCK-002 — Escopo da tradução da interface base](002-escopo-traducao-interface-base.md).

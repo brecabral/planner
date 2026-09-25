@@ -4,12 +4,13 @@ O MVP contém somente o fluxo de planejamento com usuário padrão, pt-BR via Ge
 
 ## MVP
 
-Gate GitHub e base limpa têm aceite humano registrado. A implementação começa pela TASK-002; não depende de escolhas de autenticação, idiomas ou fuso. As demais etapas mantêm produtor único e serializam arquivos compartilhados.
+Gate GitHub e base limpa têm aceite humano registrado. As TASK-036, TASK-002, TASK-001, TASK-009, TASK-016 e TASK-010 estão concluídas e integradas, com [revisão independente aprovada](../review.md) no escopo dessas entregas. O [BLOCK-001](../blocks/001-cobertura-apos-remocao-crud.md) está resolvido. A seleção das próximas tarefas deve respeitar suas dependências e bloqueios atuais. O MVP não depende de escolhas de autenticação, idiomas ou fuso. As demais etapas mantêm produtor único e serializam arquivos compartilhados.
 
 | Incremento |
 | --- |
 | [003 — Proteger a main e configurar o CI no GitHub](003-infra-github.md) |
 | [012 — Preparar a base limpa](012-reset-banco.md) |
+| [036 — Cobrir os comportamentos da base Phoenix](036-cobertura-base.md) |
 | [002 — Remover a geração experimental de Task](002-remover-crud-experimental.md) |
 | [001 — Fixar a interface base em pt-BR via Gettext](001-troca-de-idiomas.md) |
 | [009 — Gerar e preparar o usuário padrão do MVP](009-contas-e-acesso.md) |
@@ -38,7 +39,7 @@ Gate GitHub e base limpa têm aceite humano registrado. A implementação começ
 
 | Capacidade | Entregas do MVP |
 | --- | --- |
-| SPEC-001 — Interface pt-BR | 001 configura Gettext; telas traduzem seus próprios textos. |
+| SPEC-001 — Interface pt-BR | 001 configura Gettext e traduz layouts e página inicial preservada; telas futuras traduzem seus próprios textos. |
 | SPEC-002 — Planejamento | 005 scaffold, 020 cota, 021 snapshot, 022 seleção, 023 devolução, 024 ordem, 028/029 interface. |
 | SPEC-003 — Data e histórico | 016 data, 021 normalização, 007 conclusão, 025 consulta, 030 interface; recarga usa 006/027. |
 | SPEC-004 — Painel | 006 scaffold, 026 formulário, 027 listas, 028/029/030 ações, 032 acessibilidade. |
