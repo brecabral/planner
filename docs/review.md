@@ -1,14 +1,22 @@
 ---
-review_base_commit: "03e8d31d7990af6575ed2011651c9cd1b4350c4e"
-reviewed_commit: "e4875169d2823b9e60f64cb4251d0ef2e33f1c35"
-last_approved_commit: "e4875169d2823b9e60f64cb4251d0ef2e33f1c35"
+review_base_commit: "2620271b4627841ae382213bfee0c0ce78ff6c47"
+reviewed_commit: "79a22bf045bdf89c8d767335a1c87f0554e0f4e3"
+last_approved_commit: "79a22bf045bdf89c8d767335a1c87f0554e0f4e3"
 reviewed_at: "2026-09-25"
-reviewer: "Codex /root — perfil revisor, independente das implementações"
+reviewer: "/root/review_task005 — revisão independente; /root — registro de integração"
 status: approved
-reviewed_tasks: ["TASK-001", "TASK-002", "TASK-009", "TASK-010", "TASK-016", "TASK-036"]
+reviewed_tasks: ["TASK-005"]
 ---
 
 # Revisão incremental das tarefas concluídas
+
+## Marco atual — TASK-005
+
+Revisão independente `/root/review_task005` aprovada sobre a árvore local da TASK-005 na base `2620271b4627841ae382213bfee0c0ce78ff6c47`, integrada sem alterações executáveis no commit `79a22bf045bdf89c8d767335a1c87f0554e0f4e3`. Cadastro no backlog, título validado e consultas com proprietário explícito atendem CA-002-01/08 parcial. Achado de título acima de 255 caracteres corrigido com coluna text e teste de persistência integral. Gate independente: 47 testes, 83,48% total, módulos novos 100%, limiar 70% preservado. Precommit relatado pelo implementador aprovado. Evidências completas na TASK-005; código de consumidoras futuras fora do escopo.
+
+O marco atual cobre somente TASK-005; a aprovação anterior das seis tarefas permanece documentada abaixo. Não há aprovação implícita de workflows, skills ou áreas excluídas.
+
+## Revisão anterior preservada — alvo e487516
 
 Resultado: **approved**, sem achados bloqueantes nas entregas indicadas. O marco acima permite retomar a revisão incremental conforme o [fluxo de review](fluxos/review.md#marco-persistente-de-revisão); não constitui aprovação de todo o planejamento ou do MVP completo.
 

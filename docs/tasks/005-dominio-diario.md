@@ -1,6 +1,6 @@
 ---
 id: "TASK-005"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Adapta cadastro gerado para receber proprietário explícito e restringir campos de entrada."
 specs: ["SPEC-002"]
@@ -86,3 +86,7 @@ Revalidação: `mix precommit` e `mix ci` aprovados com **47 testes**, formataç
 Revisor `/root/review_task005`, independente do implementador. Decisão atual **approved**, substituindo a decisão anterior após correção do P2. Base `2620271b4627841ae382213bfee0c0ce78ff6c47`; mesmo alvo local e escopo da revisão inicial, agora com coluna `title` em `:text` e teste adicional. Schema preserva `:string`, sem limite de produto acrescentado. Contexto e fixture reinspecionados, sem mudanças de contrato. O teste cria título de 256 caracteres e confirma por consulta o conteúdo integral persistido, resolvendo o cenário que reproduzia SQLSTATE 22001. CA-002-01 e CA-002-08 parcial atendidos no escopo desta tarefa; nenhum achado bloqueante restante.
 
 Gate independente repetido após consultar `mix help ci`: `rtk mix ci` aprovado com **47 testes**, compilação/formatação/Credo estrito sem falhas, cobertura total **83,48%** e Tasks/Task/TasksFixtures **100%**; limiar 70% preservado. Primeira tentativa impedida pelo lock TCP do sandbox; repetição escalada aprovada. `rtk git diff --check` aprovado. A execução confirma o cenário de título longo na base de testes efetiva; a reaplicação histórica da migration permanece evidência relatada do implementador. Precommit não repetido por ser mutante; base anterior não medida isoladamente. Mantêm-se os limites da revisão inicial sobre consumidoras futuras e cobertura de linhas. Nenhuma correção de código, staging ou commit pelo revisor. Aprovação técnica da árvore local não comprova integração; marco `docs/review.md` preservado para atualização pelo coordenador após integrar.
+
+### Integração aceita — 25/09/2026
+
+Coordenador `/root`: entrega aprovada por `/root/review_task005` e integrada em `feat/mvp`, commit `79a22bf045bdf89c8d767335a1c87f0554e0f4e3`. Conteúdo staged conferido; nenhum código mudou após o gate independente (47 testes, 83,48%). Contrato `task-scaffold` liberado para TASK-018. Registros anteriores de pendência são históricos.
