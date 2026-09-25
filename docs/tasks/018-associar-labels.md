@@ -1,6 +1,6 @@
 ---
 id: "TASK-018"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Modela vínculos muitos-para-muitos com unicidade e compatibilidade de proprietário."
 specs: ["SPEC-006"]
@@ -68,3 +68,7 @@ Aceites atendidos: associações `many_to_many` nos dois sentidos permitem zero/
 Validação independente: `mix help ci` consultado; `rtk mix ci` aprovado com **55 testes**, compilação/formatação/Credo estrito sem falhas, cobertura total **84,05%** e TaskLabel/Task/Label **100%**, mantendo o mínimo de 70%. Tentativa no sandbox encontrou bloqueio de lock TCP; repetição escalada passou. `rtk git diff --check` aprovado. Precommit e reaplicação prévia da migration são evidências relatadas, não repetidas nesta revisão. Não houve nova medição isolada da base, reset ou alteração do banco de desenvolvimento. Cobertura não demonstra todos os ramos; concorrência não foi exercitada em conexões independentes, embora a unicidade seja imposta por índice no banco.
 
 Limites: esta aprovação cobre o storage da relação, não o cadastro composto nem deduplicação de IDs de entrada. Os testes usam savepoints para continuar verificando o estado após rejeições de constraints; a TASK-019 deve tratar o erro e reverter sua transação integral, conforme contrato. Nenhum código corrigido, staging ou commit pelo revisor. Aprovação técnica não comprova integração. Conforme orientação atual, encerrar após TASK-018 e não iniciar TASK-019.
+
+### Integração aceita e encerramento — 25/09/2026
+
+Coordenador `/root`: entrega aprovada por `/root/review_task005` e integrada em `feat/mvp`, commit `9ec53063065ac434895baa70333d49824ee8fb91`. Conteúdo staged conferido; nenhum código mudou após o gate independente (55 testes, 84,05%). Contrato `task-label-storage` liberado. Registros anteriores de pendência são históricos. Por solicitação do responsável, execução encerrada após TASK-018; TASK-019 não iniciada.

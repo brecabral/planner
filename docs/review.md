@@ -1,20 +1,26 @@
 ---
-review_base_commit: "2620271b4627841ae382213bfee0c0ce78ff6c47"
-reviewed_commit: "79a22bf045bdf89c8d767335a1c87f0554e0f4e3"
-last_approved_commit: "79a22bf045bdf89c8d767335a1c87f0554e0f4e3"
+review_base_commit: "6a6e56a2b4dfed0827558c0dda40f716440f3a7d"
+reviewed_commit: "9ec53063065ac434895baa70333d49824ee8fb91"
+last_approved_commit: "9ec53063065ac434895baa70333d49824ee8fb91"
 reviewed_at: "2026-09-25"
 reviewer: "/root/review_task005 — revisão independente; /root — registro de integração"
 status: approved
-reviewed_tasks: ["TASK-005"]
+reviewed_tasks: ["TASK-018"]
 ---
 
 # Revisão incremental das tarefas concluídas
 
-## Marco atual — TASK-005
+## Marco atual — TASK-018
+
+Revisão independente `/root/review_task005` aprovada sobre o diff local da TASK-018 na base `6a6e56a2b4dfed0827558c0dda40f716440f3a7d`, integrado sem alterações executáveis em `9ec53063065ac434895baa70333d49824ee8fb91`. Associações many_to_many, unicidade e FKs compostas garantem vínculos próprios. Gate independente: 55 testes, 84,05% total, TaskLabel/Task/Label 100%, limiar 70% preservado; precommit relatado aprovado. Sem achados bloqueantes. Evidências e limites completos na TASK-018; cadastro atômico, deduplicação de entrada e concorrência em conexões independentes não foram avaliados.
+
+O marco cobre TASK-018; aprovações anteriores permanecem abaixo, sem aprovação implícita de áreas excluídas. Coordenação encerrada após esta entrega por solicitação do responsável; TASK-019 não iniciada.
+
+## Revisão anterior preservada — TASK-005
 
 Revisão independente `/root/review_task005` aprovada sobre a árvore local da TASK-005 na base `2620271b4627841ae382213bfee0c0ce78ff6c47`, integrada sem alterações executáveis no commit `79a22bf045bdf89c8d767335a1c87f0554e0f4e3`. Cadastro no backlog, título validado e consultas com proprietário explícito atendem CA-002-01/08 parcial. Achado de título acima de 255 caracteres corrigido com coluna text e teste de persistência integral. Gate independente: 47 testes, 83,48% total, módulos novos 100%, limiar 70% preservado. Precommit relatado pelo implementador aprovado. Evidências completas na TASK-005; código de consumidoras futuras fora do escopo.
 
-O marco atual cobre somente TASK-005; a aprovação anterior das seis tarefas permanece documentada abaixo. Não há aprovação implícita de workflows, skills ou áreas excluídas.
+O marco anterior cobria somente TASK-005; a aprovação anterior das seis tarefas permanece documentada abaixo. Não há aprovação implícita de workflows, skills ou áreas excluídas.
 
 ## Revisão anterior preservada — alvo e487516
 
