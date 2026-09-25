@@ -10,6 +10,8 @@ defmodule Planner.Tasks.Task do
     field :completed_on, :date
     field :user_id, :id
 
+    many_to_many :labels, Planner.Labels.Label, join_through: Planner.Tasks.TaskLabel
+
     timestamps(type: :utc_datetime)
   end
 

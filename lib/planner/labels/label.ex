@@ -6,6 +6,8 @@ defmodule Planner.Labels.Label do
     field :name, :string
     field :user_id, :id
 
+    many_to_many :tasks, Planner.Tasks.Task, join_through: Planner.Tasks.TaskLabel
+
     timestamps(type: :utc_datetime)
   end
 
