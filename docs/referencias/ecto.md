@@ -17,3 +17,11 @@ Origem: regras do gerador Phoenix anteriormente em `AGENTS.md`, traduzidas em 22
 ```
 
 O exemplo ilustra a atribuição segura; não introduz uma entidade no Planner. Estratégia de remoção do experimento: [tarefa 002](../tasks/002-remover-crud-experimental.md).
+
+## TDD e migrations
+
+Escrever os testes de intenção primeiro, mas completar a migration nova antes da primeira execução que possa aplicá-la, inclusive por preparação automática do banco de testes. O scaffold gerado é um ponto de partida: conferir campos, tipos, defaults, nulabilidade, índices, unicidade, chaves estrangeiras e checks exigidos pelo contrato antes de aplicá-lo.
+
+A fase vermelha deve demonstrar comportamento ausente, não depender de uma estrutura de banco deliberadamente incompleta. Preparar a migration completa antes dessa execução é parte do setup; manter o ciclo de falha e implementação para os comportamentos ainda ausentes. Testes de invariantes já satisfeitas pela migration podem passar na primeira execução; registrar essa evidência sem remover constraints para fabricar uma falha.
+
+Aplicar o scaffold incompleto e depois editar sua migration já aplicada exige desfazer e reaplicar a estrutura para testar a versão final. Evitar essa sequência como rotina de TDD. Rollback de migration não se confunde com rollback de transação: testes de atomicidade continuam devendo provocar falhas e verificar que gravações parciais são revertidas. Quando uma correção real exigir rever uma migration já aplicada, avaliar o ambiente e o estado de integração antes de escolher a correção e registrar a justificativa; esta orientação não autoriza reverter migrations de bases compartilhadas.

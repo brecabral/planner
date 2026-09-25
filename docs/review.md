@@ -1,16 +1,31 @@
 ---
-review_base_commit: "6a6e56a2b4dfed0827558c0dda40f716440f3a7d"
-reviewed_commit: "9ec53063065ac434895baa70333d49824ee8fb91"
-last_approved_commit: "9ec53063065ac434895baa70333d49824ee8fb91"
+review_base_commit: "9ec53063065ac434895baa70333d49824ee8fb91"
+reviewed_commit: "6b8030933cdf64c7390709e3cc825d4300106fc3"
+last_approved_commit: "6b8030933cdf64c7390709e3cc825d4300106fc3"
 reviewed_at: "2026-09-25"
-reviewer: "/root/review_task005 — revisão independente; /root — registro de integração"
+reviewer: "/root — revisão independente das TASK-019 e TASK-020"
 status: approved
-reviewed_tasks: ["TASK-018"]
+reviewed_tasks: ["TASK-019", "TASK-020"]
 ---
 
 # Revisão incremental das tarefas concluídas
 
-## Marco atual — TASK-018
+## Marco atual — TASK-019 e TASK-020
+
+Resultado: **approved**, sem achados bloqueantes. Revisão independente por `/root`, que não implementou estas entregas nesta sessão, do intervalo `9ec53063065ac434895baa70333d49824ee8fb91..6b8030933cdf64c7390709e3cc825d4300106fc3`. Ancestralidade confirmada e código executável local idêntico ao alvo. Dependências integradas; aceites humanos anteriores apenas consultados. Esta rodada encerra as pendências de revisão detalhada das duas tarefas, preservando os registros excepcionais como histórico.
+
+| Tarefa | Critérios conferidos e evidências reproduzidas | Resultado |
+| --- | --- | --- |
+| TASK-019 | Cadastro sem labels, múltiplas próprias, existentes e novas; IDs inteiro/string deduplicados; proprietário filtrado; título/nome/ID inválidos e falha de gravação revertem tarefa, novas labels e vínculos, preservando existentes. Transação e FKs sustentam SPEC-006 RN02–RN04 e CA-006-01–04. | Aprovada. |
+| TASK-020 | Lock do usuário precede captura da data e criação da cota; conexões PostgreSQL distintas demonstram espera real e consumo serializado; outro usuário prossegue; erro/exceção reverte gravações; constraints impõem chave usuário/data e faixa 0–3; reinício efetivo do Repo/pool preserva consumo. | Aprovada. |
+
+Validação: ajuda dos aliases e `mix.exs` inspecionados; `rtk mix ci` aprovado com **72 testes, 86,97% de cobertura total**, Tasks 97,78%, UserTransaction e DailyPlan 100%. Compilação, formatação e Credo estrito aprovados; limiar de 70% preservado. `rtk mix precommit` também aprovado com 72 testes, sem alterações executáveis ou de lockfile; `rtk git diff --check` aprovado. Não foi medida novamente a base, portanto não se afirma variação de cobertura nesta rodada.
+
+As alterações locais preexistentes em `docs/fluxos/implementacao.md` e `docs/referencias/ecto.md` foram revisadas separadamente e aprovadas por coerência, link/âncora e avaliação de cenários: migration completa antes do primeiro teste; invariantes já satisfeitas sem vermelho artificial; falha de transação ainda testada; migration aplicada exige avaliar ambiente/integração, sem autorização para reversão em base compartilhada. Nenhum comando novo de operação foi introduzido. Essa aprovação documental se refere ao diff local, não ao SHA do marco.
+
+Limites: reinício cobre processo/pool, não VM ou servidor PostgreSQL; captura da data após lock conferida no código, sem simular virada durante espera. Cobertura não prova todos os interleavings. Formulário, normalização da virada e comandos consumidores pertencem às próximas tarefas e não recebem aprovação antecipada. TASK-021 não iniciada. Exclusões históricas de workflows/skills continuam preservadas.
+
+## Revisão anterior preservada — TASK-018
 
 Revisão independente `/root/review_task005` aprovada sobre o diff local da TASK-018 na base `6a6e56a2b4dfed0827558c0dda40f716440f3a7d`, integrado sem alterações executáveis em `9ec53063065ac434895baa70333d49824ee8fb91`. Associações many_to_many, unicidade e FKs compostas garantem vínculos próprios. Gate independente: 55 testes, 84,05% total, TaskLabel/Task/Label 100%, limiar 70% preservado; precommit relatado aprovado. Sem achados bloqueantes. Evidências e limites completos na TASK-018; cadastro atômico, deduplicação de entrada e concorrência em conexões independentes não foram avaliados.
 
