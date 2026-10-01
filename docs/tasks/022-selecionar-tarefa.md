@@ -1,6 +1,6 @@
 ---
 id: "TASK-022"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Aplica seleção e limite na fronteira transacional com revalidação da data corrente."
 specs: ["SPEC-002", "SPEC-003"]
@@ -42,3 +42,7 @@ Contrato `select-today`:
 TDD: antes da implementação, os quatro testes sequenciais falharam pela API ausente e os workers concorrentes também encontraram a API ausente. O teste concorrente revelou ainda ajustes necessários no harness: liberar o lock em falha e reconhecer bloqueio indireto por outro contendiente. Após essas correções e implementação, os **25 testes** então existentes de Tasks passaram; acrescentado caso de data padrão/isolamento da cota. Ajuda Mix já consultada nesta sessão. `rtk mix precommit` aprovado com **83 testes**. CI inicial pediu alias de Sandbox, corrigido; `rtk mix ci` final aprovado com **83 testes**, compilação/formatação/Credo estrito sem falhas, **88,22% de cobertura total**, Tasks **98,63%**, UserTransaction **100%**, mínimo de 70% preservado. `rtk git diff --check` aprovado.
 
 Autoavaliação pelo fluxo de review: aceites cobertos no escopo produtor e nenhum achado bloqueante. A concorrência usa conexões reais e dados próprios removidos ao terminar; cobertura não prova todos os interleavings. CA-002-02 com conclusão permanece na TASK-007. Evidências encaminhadas para conferência de aceite do coordenador; revisão independente e integração ainda pendentes neste registro.
+
+### Conferência e integração — 01/10/2026
+
+Coordenador `/root`: diff e testes conferidos contra os três aceites; limite, idempotência, rollback, virada e disputa pela última escolha atendidos. Gates relatados pelo implementador: 83 testes, cobertura 88,22%; diff check aprovado. Entrega integrada em `8ec94100e6e639c0f1eba34b766bfdfc35cf0966`. Por autorização explícita do usuário nesta rodada, a conferência do coordenador libera a próxima tarefa; revisão independente permanece pendente para o final. `done` registra conclusão operacional sob essa exceção, sem alegar aprovação do revisor. TASK-023 liberada.
