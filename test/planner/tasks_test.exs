@@ -5,8 +5,10 @@ defmodule Planner.TasksTest do
   alias Planner.Labels
   alias Planner.Labels.Label
   alias Planner.Tasks
+  alias Planner.Tasks.DailyPlan
   alias Planner.Tasks.Task
   alias Planner.Tasks.TaskLabel
+  alias Planner.UserTransaction
 
   import Planner.AccountsFixtures
   import Planner.LabelsFixtures
@@ -14,6 +16,141 @@ defmodule Planner.TasksTest do
 
   setup do
     %{user: user_fixture()}
+  end
+
+  test "snapshot rolls expired pending tasks into retry once and preserves identity", %{
+    user: user
+  } do
+    day = ~D[2026-10-01]
+    yesterday = Date.add(day, -1)
+    label = label_fixture(user)
+    expired = task_fixture(user, %{label_ids: [label.id]}) |> schedule(yesterday, 1)
+    completed = task_fixture(user) |> schedule(yesterday, 2)
+    completed = completed |> change(completed_on: yesterday) |> Repo.update!()
+    current = task_fixture(user) |> schedule(day, 1)
+    foreign = task_fixture(user_fixture()) |> schedule(yesterday, 1)
+
+    assert {:ok, snapshot} = Tasks.snapshot(user, day)
+    assert snapshot.day == day
+    assert snapshot.used_choices == 0
+    assert snapshot.available_choices == 3
+    assert Enum.map(snapshot.today, & &1.id) == [current.id]
+    assert [retry] = snapshot.retry
+    assert retry.id == expired.id
+    assert retry.title == expired.title
+    assert retry.kind == :retry
+    assert retry.scheduled_for == yesterday
+    assert is_nil(retry.position)
+    assert is_nil(retry.completed_on)
+    assert Repo.preload(retry, :labels).labels == [label]
+    assert Repo.get!(Task, completed.id) == completed
+    assert Repo.get!(Task, foreign.id) == foreign
+    assert {:ok, ^snapshot} = Tasks.snapshot(user, day)
+  end
+
+  test "snapshot orders each pending collection and reads persisted quota", %{user: user} do
+    day = ~D[2026-10-01]
+    first = task_fixture(user)
+    second = task_fixture(user)
+    older = task_fixture(user)
+    retry_first = task_fixture(user) |> schedule(Date.add(day, -1), 2)
+    retry_second = task_fixture(user) |> schedule(Date.add(day, -1), 1)
+    today_second = task_fixture(user) |> schedule(day, 2)
+    today_first = task_fixture(user) |> schedule(day, 1)
+
+    Repo.update_all(from(t in Task, where: t.user_id == ^user.id),
+      set: [inserted_at: ~U[2026-01-02 00:00:00Z]]
+    )
+
+    older |> change(inserted_at: ~U[2026-01-01 00:00:00Z]) |> Repo.update!()
+    Repo.insert!(%DailyPlan{user_id: user.id, day: day, used_choices: 3})
+
+    assert {:ok, snapshot} = Tasks.snapshot(user, day)
+    assert Enum.map(snapshot.backlog, & &1.id) == [older.id, first.id, second.id]
+    assert Enum.map(snapshot.retry, & &1.id) == [retry_first.id, retry_second.id]
+    assert Enum.map(snapshot.today, & &1.id) == [today_first.id, today_second.id]
+    assert snapshot.used_choices == 3
+    assert snapshot.available_choices == 0
+  end
+
+  test "a stale command sees normalization before validation and rejection rolls it back", %{
+    user: user
+  } do
+    day = ~D[2026-10-01]
+    stale = task_fixture(user) |> schedule(Date.add(day, -1), 1)
+
+    assert {:error, :stale_task} =
+             UserTransaction.run(
+               user,
+               fn captured, plan ->
+                 assert captured == day
+                 assert plan.day == day
+                 normalized = Repo.get!(Task, stale.id)
+                 assert normalized.kind == :retry
+                 assert is_nil(normalized.position)
+                 {:error, :stale_task}
+               end,
+               day
+             )
+
+    assert Repo.get!(Task, stale.id) == stale
+    assert Repo.get_by(DailyPlan, user_id: user.id, day: day) == nil
+    assert {:ok, %{retry: [%{id: id}]}} = Tasks.snapshot(user, day)
+    assert id == stale.id
+  end
+
+  test "snapshot defaults to the server day", %{user: user} do
+    before = Date.utc_today()
+    assert {:ok, snapshot} = Tasks.snapshot(user)
+    assert snapshot.day in [before, Date.utc_today()]
+    assert snapshot.backlog == []
+    assert snapshot.today == []
+    assert snapshot.retry == []
+  end
+
+  test "snapshot survives a repository and connection pool restart across a day change" do
+    name = __MODULE__.RestartRepo
+
+    spec =
+      Supervisor.child_spec({Repo, name: name, pool: DBConnection.ConnectionPool, pool_size: 1},
+        id: name
+      )
+
+    first_pid = start_supervised!(spec)
+    original_repo = Repo.put_dynamic_repo(name)
+    user = user_fixture()
+
+    try do
+      day = ~D[2026-10-01]
+      pending = task_fixture(user) |> schedule(day, 1)
+      backlog = task_fixture(user)
+      Repo.insert!(%DailyPlan{user_id: user.id, day: day, used_choices: 3})
+      Repo.insert!(%DailyPlan{user_id: user.id, day: Date.add(day, 1), used_choices: 2})
+      assert {:ok, before} = Tasks.snapshot(user, day)
+      backend = Repo.query!("SELECT pg_backend_pid()").rows
+      monitor = Process.monitor(first_pid)
+      stop_supervised!(name)
+      assert_receive {:DOWN, ^monitor, :process, ^first_pid, :shutdown}
+      assert start_supervised!(spec) != first_pid
+      assert Repo.query!("SELECT pg_backend_pid()").rows != backend
+      assert {:ok, ^before} = Tasks.snapshot(user, day)
+      assert {:ok, after_rollover} = Tasks.snapshot(user, Date.add(day, 1))
+      assert after_rollover.used_choices == 2
+      assert after_rollover.available_choices == 1
+      assert after_rollover.today == []
+      assert Enum.map(after_rollover.retry, & &1.id) == [pending.id]
+      assert Enum.map(after_rollover.backlog, & &1.id) == [backlog.id]
+      assert Repo.get_by!(DailyPlan, user_id: user.id, day: day).used_choices == 3
+    after
+      Repo.delete_all(from t in Task, where: t.user_id == ^user.id)
+      Repo.delete_all(from p in DailyPlan, where: p.user_id == ^user.id)
+      Repo.delete!(user)
+      Repo.put_dynamic_repo(original_repo)
+    end
+  end
+
+  defp schedule(task, day, position) do
+    task |> change(kind: :today, scheduled_for: day, position: position) |> Repo.update!()
   end
 
   test "create_task/2 creates distinct backlog tasks from trimmed titles", %{user: user} do

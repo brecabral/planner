@@ -12,6 +12,48 @@ defmodule Planner.Tasks do
   alias Planner.Repo
   alias Planner.Tasks.Task
   alias Planner.Tasks.TaskLabel
+  alias Planner.UserTransaction
+
+  @doc """
+  Returns the normalized planning collections and persisted daily quota.
+
+  The result is `{:ok, snapshot}` with `day`, `used_choices`, `available_choices`,
+  `backlog`, `today` and `retry`. Tasks include their labels; completed tasks are
+  excluded. Backlog and retry use creation order with ID as a tie-breaker, while
+  today's tasks use their positions. All reads share the user's transaction lock.
+
+  The optional date is for controlled server-side calls/tests, never browser input.
+  """
+  def snapshot(%User{id: user_id} = user, date \\ nil) do
+    UserTransaction.run(
+      user,
+      fn day, plan ->
+        pending = from task in Task, where: task.user_id == ^user_id and is_nil(task.completed_on)
+        creation_order = from task in pending, order_by: [task.inserted_at, task.id]
+
+        {:ok,
+         %{
+           day: day,
+           used_choices: plan.used_choices,
+           available_choices: 3 - plan.used_choices,
+           backlog:
+             Repo.all(
+               from task in creation_order, where: task.kind == :backlog, preload: [:labels]
+             ),
+           retry:
+             Repo.all(from task in creation_order, where: task.kind == :retry, preload: [:labels]),
+           today:
+             Repo.all(
+               from task in pending,
+                 where: task.kind == :today and task.scheduled_for == ^day,
+                 order_by: [task.position, task.id],
+                 preload: [:labels]
+             )
+         }}
+      end,
+      date
+    )
+  end
 
   @doc """
   Lists owned tasks by creation time, breaking ties by ID.

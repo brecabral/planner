@@ -9,9 +9,14 @@ defmodule Planner.UserTransaction do
   alias Planner.Day
   alias Planner.Repo
   alias Planner.Tasks.DailyPlan
+  alias Planner.Tasks.Task
 
   @doc """
   Runs an operation with a coherent day and its persisted quota under a user lock.
+
+  Before invoking the operation, expired pending tasks become retry and lose
+  their positions. Their selection date, identity and completion data remain
+  unchanged. Normalization is rolled back together with a rejected operation.
 
   The operation receives `(day, daily_plan)` and returns `{:ok, value}` or
   `{:error, reason}`. An error rolls back all writes, including quota creation;
@@ -31,12 +36,24 @@ defmodule Planner.UserTransaction do
       Repo.one!(from user in User, where: user.id == ^user_id, lock: "FOR UPDATE")
       day = if is_nil(date), do: Day.current(), else: Day.current(date)
       plan = get_or_create_plan!(user_id, day)
+      normalize_expired_tasks(user_id, day)
 
       case operation.(day, plan) do
         {:ok, value} -> value
         {:error, reason} -> Repo.rollback(reason)
       end
     end)
+  end
+
+  defp normalize_expired_tasks(user_id, day) do
+    Repo.update_all(
+      from(task in Task,
+        where:
+          task.user_id == ^user_id and task.kind == :today and
+            is_nil(task.completed_on) and task.scheduled_for < ^day
+      ),
+      set: [kind: :retry, position: nil, updated_at: DateTime.utc_now(:second)]
+    )
   end
 
   defp get_or_create_plan!(user_id, day) do
