@@ -1,6 +1,6 @@
 ---
 id: "TASK-021"
-status: "in_review"
+status: "done"
 execution_level: "advanced"
 execution_rationale: "Virada, normalização e snapshot precisam compartilhar atomicidade e data com comandos concorrentes."
 specs: ["SPEC-002", "SPEC-003"]
@@ -51,3 +51,7 @@ Aceites 1 e 2 atendidos no escopo produtor. Inspeção e testes confirmam normal
 Verificação independente: aliases e ajuda de `ci` consultados; `rtk mix ci` aprovado, saída 0, **77 testes**, compilação/formatação/Credo estrito aprovados, **87,46% de cobertura total**, Tasks **98,15%**, UserTransaction **100%**, mínimo de 70% preservado. `precommit` permanece evidência relatada pelo implementador; o revisor reproduziu o gate sem correção automática. Não foi remedida a base para afirmar variação de cobertura.
 
 Limites: reinício validado no Repo/pool, não na VM ou no servidor PostgreSQL; rejeição do comando antigo demonstrada por callback, sem aprovar antecipadamente comandos das consumidoras futuras. Cobertura de linhas e serialização da fronteira não demonstram todos os interleavings. Aprovação técnica do diff local não representa integração, commit ou autorização de publicação remota.
+
+### Integração — 01/10/2026
+
+Coordenador `/root`: entrega aprovada pelo revisor independente `/root/review_task021`, com CI reproduzido (77 testes, 87,46%). Código e evidências integrados em `aafed16d7b7a09000404e716cc98dcc43763510e`, sem mudanças executáveis após a revisão. TASK-022 liberada.

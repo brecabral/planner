@@ -1,16 +1,20 @@
 ---
-review_base_commit: "9ec53063065ac434895baa70333d49824ee8fb91"
-reviewed_commit: "6b8030933cdf64c7390709e3cc825d4300106fc3"
-last_approved_commit: "6b8030933cdf64c7390709e3cc825d4300106fc3"
-reviewed_at: "2026-09-25"
-reviewer: "/root — revisão independente das TASK-019 e TASK-020"
+review_base_commit: "ed37fdbe7c91fed6cb6eb9c1ab95ee1deda125d8"
+reviewed_commit: "aafed16d7b7a09000404e716cc98dcc43763510e"
+last_approved_commit: "aafed16d7b7a09000404e716cc98dcc43763510e"
+reviewed_at: "2026-10-01"
+reviewer: "/root/review_task021 — revisão independente"
 status: approved
-reviewed_tasks: ["TASK-019", "TASK-020"]
+reviewed_tasks: ["TASK-021"]
 ---
 
 # Revisão incremental das tarefas concluídas
 
-## Marco atual — TASK-019 e TASK-020
+## Marco atual — TASK-021
+
+Revisor independente `/root/review_task021`: **approved**, sem achados bloqueantes no diff da base `ed37fdbe7c91fed6cb6eb9c1ab95ee1deda125d8`, integrado sem alterações executáveis em `aafed16d7b7a09000404e716cc98dcc43763510e`. Normalização antes do callback, rollback, isolamento e ordenação atendidos. CI reproduzido: 77 testes, 87,46% total, Tasks 98,15%, UserTransaction 100%; diff check aprovado. Reinício cobre Repo/pool; comando antigo usa callback. Comandos futuros fora do escopo. Evidências completas na TASK-021.
+
+## Revisão anterior preservada — TASK-019 e TASK-020
 
 Resultado: **approved**, sem achados bloqueantes. Revisão independente por `/root`, que não implementou estas entregas nesta sessão, do intervalo `9ec53063065ac434895baa70333d49824ee8fb91..6b8030933cdf64c7390709e3cc825d4300106fc3`. Ancestralidade confirmada e código executável local idêntico ao alvo. Dependências integradas; aceites humanos anteriores apenas consultados. Esta rodada encerra as pendências de revisão detalhada das duas tarefas, preservando os registros excepcionais como histórico.
 
