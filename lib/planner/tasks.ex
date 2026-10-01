@@ -16,6 +16,59 @@ defmodule Planner.Tasks do
   alias Planner.UserTransaction
 
   @doc """
+  Returns a current pending task to backlog and refunds one choice atomically.
+
+  Returns `{:ok, task}`; an already pending backlog task is an unchanged success.
+  Missing/foreign/malformed IDs return `{:error, :not_found}` and completed,
+  retry or noncurrent tasks return `{:error, :invalid_state}`. Persistence
+  errors roll back the task, remaining positions and quota together.
+  The optional date is server/test controlled, never browser input.
+  """
+  def return_to_backlog(%User{} = user, id, date \\ nil) do
+    UserTransaction.run(
+      user,
+      fn day, plan ->
+        task = owned_task(user, id)
+
+        cond do
+          is_nil(task) -> {:error, :not_found}
+          not is_nil(task.completed_on) -> {:error, :invalid_state}
+          task.kind == :backlog -> {:ok, task}
+          task.kind == :today and task.scheduled_for == day -> return_task(task, day, plan)
+          true -> {:error, :invalid_state}
+        end
+      end,
+      date
+    )
+  end
+
+  defp return_task(task, day, plan) do
+    with {:ok, returned} <-
+           task |> Changeset.change(kind: :backlog, position: nil) |> Repo.update() do
+      compact_positions(task.user_id, day)
+
+      case plan |> DailyPlan.changeset(%{used_choices: plan.used_choices - 1}) |> Repo.update() do
+        {:ok, _plan} -> {:ok, returned}
+        {:error, changeset} -> {:error, changeset}
+      end
+    end
+  end
+
+  defp compact_positions(user_id, day) do
+    Repo.all(
+      from task in Task,
+        where:
+          task.user_id == ^user_id and task.kind == :today and
+            task.scheduled_for == ^day and is_nil(task.completed_on),
+        order_by: [task.position, task.id]
+    )
+    |> Enum.with_index(1)
+    |> Enum.each(fn {task, position} ->
+      task |> Changeset.change(position: position) |> Repo.update!()
+    end)
+  end
+
+  @doc """
   Selects an owned backlog/retry task for today and consumes one daily choice.
 
   Returns `{:ok, task}` or `{:error, :not_found | :invalid_state | :quota_exhausted}`.

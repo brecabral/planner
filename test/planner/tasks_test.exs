@@ -19,6 +19,192 @@ defmodule Planner.TasksTest do
     %{user: user_fixture()}
   end
 
+  test "return_to_backlog refunds once, compacts positions and permits reselection", %{user: user} do
+    day = ~D[2026-10-01]
+    label = label_fixture(user)
+    tasks = for _ <- 1..3, do: task_fixture(user, %{label_ids: [label.id]})
+    for task <- tasks, do: assert({:ok, _} = Tasks.select_today(user, task.id, day))
+    [first, middle, last] = tasks
+    assert {:ok, returned} = Tasks.return_to_backlog(user, Integer.to_string(middle.id), day)
+    assert returned.kind == :backlog
+    assert returned.id == middle.id
+    assert returned.title == middle.title
+    assert is_nil(returned.position)
+    assert Repo.preload(returned, :labels).labels == [label]
+    assert {:ok, ^returned} = Tasks.return_to_backlog(user, middle.id, day)
+    assert {:ok, %{used_choices: 2, today: today}} = Tasks.snapshot(user, day)
+    assert Enum.map(today, &{&1.id, &1.position}) == [{first.id, 1}, {last.id, 2}]
+    assert {:ok, reselected} = Tasks.select_today(user, middle.id, day)
+    assert reselected.position == 3
+    assert {:ok, %{used_choices: 3}} = Tasks.snapshot(user, day)
+  end
+
+  test "return_to_backlog rejects invalid owners, completion and expired selections", %{
+    user: user
+  } do
+    day = ~D[2026-10-01]
+    expired = task_fixture(user)
+    assert {:ok, _} = Tasks.select_today(user, expired.id, Date.add(day, -1))
+    completed = task_fixture(user)
+    assert {:ok, completed} = Tasks.select_today(user, completed.id, day)
+    completed = completed |> change(completed_on: day) |> Repo.update!()
+    foreign = task_fixture(user_fixture()) |> schedule(day, 1)
+
+    for id <- [nil, "bad-id", -1, foreign.id] do
+      assert {:error, :not_found} = Tasks.return_to_backlog(user, id, day)
+    end
+
+    for id <- [expired.id, completed.id] do
+      assert {:error, :invalid_state} = Tasks.return_to_backlog(user, id, day)
+    end
+
+    assert Repo.get!(Task, completed.id) == completed
+    assert Repo.get!(Task, foreign.id) == foreign
+    assert {:ok, %{used_choices: 1, retry: [retry]}} = Tasks.snapshot(user, day)
+    assert retry.id == expired.id
+    assert Repo.get_by!(DailyPlan, user_id: user.id, day: Date.add(day, -1)).used_choices == 1
+  end
+
+  test "return_to_backlog rolls back task, positions and quota after a refund write failure", %{
+    user: user
+  } do
+    day = ~D[2026-10-01]
+    tasks = for _ <- 1..3, do: task_fixture(user)
+    for task <- tasks, do: assert({:ok, _} = Tasks.select_today(user, task.id, day))
+    assert {:ok, original} = Tasks.snapshot(user, day)
+
+    SQL.query!(
+      Repo,
+      "ALTER TABLE daily_plans ADD CONSTRAINT reject_test_refund CHECK (used_choices = 3) NOT VALID"
+    )
+
+    assert_raise Ecto.ConstraintError, fn -> Tasks.return_to_backlog(user, hd(tasks).id, day) end
+    assert {:ok, ^original} = Tasks.snapshot(user, day)
+  end
+
+  test "return_to_backlog handles a single task and uses the server day", %{user: user} do
+    task = task_fixture(user)
+    assert {:ok, _} = Tasks.select_today(user, task.id)
+    assert {:ok, returned} = Tasks.return_to_backlog(user, task.id)
+    assert returned.kind == :backlog
+    assert {:ok, %{used_choices: 0, today: []}} = Tasks.snapshot(user)
+  end
+
+  test "a stale return command cannot refund yesterday's choice into a new day", %{user: user} do
+    yesterday = ~D[2026-09-30]
+    day = Date.add(yesterday, 1)
+    task = task_fixture(user)
+    assert {:ok, selected} = Tasks.select_today(user, task.id, yesterday)
+    assert {:error, :invalid_state} = Tasks.return_to_backlog(user, task.id, day)
+    assert Repo.get_by(DailyPlan, user_id: user.id, day: day) == nil
+    assert Repo.get!(Task, task.id) == selected
+    assert {:ok, %{used_choices: 0, today: [], retry: [retry]}} = Tasks.snapshot(user, day)
+    assert retry.id == task.id
+    assert Repo.get_by!(DailyPlan, user_id: user.id, day: yesterday).used_choices == 1
+  end
+
+  test "concurrent returns refund the same task only once" do
+    with_committed_user(fn user ->
+      day = ~D[2026-10-01]
+      task = task_fixture(user)
+      assert {:ok, _} = Tasks.select_today(user, task.id, day)
+      command = fn -> Tasks.return_to_backlog(user, task.id, day) end
+      assert [{:ok, first}, {:ok, second}] = race_planning_commands(user, day, [command, command])
+      assert first == second
+      assert {:ok, %{used_choices: 0, today: [], backlog: [returned]}} = Tasks.snapshot(user, day)
+      assert returned.id == task.id
+    end)
+  end
+
+  test "concurrent return and selection preserve the quota and consecutive positions" do
+    with_committed_user(fn user ->
+      day = ~D[2026-10-01]
+      tasks = for _ <- 1..4, do: task_fixture(user)
+
+      for task <- Enum.take(tasks, 3),
+          do: assert({:ok, _} = Tasks.select_today(user, task.id, day))
+
+      [returning, _, _, selecting] = tasks
+
+      [return_result, select_result] =
+        race_planning_commands(user, day, [
+          fn -> Tasks.return_to_backlog(user, returning.id, day) end,
+          fn -> Tasks.select_today(user, selecting.id, day) end
+        ])
+
+      assert {:ok, %{kind: :backlog}} = return_result
+      assert {:ok, snapshot} = Tasks.snapshot(user, day)
+
+      case select_result do
+        {:ok, selected} ->
+          assert selected.id == selecting.id
+          assert snapshot.used_choices == 3
+          assert length(snapshot.today) == 3
+
+        {:error, :quota_exhausted} ->
+          assert snapshot.used_choices == 2
+          assert length(snapshot.today) == 2
+      end
+
+      assert Enum.map(snapshot.today, & &1.position) == Enum.to_list(1..length(snapshot.today))
+      assert Enum.any?(snapshot.backlog, &(&1.id == returning.id))
+    end)
+  end
+
+  defp with_committed_user(operation) do
+    Sandbox.unboxed_run(Repo, fn ->
+      user = user_fixture()
+
+      try do
+        operation.(user)
+      after
+        Repo.delete_all(from t in Task, where: t.user_id == ^user.id)
+        Repo.delete_all(from p in DailyPlan, where: p.user_id == ^user.id)
+        Repo.delete!(user)
+      end
+    end)
+  end
+
+  defp race_planning_commands(user, day, commands) do
+    parent = self()
+
+    holder =
+      selection_worker(fn ->
+        UserTransaction.run(
+          user,
+          fn _day, _plan ->
+            send(parent, {:holder, selection_backend()})
+            receive do: (:release -> {:ok, :released})
+          end,
+          day
+        )
+      end)
+
+    assert_receive {:holder, holder_backend}, 2_000
+
+    contenders =
+      Enum.map(commands, fn command ->
+        selection_worker(fn ->
+          send(parent, {:contender, selection_backend()})
+          command.()
+        end)
+      end)
+
+    try do
+      assert_receive {:contender, first_backend}, 2_000
+      assert_receive {:contender, second_backend}, 2_000
+      assert first_backend != second_backend
+      deadline = System.monotonic_time(:millisecond) + 2_000
+      wait_for_selection_lock(first_backend, [holder_backend, second_backend], deadline)
+      wait_for_selection_lock(second_backend, [holder_backend, first_backend], deadline)
+    after
+      send(holder.pid, :release)
+    end
+
+    assert {:ok, :released} = Elixir.Task.await(holder)
+    Enum.map(contenders, &Elixir.Task.await/1)
+  end
+
   test "select_today uses three choices, appends positions and is idempotent at the limit", %{
     user: user
   } do
