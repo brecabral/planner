@@ -1,6 +1,6 @@
 ---
 id: "TASK-007"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Compõe conclusão idempotente e compactação de ordem na fronteira transacional existente."
 specs: ["SPEC-002", "SPEC-003"]
@@ -52,3 +52,7 @@ Contrato `complete-task`:
 TDD: seis falhas pela API ausente antes da implementação, inclusive nos workers de concorrência; depois **46 testes de Tasks aprovados**. Ajuda Mix já consultada nesta sessão. `rtk mix precommit` e `rtk mix ci`: **103 testes aprovados**, compilação/formatação/Credo estrito aprovados, **89,39% de cobertura total**, Tasks **98,29%**, UserTransaction **100%**, mínimo de 70% preservado. `rtk git diff --check` aprovado.
 
 Autoavaliação pelo fluxo de review: aceites atendidos, sem bloqueadores identificados. Concorrência confirma backends distintos e espera por lock; aceita os dois vencedores serializáveis sem afirmar enumeração de todos os interleavings. Reinício/persistência da consulta histórica e UI não pertencem a esta entrega. Encaminhada ao coordenador para conferência operacional; revisão independente e integração pendentes neste registro.
+
+### Conferência e integração — 01/10/2026
+
+Coordenador `/root`: código/testes conferidos contra os três aceites, incluindo CA-002-02 por APIs reais, preservação de consumo/data, compactação, rejeições, rollback e disputa com devolução. Gates relatados: 103 testes, 89,39%; diff check aprovado. Integrada em `1c4f88659d47c32fae5f55375f446aaf25e8877d`. Conforme autorização explícita do usuário, conclusão operacional e liberação da TASK-025 por conferência do coordenador; revisão independente pendente para o final, sem aprovação presumida do revisor.
