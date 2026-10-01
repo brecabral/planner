@@ -10,9 +10,67 @@ defmodule Planner.Tasks do
   alias Planner.Labels
   alias Planner.Labels.Label
   alias Planner.Repo
+  alias Planner.Tasks.DailyPlan
   alias Planner.Tasks.Task
   alias Planner.Tasks.TaskLabel
   alias Planner.UserTransaction
+
+  @doc """
+  Selects an owned backlog/retry task for today and consumes one daily choice.
+
+  Returns `{:ok, task}` or `{:error, :not_found | :invalid_state | :quota_exhausted}`.
+  Selecting a current pending task again succeeds without consuming another choice.
+  Missing, foreign and malformed IDs have the same result. The optional date is
+  controlled by the server/tests, never browser input. All state is reloaded after
+  acquiring the user's lock and normalizing expired tasks.
+  """
+  def select_today(%User{} = user, id, date \\ nil) do
+    UserTransaction.run(
+      user,
+      fn day, plan ->
+        task = owned_task(user, id)
+
+        cond do
+          is_nil(task) -> {:error, :not_found}
+          not is_nil(task.completed_on) -> {:error, :invalid_state}
+          task.kind == :today and task.scheduled_for == day -> {:ok, task}
+          task.kind not in [:backlog, :retry] -> {:error, :invalid_state}
+          plan.used_choices >= 3 -> {:error, :quota_exhausted}
+          true -> select_task(task, day, plan)
+        end
+      end,
+      date
+    )
+  end
+
+  defp owned_task(user, id) do
+    case Ecto.Type.cast(:id, id) do
+      {:ok, id} when is_integer(id) -> Repo.get_by(Task, id: id, user_id: user.id)
+      _ -> nil
+    end
+  end
+
+  defp select_task(task, day, plan) do
+    last_position =
+      Repo.aggregate(
+        from(t in Task,
+          where:
+            t.user_id == ^task.user_id and t.kind == :today and
+              t.scheduled_for == ^day and is_nil(t.completed_on)
+        ),
+        :max,
+        :position
+      ) || 0
+
+    with {:ok, selected} <-
+           task
+           |> Changeset.change(kind: :today, scheduled_for: day, position: last_position + 1)
+           |> Repo.update(),
+         {:ok, _plan} <-
+           plan |> DailyPlan.changeset(%{used_choices: plan.used_choices + 1}) |> Repo.update() do
+      {:ok, selected}
+    end
+  end
 
   @doc """
   Returns the normalized planning collections and persisted daily quota.

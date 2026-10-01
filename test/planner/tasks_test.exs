@@ -2,6 +2,7 @@ defmodule Planner.TasksTest do
   use Planner.DataCase
 
   alias Ecto.Adapters.SQL
+  alias Ecto.Adapters.SQL.Sandbox
   alias Planner.Labels
   alias Planner.Labels.Label
   alias Planner.Tasks
@@ -16,6 +17,183 @@ defmodule Planner.TasksTest do
 
   setup do
     %{user: user_fixture()}
+  end
+
+  test "select_today uses three choices, appends positions and is idempotent at the limit", %{
+    user: user
+  } do
+    day = ~D[2026-10-01]
+    tasks = for _ <- 1..4, do: task_fixture(user)
+
+    for {task, position} <- Enum.zip(Enum.take(tasks, 3), 1..3) do
+      assert {:ok, selected} = Tasks.select_today(user, task.id, day)
+      assert selected.id == task.id
+      assert selected.kind == :today
+      assert selected.scheduled_for == day
+      assert selected.position == position
+    end
+
+    assert {:ok, first} = Tasks.select_today(user, hd(tasks).id, day)
+    assert first.position == 1
+    assert {:error, :quota_exhausted} = Tasks.select_today(user, List.last(tasks).id, day)
+
+    assert {:ok, %{used_choices: 3, today: today, backlog: [remaining]}} =
+             Tasks.snapshot(user, day)
+
+    assert length(today) == 3
+    assert remaining.id == List.last(tasks).id
+  end
+
+  test "select_today rejects foreign, missing, malformed and completed tasks", %{user: user} do
+    day = ~D[2026-10-01]
+    foreign = task_fixture(user_fixture())
+    completed = task_fixture(user) |> schedule(day, 1)
+    completed = completed |> change(completed_on: day) |> Repo.update!()
+
+    for id <- [foreign.id, -1, "bad-id", nil] do
+      assert {:error, :not_found} = Tasks.select_today(user, id, day)
+    end
+
+    assert {:error, :invalid_state} = Tasks.select_today(user, completed.id, day)
+    assert Repo.get!(Task, foreign.id) == foreign
+    assert Repo.get!(Task, completed.id) == completed
+    assert Repo.get_by(DailyPlan, user_id: user.id, day: day) == nil
+  end
+
+  test "select_today captures the server day and keeps each user's quota independent", %{
+    user: user
+  } do
+    before = Date.utc_today()
+
+    for _ <- 1..3 do
+      task = task_fixture(user)
+      assert {:ok, selected} = Tasks.select_today(user, task.id)
+      assert selected.scheduled_for in [before, Date.utc_today()]
+    end
+
+    other = user_fixture()
+    task = task_fixture(other)
+    assert {:ok, selected} = Tasks.select_today(other, task.id)
+    assert selected.user_id == other.id
+    assert selected.position == 1
+    assert {:ok, %{used_choices: 1}} = Tasks.snapshot(other)
+  end
+
+  test "select_today revalidates rollover and consumes the current day's quota", %{user: user} do
+    yesterday = ~D[2026-09-30]
+    day = Date.add(yesterday, 1)
+    label = label_fixture(user)
+    stale = task_fixture(user, %{label_ids: [label.id]})
+    abandoned = task_fixture(user)
+    assert {:ok, _} = Tasks.select_today(user, stale.id, yesterday)
+    assert {:ok, _} = Tasks.select_today(user, abandoned.id, yesterday)
+    assert {:ok, selected} = Tasks.select_today(user, Integer.to_string(stale.id), day)
+    assert selected.id == stale.id
+    assert selected.title == stale.title
+    assert selected.position == 1
+    assert selected.scheduled_for == day
+    assert Repo.preload(selected, :labels).labels == [label]
+    assert {:ok, %{used_choices: 1, retry: [retry]}} = Tasks.snapshot(user, day)
+    assert retry.id == abandoned.id
+    assert Repo.get_by!(DailyPlan, user_id: user.id, day: yesterday).used_choices == 2
+  end
+
+  test "select_today rolls back the movement when the quota write fails", %{user: user} do
+    day = ~D[2026-10-01]
+    task = task_fixture(user)
+    assert {:ok, _} = Tasks.snapshot(user, day)
+
+    SQL.query!(
+      Repo,
+      "ALTER TABLE daily_plans ADD CONSTRAINT reject_test_consumption CHECK (used_choices = 0) NOT VALID"
+    )
+
+    assert_raise Ecto.ConstraintError, fn -> Tasks.select_today(user, task.id, day) end
+    assert Repo.get!(Task, task.id) == task
+    assert Repo.get_by!(DailyPlan, user_id: user.id, day: day).used_choices == 0
+  end
+
+  test "concurrent selections on separate connections have one winner for the last choice" do
+    Sandbox.unboxed_run(Repo, fn ->
+      user = user_fixture()
+
+      try do
+        day = ~D[2026-10-01]
+        first = task_fixture(user)
+        second = task_fixture(user)
+        Repo.insert!(%DailyPlan{user_id: user.id, day: day, used_choices: 2})
+        parent = self()
+
+        holder =
+          selection_worker(fn ->
+            UserTransaction.run(
+              user,
+              fn _day, _plan ->
+                send(parent, {:holder, selection_backend()})
+                receive do: (:release -> {:ok, :released})
+              end,
+              day
+            )
+          end)
+
+        assert_receive {:holder, holder_backend}, 2_000
+
+        contenders =
+          for task <- [first, second] do
+            selection_worker(fn ->
+              send(parent, {:contender, selection_backend()})
+              Tasks.select_today(user, task.id, day)
+            end)
+          end
+
+        try do
+          assert_receive {:contender, first_backend}, 2_000
+          assert_receive {:contender, second_backend}, 2_000
+          assert first_backend != second_backend
+          deadline = System.monotonic_time(:millisecond) + 2_000
+          wait_for_selection_lock(first_backend, [holder_backend, second_backend], deadline)
+          wait_for_selection_lock(second_backend, [holder_backend, first_backend], deadline)
+        after
+          send(holder.pid, :release)
+        end
+
+        assert {:ok, :released} = Elixir.Task.await(holder)
+        results = Enum.map(contenders, &Elixir.Task.await/1)
+        assert Enum.count(results, &match?({:ok, %Task{}}, &1)) == 1
+        assert Enum.count(results, &(&1 == {:error, :quota_exhausted})) == 1
+
+        assert {:ok, %{used_choices: 3, today: [winner], backlog: [loser]}} =
+                 Tasks.snapshot(user, day)
+
+        assert winner.id != loser.id
+        assert winner.position == 1
+        assert {:ok, _} = Tasks.select_today(user, winner.id, day)
+        assert Repo.get_by!(DailyPlan, user_id: user.id, day: day).used_choices == 3
+      after
+        Repo.delete_all(from t in Task, where: t.user_id == ^user.id)
+        Repo.delete_all(from p in DailyPlan, where: p.user_id == ^user.id)
+        Repo.delete!(user)
+      end
+    end)
+  end
+
+  defp selection_worker(fun) do
+    supervisor = start_supervised!({Elixir.Task.Supervisor, name: nil}, id: make_ref())
+
+    Elixir.Task.Supervisor.async_nolink(supervisor, fn ->
+      Sandbox.unboxed_run(Repo, fun)
+    end)
+  end
+
+  defp selection_backend, do: Repo.query!("SELECT pg_backend_pid()").rows |> hd() |> hd()
+
+  defp wait_for_selection_lock(waiter, expected_blockers, deadline) do
+    %{rows: [[blockers]]} = Repo.query!("SELECT pg_blocking_pids($1)", [waiter])
+
+    unless Enum.any?(blockers, &(&1 in expected_blockers)) do
+      assert System.monotonic_time(:millisecond) < deadline, "expected PostgreSQL lock wait"
+      wait_for_selection_lock(waiter, expected_blockers, deadline)
+    end
   end
 
   test "snapshot rolls expired pending tasks into retry once and preserves identity", %{
