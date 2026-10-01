@@ -1,6 +1,6 @@
 ---
 id: "TASK-023"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Compõe devolução idempotente, restituição e ordem na mesma fronteira transacional."
 specs: ["SPEC-002", "SPEC-003"]
@@ -51,3 +51,7 @@ Contrato `return-to-backlog`:
 TDD: seis falhas iniciais por API ausente (nos casos concorrentes os workers falharam antes de adquirir lock); após implementação, **32 testes de Tasks aprovados**. Acrescentado caso explícito de retorno vencido como primeira operação na nova data. Ajuda Mix já consultada nesta sessão. `rtk mix precommit` e `rtk mix ci`: **90 testes aprovados**, compilação/formatação/Credo estrito aprovados, **88,48% de cobertura total**, Tasks **97,75%**, UserTransaction **100%**, mínimo de 70% preservado. `rtk git diff --check` aprovado.
 
 Autoavaliação pelo fluxo de review: aceites atendidos, sem achado bloqueante. Concorrência confirma espera real (`pg_blocking_pids`) e backends distintos; não enumera todos os interleavings, e o teste aceita ambos os resultados serializáveis da disputa retorno/seleção. A cobertura de Tasks inclui tratamento defensivo de erro de changeset não provocado; falha real de escrita e rollback integral são exercitados por constraint no sandbox. Evidências entregues ao coordenador para conferência operacional; revisão independente e integração pendentes neste registro.
+
+### Conferência e integração — 01/10/2026
+
+Coordenador `/root`: código/testes conferidos contra aceites de restituição única, compactação, concorrência, rollback e virada. Gates relatados: 90 testes, 88,48% de cobertura; diff check aprovado. Integrada em `f61e30d51399121d8a2947d4b291e507cd2ea9ab`. Conforme autorização explícita do usuário, conclusão operacional e liberação da TASK-024 por conferência do coordenador, mantendo revisão independente pendente para o final da rodada; não constitui aprovação do revisor.
