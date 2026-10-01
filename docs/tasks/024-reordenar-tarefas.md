@@ -1,6 +1,6 @@
 ---
 id: "TASK-024"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Valida permutação completa e persiste posições atomicamente sob a trava existente."
 specs: ["SPEC-002"]
@@ -55,3 +55,7 @@ Contrato `reorder-today`:
 TDD: ajuda do gerador consultada, scaffold gerado e migration integralmente preenchida antes da primeira aplicação. Nenhuma migration integrada revertida ou editada. Primeiro teste teve seis falhas pela API ausente; constraints já passaram. Após implementação, **40 testes de Tasks aprovados**. `rtk mix precommit` e `rtk mix ci`: **97 testes aprovados**, compilação/formatação/Credo estrito aprovados, **89,08% de cobertura total**, Tasks **98,13%**, UserTransaction **100%**, mínimo de 70% preservado. CI repetido após tornar a asserção de repetição independente do timestamp técnico. `rtk git diff --check` aprovado.
 
 Autoavaliação pelo fluxo de review: aceites atendidos, sem bloqueadores identificados. A migration foi validada no banco de testes, sem aplicar rollback de bases existentes; não foi simulada instalação com dados legados inválidos. Concorrência cobre resultados serializáveis de disputas reais, sem enumerar todos os interleavings. Cobertura de linhas não substitui asserções das constraints nem garante todas as exceções defensivas. Encaminhada ao coordenador para conferência operacional; revisão independente e integração pendentes neste registro.
+
+### Conferência e integração — 01/10/2026
+
+Coordenador `/root`: diff, migration e testes conferidos contra aceites; permutação exata, rejeição integral, unicidade compatível com troca, rollback e concorrência atendidos. Gates relatados: 97 testes, cobertura 89,08%; diff check aprovado. Integrada em `fe4632b521e1b560bbaea22c003cd8318aee950a`. Conforme autorização explícita do usuário, conclusão operacional e liberação da TASK-007 por conferência do coordenador; revisão independente permanece pendente para o final, sem alegação de aprovação pelo revisor.
