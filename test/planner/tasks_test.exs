@@ -19,6 +19,147 @@ defmodule Planner.TasksTest do
     %{user: user_fixture()}
   end
 
+  test "reorder_today persists an exact permutation without changing quota", %{user: user} do
+    day = ~D[2026-10-01]
+    tasks = for _ <- 1..3, do: task_fixture(user)
+    for task <- tasks, do: assert({:ok, _} = Tasks.select_today(user, task.id, day))
+    ids = tasks |> Enum.reverse() |> Enum.map(& &1.id)
+    assert {:ok, reordered} = Tasks.reorder_today(user, Enum.map(ids, &Integer.to_string/1), day)
+    assert Enum.map(reordered, & &1.id) == ids
+    assert Enum.map(reordered, & &1.position) == [1, 2, 3]
+    assert {:ok, repeated} = Tasks.reorder_today(user, ids, day)
+    assert Enum.map(repeated, &{&1.id, &1.position}) == Enum.map(reordered, &{&1.id, &1.position})
+    assert {:ok, %{today: today, used_choices: 3}} = Tasks.snapshot(user, day)
+    assert Enum.map(today, & &1.id) == ids
+  end
+
+  test "reorder_today rejects nonpermutations without changing state", %{user: user} do
+    day = ~D[2026-10-01]
+    first = task_fixture(user)
+    second = task_fixture(user)
+    backlog = task_fixture(user)
+    foreign = task_fixture(user_fixture()) |> schedule(day, 1)
+    completed = task_fixture(user) |> schedule(day, 3)
+    completed |> change(completed_on: day) |> Repo.update!()
+    for task <- [first, second], do: assert({:ok, _} = Tasks.select_today(user, task.id, day))
+    assert {:ok, original} = Tasks.snapshot(user, day)
+
+    for ids <- [
+          [],
+          [first.id],
+          [first.id, first.id],
+          [first.id, foreign.id],
+          [first.id, -1],
+          [first.id, backlog.id],
+          [first.id, completed.id],
+          [first.id, "bad-id"],
+          [nil, second.id],
+          "bad-list",
+          nil
+        ] do
+      assert {:error, :invalid_order} = Tasks.reorder_today(user, ids, day)
+      assert {:ok, ^original} = Tasks.snapshot(user, day)
+    end
+  end
+
+  test "reorder_today revalidates stale sets after a return, selection or rollover", %{user: user} do
+    day = ~D[2026-10-01]
+    first = task_fixture(user)
+    second = task_fixture(user)
+    assert {:ok, _} = Tasks.select_today(user, first.id, day)
+    assert {:ok, _} = Tasks.select_today(user, second.id, day)
+    assert {:ok, _} = Tasks.return_to_backlog(user, first.id, day)
+    assert {:error, :invalid_order} = Tasks.reorder_today(user, [second.id, first.id], day)
+    assert {:ok, _} = Tasks.select_today(user, first.id, day)
+    assert {:error, :invalid_order} = Tasks.reorder_today(user, [second.id], day)
+
+    assert {:error, :invalid_order} =
+             Tasks.reorder_today(user, [second.id, first.id], Date.add(day, 1))
+
+    assert {:ok, %{today: [], retry: retry, used_choices: 0}} =
+             Tasks.snapshot(user, Date.add(day, 1))
+
+    assert length(retry) == 2
+    assert Repo.get_by!(DailyPlan, user_id: user.id, day: day).used_choices == 2
+  end
+
+  test "reorder_today accepts an empty current set and the server date", %{user: user} do
+    assert {:ok, []} = Tasks.reorder_today(user, [])
+    assert {:ok, %{used_choices: 0}} = Tasks.snapshot(user)
+  end
+
+  test "reorder_today rolls back temporary positions after a final write failure", %{user: user} do
+    day = ~D[2026-10-01]
+    tasks = for _ <- 1..3, do: task_fixture(user)
+    for task <- tasks, do: assert({:ok, _} = Tasks.select_today(user, task.id, day))
+    assert {:ok, original} = Tasks.snapshot(user, day)
+    last = List.last(tasks)
+
+    SQL.query!(
+      Repo,
+      "ALTER TABLE tasks ADD CONSTRAINT reject_test_order CHECK (id <> #{last.id} OR position <> 1) NOT VALID"
+    )
+
+    ids = tasks |> Enum.reverse() |> Enum.map(& &1.id)
+    assert_raise Ecto.ConstraintError, fn -> Tasks.reorder_today(user, ids, day) end
+    assert {:ok, ^original} = Tasks.snapshot(user, day)
+  end
+
+  test "position constraints reject duplicate, missing and nonpositive pending positions", %{
+    user: user
+  } do
+    day = ~D[2026-10-01]
+    first = task_fixture(user) |> schedule(day, 1)
+    second = task_fixture(user)
+
+    for attrs <- [
+          [kind: :today, scheduled_for: day, position: 1],
+          [kind: :today, scheduled_for: day],
+          [position: 0],
+          [position: -1],
+          [kind: :today, position: 2]
+        ] do
+      assert_raise Ecto.ConstraintError, fn ->
+        Repo.transaction(fn -> second |> change(attrs) |> Repo.update!() end)
+      end
+    end
+
+    assert Repo.get!(Task, first.id) == first
+    assert Repo.get!(Task, second.id) == second
+    assert task_fixture(user_fixture()) |> schedule(day, 1)
+  end
+
+  test "reordering concurrently with return or selection preserves the resulting set and quota" do
+    for operation <- [:return, :select] do
+      with_committed_user(fn user ->
+        day = ~D[2026-10-01]
+        tasks = for _ <- 1..3, do: task_fixture(user)
+        [first, second, third] = tasks
+        for task <- [first, second], do: assert({:ok, _} = Tasks.select_today(user, task.id, day))
+
+        mutation =
+          case operation do
+            :return -> fn -> Tasks.return_to_backlog(user, first.id, day) end
+            :select -> fn -> Tasks.select_today(user, third.id, day) end
+          end
+
+        [order_result, mutation_result] =
+          race_planning_commands(user, day, [
+            fn -> Tasks.reorder_today(user, [second.id, first.id], day) end,
+            mutation
+          ])
+
+        assert match?({:ok, _}, order_result) or order_result == {:error, :invalid_order}
+        assert {:ok, _} = mutation_result
+        assert {:ok, snapshot} = Tasks.snapshot(user, day)
+        expected = if operation == :return, do: [second.id], else: Enum.map(tasks, & &1.id)
+        assert Enum.sort(Enum.map(snapshot.today, & &1.id)) == Enum.sort(expected)
+        assert snapshot.used_choices == length(expected)
+        assert Enum.map(snapshot.today, & &1.position) == Enum.to_list(1..length(expected))
+      end)
+    end
+  end
+
   test "return_to_backlog refunds once, compacts positions and permits reselection", %{user: user} do
     day = ~D[2026-10-01]
     label = label_fixture(user)

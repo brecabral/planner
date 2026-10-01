@@ -16,6 +16,70 @@ defmodule Planner.Tasks do
   alias Planner.UserTransaction
 
   @doc """
+  Reorders exactly the current pending task IDs, leaving the quota unchanged.
+
+  Returns `{:ok, tasks}` in the requested order or `{:error, :invalid_order}`.
+  Integer IDs and their string representations are accepted. The complete set
+  is reloaded under the user lock, so stale, duplicate, missing and foreign IDs
+  are rejected together. The optional date is server/test controlled.
+  """
+  def reorder_today(%User{id: user_id} = user, ids, date \\ nil) do
+    UserTransaction.run(
+      user,
+      fn day, _plan ->
+        tasks =
+          Repo.all(
+            from task in Task,
+              where:
+                task.user_id == ^user_id and task.kind == :today and
+                  task.scheduled_for == ^day and is_nil(task.completed_on),
+              order_by: [task.position, task.id]
+          )
+
+        parsed_ids = parse_order_ids(ids)
+
+        if is_list(parsed_ids) and length(parsed_ids) == length(tasks) and
+             MapSet.new(parsed_ids) == MapSet.new(tasks, & &1.id) do
+          {:ok, persist_order(tasks, parsed_ids)}
+        else
+          {:error, :invalid_order}
+        end
+      end,
+      date
+    )
+  end
+
+  defp parse_order_ids(ids) when is_list(ids) do
+    Enum.map(ids, fn id ->
+      case Ecto.Type.cast(:id, id) do
+        {:ok, id} when is_integer(id) -> id
+        _ -> nil
+      end
+    end)
+  end
+
+  defp parse_order_ids(_), do: nil
+
+  defp persist_order(tasks, ids) do
+    offset = Enum.max(Enum.map(tasks, & &1.position), fn -> 0 end) + 1
+
+    # Vacate the target range without violating the immediate unique index.
+    staged =
+      tasks
+      |> Enum.with_index(offset)
+      |> Map.new(fn {task, position} ->
+        updated = task |> Changeset.change(position: position) |> Repo.update!()
+        {updated.id, updated}
+      end)
+
+    ids
+    |> Enum.with_index(1)
+    |> Enum.map(fn {id, position} ->
+      staged |> Map.fetch!(id) |> Changeset.change(position: position) |> Repo.update!()
+    end)
+  end
+
+  @doc """
   Returns a current pending task to backlog and refunds one choice atomically.
 
   Returns `{:ok, task}`; an already pending backlog task is an unchanged success.
