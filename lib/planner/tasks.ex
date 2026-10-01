@@ -16,6 +16,43 @@ defmodule Planner.Tasks do
   alias Planner.UserTransaction
 
   @doc """
+  Completes a current pending task without refunding a daily choice.
+
+  Returns `{:ok, task}` and preserves the original date on repeated completion.
+  Missing/foreign/malformed IDs return `{:error, :not_found}`; backlog, retry
+  and noncurrent tasks return `{:error, :invalid_state}`. Completion and order
+  compaction share the user's transaction. The optional date is server/test
+  controlled, never browser input.
+  """
+  def complete_task(%User{} = user, id, date \\ nil) do
+    UserTransaction.run(
+      user,
+      fn day, _plan ->
+        task = owned_task(user, id)
+
+        cond do
+          is_nil(task) ->
+            {:error, :not_found}
+
+          not is_nil(task.completed_on) ->
+            {:ok, task}
+
+          task.kind == :today and task.scheduled_for == day ->
+            completed =
+              task |> Changeset.change(completed_on: day, position: nil) |> Repo.update!()
+
+            compact_positions(user.id, day)
+            {:ok, completed}
+
+          true ->
+            {:error, :invalid_state}
+        end
+      end,
+      date
+    )
+  end
+
+  @doc """
   Reorders exactly the current pending task IDs, leaving the quota unchanged.
 
   Returns `{:ok, tasks}` in the requested order or `{:error, :invalid_order}`.

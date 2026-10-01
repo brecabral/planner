@@ -19,6 +19,130 @@ defmodule Planner.TasksTest do
     %{user: user_fixture()}
   end
 
+  test "completing one of three selected tasks does not make room for a fourth", %{user: user} do
+    day = ~D[2026-10-01]
+    label = label_fixture(user)
+    tasks = for _ <- 1..4, do: task_fixture(user, %{label_ids: [label.id]})
+    for task <- Enum.take(tasks, 3), do: assert({:ok, _} = Tasks.select_today(user, task.id, day))
+    [first, middle, third, fourth] = tasks
+    assert {:ok, completed} = Tasks.complete_task(user, Integer.to_string(middle.id), day)
+    assert completed.id == middle.id
+    assert completed.title == middle.title
+    assert completed.completed_on == day
+    assert is_nil(completed.position)
+    assert Repo.preload(completed, :labels).labels == [label]
+    assert {:error, :quota_exhausted} = Tasks.select_today(user, fourth.id, day)
+
+    assert {:ok, %{used_choices: 3, today: today, backlog: [remaining], retry: []}} =
+             Tasks.snapshot(user, day)
+
+    assert Enum.map(today, &{&1.id, &1.position}) == [{first.id, 1}, {third.id, 2}]
+    assert remaining.id == fourth.id
+    assert {:ok, ^completed} = Tasks.complete_task(user, middle.id, day)
+    assert {:ok, ^completed} = Tasks.complete_task(user, middle.id, Date.add(day, 1))
+    assert Repo.get_by!(DailyPlan, user_id: user.id, day: day).used_choices == 3
+    assert Repo.get_by!(DailyPlan, user_id: user.id, day: Date.add(day, 1)).used_choices == 0
+  end
+
+  test "complete_task rejects backlog, expired, foreign and invalid IDs without spending", %{
+    user: user
+  } do
+    day = ~D[2026-10-01]
+    backlog = task_fixture(user)
+    expired = task_fixture(user)
+    foreign = task_fixture(user_fixture()) |> schedule(day, 1)
+    assert {:ok, selected} = Tasks.select_today(user, expired.id, Date.add(day, -1))
+
+    for id <- [nil, "bad-id", -1, foreign.id] do
+      assert {:error, :not_found} = Tasks.complete_task(user, id, day)
+    end
+
+    for id <- [backlog.id, expired.id] do
+      assert {:error, :invalid_state} = Tasks.complete_task(user, id, day)
+    end
+
+    assert Repo.get!(Task, backlog.id) == backlog
+    assert Repo.get!(Task, expired.id) == selected
+    assert Repo.get!(Task, foreign.id) == foreign
+    assert Repo.get_by(DailyPlan, user_id: user.id, day: day) == nil
+    assert {:ok, %{used_choices: 0, retry: [retry]}} = Tasks.snapshot(user, day)
+    assert retry.id == expired.id
+    assert {:error, :invalid_state} = Tasks.complete_task(user, retry.id, day)
+  end
+
+  test "complete_task uses the server day and empties a single-task plan", %{user: user} do
+    task = task_fixture(user)
+    assert {:ok, _} = Tasks.select_today(user, task.id)
+    before = Date.utc_today()
+    assert {:ok, completed} = Tasks.complete_task(user, task.id)
+    assert completed.completed_on in [before, Date.utc_today()]
+    assert {:ok, %{used_choices: 1, today: []}} = Tasks.snapshot(user)
+  end
+
+  test "completion rolls back when compacting a remaining position fails", %{user: user} do
+    day = ~D[2026-10-01]
+    first = task_fixture(user)
+    second = task_fixture(user)
+    for task <- [first, second], do: assert({:ok, _} = Tasks.select_today(user, task.id, day))
+    assert {:ok, original} = Tasks.snapshot(user, day)
+
+    SQL.query!(
+      Repo,
+      "ALTER TABLE tasks ADD CONSTRAINT reject_test_completion_order CHECK (id <> #{second.id} OR position <> 1) NOT VALID"
+    )
+
+    assert_raise Ecto.ConstraintError, fn -> Tasks.complete_task(user, first.id, day) end
+    assert {:ok, ^original} = Tasks.snapshot(user, day)
+    assert is_nil(Repo.get!(Task, first.id).completed_on)
+  end
+
+  test "concurrent completions preserve one result and consumption" do
+    with_committed_user(fn user ->
+      day = ~D[2026-10-01]
+      task = task_fixture(user)
+      assert {:ok, _} = Tasks.select_today(user, task.id, day)
+      command = fn -> Tasks.complete_task(user, task.id, day) end
+      assert [{:ok, first}, {:ok, second}] = race_planning_commands(user, day, [command, command])
+      assert first == second
+      assert first.completed_on == day
+
+      assert {:ok, %{used_choices: 1, today: [], backlog: [], retry: []}} =
+               Tasks.snapshot(user, day)
+    end)
+  end
+
+  test "completion racing with return has exactly one consistent winner" do
+    with_committed_user(fn user ->
+      day = ~D[2026-10-01]
+      task = task_fixture(user)
+      assert {:ok, _} = Tasks.select_today(user, task.id, day)
+
+      results =
+        race_planning_commands(user, day, [
+          fn -> Tasks.complete_task(user, task.id, day) end,
+          fn -> Tasks.return_to_backlog(user, task.id, day) end
+        ])
+
+      assert Enum.count(results, &match?({:ok, %Task{}}, &1)) == 1
+      assert Enum.count(results, &(&1 == {:error, :invalid_state})) == 1
+      assert {:ok, snapshot} = Tasks.snapshot(user, day)
+      assert snapshot.today == []
+      assert snapshot.retry == []
+      persisted = Repo.get!(Task, task.id)
+
+      case persisted.completed_on do
+        ^day ->
+          assert snapshot.used_choices == 1
+          assert snapshot.backlog == []
+
+        nil ->
+          assert snapshot.used_choices == 0
+          assert persisted.kind == :backlog
+          assert Enum.map(snapshot.backlog, & &1.id) == [task.id]
+      end
+    end)
+  end
+
   test "reorder_today persists an exact permutation without changing quota", %{user: user} do
     day = ~D[2026-10-01]
     tasks = for _ <- 1..3, do: task_fixture(user)
