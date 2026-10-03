@@ -1,6 +1,6 @@
 ---
 id: "TASK-025"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Consulta conclusões do proprietário com preload e desempate estável."
 specs: ["SPEC-003", "SPEC-006"]
@@ -46,3 +46,7 @@ Contrato `history-query`: `Planner.Tasks.list_history(%Planner.Accounts.User{})`
 TDD: após corrigir a limpeza das associações da fixture de reinício e remover somente os dados criados pela tentativa inicial, a fase vermelha limpa apresentou **46 aprovados e 2 falhas**, ambas por ausência de `list_history/1`. Implementação mínima deixou **48 testes de Tasks aprovados**. Ajuda de `test`, `precommit`, `ci` e `run` consultada antes do uso. `rtk mix precommit` e `rtk mix ci`: **105 testes aprovados**, compilação/formatação/Credo estrito aprovados, **89,42% de cobertura total**, Tasks **98,31%**, mínimo de 70% preservado. `rtk git diff --check` aprovado.
 
 Autoavaliação pelo fluxo de review: critérios atendidos, escopo preservado e nenhum bloqueador identificado. Teste reinicia Repo/pool, não o servidor PostgreSQL nem todo o sistema operacional; a consulta lê registros persistidos e não depende de cache. Nenhuma aprovação independente alegada. Integração e liberação de consumidoras dependem da conferência operacional do coordenador autorizada pelo usuário.
+
+### Conferência e integração — 03/10/2026
+
+Coordenador `/root`: conferência superficial do diff contra os aceites e evidências reportadas (105 testes, cobertura de 89,42% nos gates locais), sem revisão independente, conforme pedido explícito do usuário. Diff check aprovado. Entrega integrada no commit `0cfb002`; conclusão operacional registrada e TASK-006 liberada. Não foi verificado CI remoto nem avançado o marco de revisão independente.
