@@ -1,6 +1,6 @@
 ---
 id: "TASK-026"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Integra seleção múltipla e criação de labels ao formulário e cadastro atômico existentes."
 specs: ["SPEC-004", "SPEC-006"]
@@ -46,3 +46,7 @@ Contrato `task-label-form`: Form carrega catálogo do usuário padrão resolvido
 TDD: **3 testes novos falharam** pela ausência dos campos/erros antes da implementação; depois **6 testes LiveView aprovados**. `rtk mix precommit` e `rtk mix ci`: **112 testes aprovados**, compilação/formatação/Credo estrito aprovados, **90,46% de cobertura total**, Form **96,77%**, Tasks **98,31%**, mínimo 70% preservado. `rtk git diff --check` aprovado. Ajuda Mix já consultada nesta sessão; extração/merge restritos ao catálogo pt_BR, sem traduções fuzzy.
 
 Autoavaliação pelo fluxo de review: critérios atendidos, sem bloqueadores identificados. Reuso de componentes, `to_form`, catálogo autorizado e transação do contexto. Cobertura do Form não inclui o ramo defensivo que repassa valores não textuais forjados de novas labels ao contexto; os caminhos reais do formulário e rejeições de IDs foram exercitados. Testes via LiveViewTest, sem navegador real; exibição de labels nas listas é entrega posterior. Estado `in_review`, aguardando conferência superficial e integração pelo coordenador. Nenhuma revisão independente alegada; TASK-027 não iniciada.
+
+### Conferência operacional — 03/10/2026
+
+Coordenador `/root`: registro e resumo conferidos superficialmente; gates locais relatados aprovados (112 testes, cobertura 90,46%), sem impedimentos. Entrega integrada em `b3cbf7e`; TASK-027 liberada. Sem revisão independente ou verificação de CI remoto.
