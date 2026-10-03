@@ -3,12 +3,106 @@ defmodule PlannerWeb.TaskLiveTest do
 
   import Phoenix.LiveViewTest
   import Planner.AccountsFixtures
+  import Planner.LabelsFixtures
   import Planner.TasksFixtures
 
+  alias Planner.Labels
+  alias Planner.Repo
   alias Planner.Tasks
 
   setup do
     %{user: user_fixture(%{identifier: "default"})}
+  end
+
+  test "registers multiple existing and new labels together", %{conn: conn, user: user} do
+    first = label_fixture(user, %{name: "Reading"})
+    second = label_fixture(user, %{name: "Writing"})
+    foreign = label_fixture(user_fixture(), %{name: "Private label"})
+    {:ok, view, _} = live(conn, "/tasks/new")
+    assert has_element?(view, "#task_label_ids[multiple] option[value='#{first.id}']", "Reading")
+    assert has_element?(view, "#task_label_ids option[value='#{second.id}']", "Writing")
+    refute has_element?(view, "#task_label_ids option[value='#{foreign.id}']")
+
+    assert {:ok, _, _} =
+             view
+             |> form("#task-form",
+               task: %{
+                 title: "Study",
+                 label_ids: [to_string(first.id), to_string(second.id)],
+                 new_label_names: "  Research  \nNotes"
+               }
+             )
+             |> render_submit()
+             |> follow_redirect(conn, "/tasks")
+
+    assert [task] = Tasks.list_tasks(user)
+
+    assert Enum.sort(Enum.map(Repo.preload(task, :labels).labels, & &1.name)) ==
+             ["Notes", "Reading", "Research", "Writing"]
+
+    {:ok, next, _} = live(conn, "/tasks/new")
+
+    for label <- Labels.list_labels(user),
+        do: assert(has_element?(next, "#task_label_ids option[value='#{label.id}']", label.name))
+  end
+
+  test "label errors and invalid titles roll back registration and preserve input", %{
+    conn: conn,
+    user: user
+  } do
+    existing = label_fixture(user, %{name: "Existing"})
+    {:ok, view, _} = live(conn, "/tasks/new")
+
+    view
+    |> form("#task-form",
+      task: %{title: "", label_ids: [to_string(existing.id)], new_label_names: "New"}
+    )
+    |> render_submit()
+
+    assert has_element?(view, "#task-form", "não pode ficar em branco")
+    assert has_element?(view, "#task_label_ids option[value='#{existing.id}'][selected]")
+    assert has_element?(view, "#task_new_label_names", "New")
+    assert Tasks.list_tasks(user) == []
+    assert Labels.list_labels(user) == [existing]
+
+    view
+    |> form("#task-form",
+      task: %{
+        title: "Keep title",
+        label_ids: [to_string(existing.id)],
+        new_label_names: "Valid\n   "
+      }
+    )
+    |> render_submit()
+
+    assert has_element?(view, "#task-new-labels", "é inválido")
+    assert has_element?(view, "#task_title[value='Keep title']")
+    assert Tasks.list_tasks(user) == []
+    assert Labels.list_labels(user) == [existing]
+  end
+
+  test "forged label IDs reject the whole registration without exposing other labels", %{
+    conn: conn,
+    user: user
+  } do
+    existing = label_fixture(user)
+    foreign = label_fixture(user_fixture(), %{name: "Private label"})
+    {:ok, view, _} = live(conn, "/tasks/new")
+
+    for id <- [foreign.id, -1] do
+      render_submit(view, "save", %{
+        "task" => %{
+          "title" => "Must roll back",
+          "label_ids" => [to_string(id)],
+          "new_label_names" => "New"
+        }
+      })
+
+      assert has_element?(view, "#task-existing-labels", "é inválido")
+      refute has_element?(view, "option", "Private label")
+      assert Tasks.list_tasks(user) == []
+      assert Labels.list_labels(user) == [existing]
+    end
   end
 
   test "opens without login and creates a persisted backlog task", %{conn: conn, user: user} do
