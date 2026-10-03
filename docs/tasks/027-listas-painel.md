@@ -1,6 +1,6 @@
 ---
 id: "TASK-027"
-status: "planned"
+status: "in_review"
 execution_level: "standard"
 execution_rationale: "Representa snapshot autorizado em streams e contadores coerentes após recarga."
 specs: ["SPEC-002", "SPEC-004"]
@@ -34,4 +34,17 @@ Escrever o teste de intenção antes dos ajustes; preservar testes gerados perti
 
 ## Evidência e revisão
 
-Pendentes. Registrar teste antes/depois, precommit e CI com cobertura mínima de 70%, revisor independente, alvo/base, critérios, achados e integração. Não liberar consumidora antes de revisão aprovada e integração.
+Implementador `/root/implement_task025`, em 03/10/2026. Base `3617773`, com TASK-026 integrada em `b3cbf7e`. Alvo: diff local de `lib/planner_web/live/task_live/index.ex`, `test/planner_web/live/task_live_test.exs`, `priv/gettext/default.pot`, `priv/gettext/pt_BR/LC_MESSAGES/default.po` e este registro. Alterações preexistentes em instruções/documentação preservadas; sem staging/commit.
+
+Contrato `planning-panel-read`: Index consulta `Tasks.snapshot/1` na montagem e representa backlog (`:tasks`, preservando IDs anteriores), hoje (`:today`) e retry (`:retry`) em três streams. Contagens de pendências vêm das respectivas coleções e escolhas usadas/disponíveis vêm diretamente do snapshot, sem deduzir consumo do número de pendências. Hoje recebe destaque e posição numerada; todas as coleções exibem labels e estados vazios próprios. Recarga/remontagem relê o domínio; navegação após cadastro monta o painel novamente. Sem timers, assinatura/broadcast ou botões de transição.
+
+| Aceite | Evidência |
+| --- | --- |
+| 1 — coleções e recarga | Teste cria backlog, tarefa vencida e duas prioridades via APIs do contexto; duas montagens verificam coleções corretas, posições 1/2, labels intactas, contagens 1/1/2 e duas escolhas usadas/uma disponível. Outra conta não aparece no backlog e tarefas hoje/retry não aparecem nele. |
+| 2 — cota após conclusões | Teste seleciona/conclui três tarefas por APIs reais, depois monta e recarrega: hoje tem zero pendências, três escolhas usadas e zero disponíveis, com aviso pt-BR de esgotamento e estados vazios. Nenhuma tarefa concluída aparece nas coleções pendentes. |
+
+TDD: **2 falhas iniciais** por ausência de hoje/retry/cota; depois **8 testes LiveView aprovados**. `rtk mix precommit` e `rtk mix ci`: **114 testes aprovados**, compilação/formatação/Credo estrito aprovados, cobertura total **91,16%**, Index **100%**, limiar mínimo 70% preservado. `rtk git diff --check` aprovado. Ajuda Mix consultada nesta sessão; mensagens/plurais extraídos e traduzidos no catálogo pt_BR.
+
+Autoavaliação pelo fluxo de review: aceites atendidos, sem achados bloqueantes no diff da entrega. Não houve alteração de domínio, inferência de cota pelas pendências ou sincronização automática. Limitações: testes LiveView/HTML, sem navegador real; visibilidade dos estados vazios usa padrão `hidden only:block` dos streams. Operações de seleção/devolução/ordem/conclusão e acesso ao histórico aguardam tarefas próprias.
+
+Estado `in_review`, encaminhado à conferência superficial e integração do coordenador, sem revisão independente alegada. Conforme pedido do usuário para parar na próxima tarefa, nenhuma tarefa seguinte foi iniciada.

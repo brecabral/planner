@@ -20,8 +20,38 @@ defmodule PlannerWeb.TaskLive.Index do
           </.link>
         </:actions>
       </.header>
+      <section aria-labelledby="today-heading" class="rounded-xl border-2 border-indigo-500 p-4">
+        <h2 id="today-heading" class="text-xl font-semibold">{gettext("Today")}</h2>
+        <p id="used-choices">{gettext("Choices used: %{count} of 3", count: @used_choices)}</p>
+        <p id="available-choices">
+          {ngettext("%{count} choice available", "%{count} choices available", @available_choices)}
+        </p>
+        <p :if={@available_choices == 0} id="quota-exhausted" class="font-semibold">
+          {gettext("Today's choices are exhausted.")}
+        </p>
+        <p id="today-count">
+          {ngettext("%{count} pending task", "%{count} pending tasks", @today_count)}
+        </p>
+        <div id="today" phx-update="stream" class="mt-4 space-y-3">
+          <p id="today-empty" class="hidden only:block">
+            {gettext("No tasks for today. Choose from backlog or retry.")}
+          </p>
+          <div
+            :for={{id, task} <- @streams.today}
+            id={id}
+            class="break-words rounded-lg border border-slate-300 p-4"
+          >
+            <span data-priority class="mr-2 font-bold">{task.position}.</span>
+            <span data-task-title>{task.title}</span>
+            <.task_labels task={task} />
+          </div>
+        </div>
+      </section>
       <section aria-labelledby="backlog-heading">
         <h2 id="backlog-heading" class="mb-4 text-lg font-semibold">{gettext("Backlog")}</h2>
+        <p id="backlog-count">
+          {ngettext("%{count} pending task", "%{count} pending tasks", @backlog_count)}
+        </p>
         <div id="tasks" phx-update="stream" class="space-y-3">
           <p id="tasks-empty" class="hidden only:block">
             {gettext("Add a task to start your backlog.")}
@@ -31,7 +61,27 @@ defmodule PlannerWeb.TaskLive.Index do
             id={id}
             class="break-words rounded-lg border border-slate-300 p-4"
           >
-            {task.title}
+            <span data-task-title>{task.title}</span>
+            <.task_labels task={task} />
+          </div>
+        </div>
+      </section>
+      <section aria-labelledby="retry-heading">
+        <h2 id="retry-heading" class="mb-4 text-lg font-semibold">{gettext("Retry")}</h2>
+        <p id="retry-count">
+          {ngettext("%{count} pending task", "%{count} pending tasks", @retry_count)}
+        </p>
+        <div id="retry" phx-update="stream" class="space-y-3">
+          <p id="retry-empty" class="hidden only:block">
+            {gettext("No unfinished tasks from previous days.")}
+          </p>
+          <div
+            :for={{id, task} <- @streams.retry}
+            id={id}
+            class="break-words rounded-lg border border-slate-300 p-4"
+          >
+            <span data-task-title>{task.title}</span>
+            <.task_labels task={task} />
           </div>
         </div>
       </section>
@@ -48,6 +98,29 @@ defmodule PlannerWeb.TaskLive.Index do
      socket
      |> assign(:user, user)
      |> assign(:page_title, gettext("Planner"))
-     |> stream(:tasks, snapshot.backlog)}
+     |> assign(:used_choices, snapshot.used_choices)
+     |> assign(:available_choices, snapshot.available_choices)
+     |> assign(:today_count, length(snapshot.today))
+     |> assign(:backlog_count, length(snapshot.backlog))
+     |> assign(:retry_count, length(snapshot.retry))
+     |> stream(:tasks, snapshot.backlog)
+     |> stream(:today, snapshot.today)
+     |> stream(:retry, snapshot.retry)}
+  end
+
+  attr :task, Planner.Tasks.Task, required: true
+
+  defp task_labels(assigns) do
+    ~H"""
+    <ul :if={@task.labels != []} class="mt-2 flex flex-wrap gap-2" aria-label={gettext("Labels")}>
+      <li
+        :for={label <- @task.labels}
+        data-label
+        class="rounded border border-slate-300 px-2 py-1 text-sm"
+      >
+        {label.name}
+      </li>
+    </ul>
+    """
   end
 end

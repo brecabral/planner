@@ -107,22 +107,22 @@ msgstr ""
 msgid "close"
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:27
+#: lib/planner_web/live/task_live/index.ex:42
 #, elixir-autogen, elixir-format
 msgid "Add a task to start your backlog."
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:24
+#: lib/planner_web/live/task_live/index.ex:39
 #, elixir-autogen, elixir-format
 msgid "Backlog"
 msgstr ""
 
-#: lib/planner_web/live/task_live/form.ex:40
+#: lib/planner_web/live/task_live/form.ex:55
 #, elixir-autogen, elixir-format
 msgid "Cancel"
 msgstr ""
 
-#: lib/planner_web/live/task_live/form.ex:54
+#: lib/planner_web/live/task_live/form.ex:69
 #: lib/planner_web/live/task_live/index.ex:19
 #, elixir-autogen, elixir-format
 msgid "New task"
@@ -134,22 +134,22 @@ msgid "Open planner"
 msgstr ""
 
 #: lib/planner_web/live/task_live/index.ex:12
-#: lib/planner_web/live/task_live/index.ex:50
+#: lib/planner_web/live/task_live/index.ex:72
 #, elixir-autogen, elixir-format
 msgid "Planner"
 msgstr ""
 
-#: lib/planner_web/live/task_live/form.ex:34
+#: lib/planner_web/live/task_live/form.ex:49
 #, elixir-autogen, elixir-format
 msgid "Save task"
 msgstr ""
 
-#: lib/planner_web/live/task_live/form.ex:31
+#: lib/planner_web/live/task_live/form.ex:46
 #, elixir-autogen, elixir-format
 msgid "Saving..."
 msgstr ""
 
-#: lib/planner_web/live/task_live/form.ex:70
+#: lib/planner_web/live/task_live/form.ex:85
 #, elixir-autogen, elixir-format
 msgid "Task created successfully"
 msgstr ""
@@ -159,17 +159,68 @@ msgstr ""
 msgid "Title"
 msgstr ""
 
-#: lib/planner_web/live/task_live/form.ex:25
+#: lib/planner_web/live/task_live/form.ex:39
 #, elixir-autogen, elixir-format
 msgid "Enter one new label per line, or leave empty."
 msgstr ""
 
-#: lib/planner_web/live/task_live/form.ex:21
+#: lib/planner_web/live/task_live/form.ex:26
 #, elixir-autogen, elixir-format
 msgid "Existing labels"
 msgstr ""
 
-#: lib/planner_web/live/task_live/form.ex:24
+#: lib/planner_web/live/task_live/form.ex:34
 #, elixir-autogen, elixir-format
 msgid "New labels"
+msgstr ""
+
+#: lib/planner_web/live/task_live/index.ex:26
+#, elixir-autogen, elixir-format
+msgid "%{count} choice available"
+msgid_plural "%{count} choices available"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lib/planner_web/live/task_live/index.ex:28
+#: lib/planner_web/live/task_live/index.ex:40
+#: lib/planner_web/live/task_live/index.ex:51
+#, elixir-autogen, elixir-format
+msgid "%{count} pending task"
+msgid_plural "%{count} pending tasks"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lib/planner_web/live/task_live/index.ex:25
+#, elixir-autogen, elixir-format
+msgid "Choices used: %{count} of 3"
+msgstr ""
+
+#: lib/planner_web/live/task_live/index.ex:87
+#, elixir-autogen, elixir-format
+msgid "Labels"
+msgstr ""
+
+#: lib/planner_web/live/task_live/index.ex:30
+#, elixir-autogen, elixir-format
+msgid "No tasks for today. Choose from backlog or retry."
+msgstr ""
+
+#: lib/planner_web/live/task_live/index.ex:53
+#, elixir-autogen, elixir-format
+msgid "No unfinished tasks from previous days."
+msgstr ""
+
+#: lib/planner_web/live/task_live/index.ex:50
+#, elixir-autogen, elixir-format
+msgid "Retry"
+msgstr ""
+
+#: lib/planner_web/live/task_live/index.ex:24
+#, elixir-autogen, elixir-format
+msgid "Today"
+msgstr ""
+
+#: lib/planner_web/live/task_live/index.ex:27
+#, elixir-autogen, elixir-format
+msgid "Today's choices are exhausted."
 msgstr ""

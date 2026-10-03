@@ -14,6 +14,64 @@ defmodule PlannerWeb.TaskLiveTest do
     %{user: user_fixture(%{identifier: "default"})}
   end
 
+  test "panel separates pending collections, priorities, labels and persisted quota", %{
+    conn: conn,
+    user: user
+  } do
+    day = Date.utc_today()
+    label = label_fixture(user, %{name: "Reading"})
+    backlog = task_fixture(user, %{title: "Backlog task"})
+    retry = task_fixture(user, %{title: "Retry task", label_ids: [label.id]})
+    first = task_fixture(user, %{title: "First priority", label_ids: [label.id]})
+    second = task_fixture(user, %{title: "Second priority"})
+    assert {:ok, _} = Tasks.select_today(user, retry.id, Date.add(day, -1))
+    assert {:ok, _} = Tasks.select_today(user, first.id, day)
+    assert {:ok, _} = Tasks.select_today(user, second.id, day)
+    foreign = task_fixture(user_fixture())
+
+    for _ <- 1..2 do
+      {:ok, view, _} = live(recycle(conn), "/tasks")
+      assert has_element?(view, "#tasks #tasks-#{backlog.id}", backlog.title)
+      assert has_element?(view, "#retry #retry-#{retry.id}", retry.title)
+      assert has_element?(view, "#today #today-#{first.id} [data-priority]", "1")
+      assert has_element?(view, "#today #today-#{second.id} [data-priority]", "2")
+      assert has_element?(view, "#today-#{first.id} [data-label]", "Reading")
+      assert has_element?(view, "#retry-#{retry.id} [data-label]", "Reading")
+      assert has_element?(view, "#used-choices", "2")
+      assert has_element?(view, "#available-choices", "1")
+      assert has_element?(view, "#today-count", "2")
+      assert has_element?(view, "#backlog-count", "1")
+      assert has_element?(view, "#retry-count", "1")
+      refute has_element?(view, "#tasks-#{foreign.id}")
+      refute has_element?(view, "#tasks-#{first.id}")
+      refute has_element?(view, "#tasks-#{retry.id}")
+      refute has_element?(view, "[phx-click='select']")
+    end
+  end
+
+  test "three completions leave the empty today list with exhausted quota after reload", %{
+    conn: conn,
+    user: user
+  } do
+    for _ <- 1..3 do
+      task = task_fixture(user)
+      assert {:ok, _} = Tasks.select_today(user, task.id)
+      assert {:ok, _} = Tasks.complete_task(user, task.id)
+    end
+
+    for _ <- 1..2 do
+      {:ok, view, _} = live(recycle(conn), "/tasks")
+      assert has_element?(view, "#today-empty", "Nenhuma tarefa")
+      assert has_element?(view, "#retry-empty", "Nenhuma tarefa")
+      assert has_element?(view, "#tasks-empty", "Cadastre uma tarefa")
+      assert has_element?(view, "#today-count", "0")
+      assert has_element?(view, "#used-choices", "3")
+      assert has_element?(view, "#available-choices", "0")
+      assert has_element?(view, "#quota-exhausted", "esgotadas")
+      refute has_element?(view, "[data-task-title]")
+    end
+  end
+
   test "registers multiple existing and new labels together", %{conn: conn, user: user} do
     first = label_fixture(user, %{name: "Reading"})
     second = label_fixture(user, %{name: "Writing"})
