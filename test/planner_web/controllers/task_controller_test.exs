@@ -1,10 +1,18 @@
 defmodule PlannerWeb.TaskRoutesTest do
   use PlannerWeb.ConnCase
 
-  test "experimental task routes are unavailable" do
+  test "planner routes resolve to the authorized LiveViews" do
+    for {path, module, action} <- [
+          {"/tasks", PlannerWeb.TaskLive.Index, :index},
+          {"/tasks/new", PlannerWeb.TaskLive.Form, :new}
+        ] do
+      assert %{phoenix_live_view: {^module, ^action, _, _}} =
+               Phoenix.Router.route_info(PlannerWeb.Router, "GET", path, "localhost")
+    end
+  end
+
+  test "experimental show, edit and HTTP mutation routes are unavailable" do
     for {method, path} <- [
-          {"GET", "/tasks"},
-          {"GET", "/tasks/new"},
           {"POST", "/tasks"},
           {"GET", "/tasks/1"},
           {"GET", "/tasks/1/edit"},

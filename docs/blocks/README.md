@@ -14,9 +14,11 @@ O implementador para a tarefa e preserva o diff, sem apagar trabalho, ampliar es
 
 Comunicar o registro ao coordenador e referenciá-lo na tarefa. Preservar a fase atual (`in_progress` ou `in_review`); usar `blockers` para impedimentos sem solução planejada. Quando existir uma tarefa corretiva, registrar a dependência em `depends_on`, sem repetir essa aresta em `blockers`. A existência do relatório não libera nem conclui tarefas.
 
-O coordenador só encerra o relatório quando a condição de retomada estiver comprovada: correção de código validada e integrada, decisão explícita registrada nos contratos ou confirmação humana com evidência de aceite, conforme a causa. Retomar as tarefas na fase interrompida, sem considerar resolvidas outras pendências de revisão. Falhas esperadas no TDD e correções rotineiras dentro do escopo não exigem relatório. A tarefa corretiva pode trabalhar sobre a falha explicitamente prevista em seu contrato, mas precisa entregar o gate aprovado.
+O coordenador só encerra o relatório quando a condição de retomada estiver comprovada: correção de código validada e integrada, decisão explícita registrada nos contratos ou confirmação humana com evidência de aceite, conforme a causa. Retomar as tarefas na fase interrompida, sem considerar resolvidas outras pendências de aceite ou revisão explicitamente exigida. Falhas esperadas no TDD e correções rotineiras dentro do escopo não exigem relatório. A tarefa corretiva pode trabalhar sobre a falha explicitamente prevista em seu contrato, mas precisa entregar o gate aprovado.
 
 ## Registros
 
 - [BLOCK-001 — Cobertura após a remoção do CRUD experimental](001-cobertura-apos-remocao-crud.md).
 - [BLOCK-002 — Escopo da tradução da interface base](002-escopo-traducao-interface-base.md).
+
+- [BLOCK-003 — Escopo do teste de rotas do painel](003-escopo-teste-rotas-painel.md).

@@ -22,12 +22,12 @@ msgstr ""
 msgid "Attempting to reconnect"
 msgstr ""
 
-#: lib/planner_web/controllers/page_html/home.html.heex:63
+#: lib/planner_web/controllers/page_html/home.html.heex:64
 #, elixir-autogen, elixir-format
 msgid "Build rich, interactive web applications quickly, with less code and fewer moving parts. Join our growing community of developers using Phoenix to craft APIs, HTML5 apps and more, for fun or at scale."
 msgstr ""
 
-#: lib/planner_web/controllers/page_html/home.html.heex:132
+#: lib/planner_web/controllers/page_html/home.html.heex:133
 #, elixir-autogen, elixir-format
 msgid "Changelog"
 msgstr ""
@@ -37,12 +37,12 @@ msgstr ""
 msgid "Dark theme"
 msgstr ""
 
-#: lib/planner_web/controllers/page_html/home.html.heex:194
+#: lib/planner_web/controllers/page_html/home.html.heex:195
 #, elixir-autogen, elixir-format
 msgid "Deploy your application"
 msgstr ""
 
-#: lib/planner_web/controllers/page_html/home.html.heex:149
+#: lib/planner_web/controllers/page_html/home.html.heex:150
 #, elixir-autogen, elixir-format
 msgid "Discuss on the Elixir Forum"
 msgstr ""
@@ -52,17 +52,17 @@ msgstr ""
 msgid "Get Started"
 msgstr ""
 
-#: lib/planner_web/controllers/page_html/home.html.heex:86
+#: lib/planner_web/controllers/page_html/home.html.heex:87
 #, elixir-autogen, elixir-format
 msgid "Guides & Docs"
 msgstr ""
 
-#: lib/planner_web/controllers/page_html/home.html.heex:164
+#: lib/planner_web/controllers/page_html/home.html.heex:165
 #, elixir-autogen, elixir-format
 msgid "Join our Discord server"
 msgstr ""
 
-#: lib/planner_web/controllers/page_html/home.html.heex:179
+#: lib/planner_web/controllers/page_html/home.html.heex:180
 #, elixir-autogen, elixir-format
 msgid "Join us on Slack"
 msgstr ""
@@ -72,7 +72,7 @@ msgstr ""
 msgid "Light theme"
 msgstr ""
 
-#: lib/planner_web/controllers/page_html/home.html.heex:60
+#: lib/planner_web/controllers/page_html/home.html.heex:61
 #, elixir-autogen, elixir-format
 msgid "Peace of mind from prototype to production."
 msgstr ""
@@ -82,7 +82,7 @@ msgstr ""
 msgid "Something went wrong!"
 msgstr ""
 
-#: lib/planner_web/controllers/page_html/home.html.heex:103
+#: lib/planner_web/controllers/page_html/home.html.heex:104
 #, elixir-autogen, elixir-format
 msgid "Source Code"
 msgstr ""
@@ -105,4 +105,56 @@ msgstr ""
 #: lib/planner_web/components/core_components.ex:82
 #, elixir-autogen, elixir-format
 msgid "close"
+msgstr ""
+
+#: lib/planner_web/live/task_live/index.ex:22
+#, elixir-autogen, elixir-format
+msgid "Add a task to start your backlog."
+msgstr ""
+
+#: lib/planner_web/live/task_live/index.ex:20
+#, elixir-autogen, elixir-format
+msgid "Backlog"
+msgstr ""
+
+#: lib/planner_web/live/task_live/form.ex:18
+#, elixir-autogen, elixir-format
+msgid "Cancel"
+msgstr ""
+
+#: lib/planner_web/live/task_live/form.ex:32
+#: lib/planner_web/live/task_live/index.ex:15
+#, elixir-autogen, elixir-format
+msgid "New task"
+msgstr ""
+
+#: lib/planner_web/controllers/page_html/home.html.heex:43
+#, elixir-autogen, elixir-format
+msgid "Open planner"
+msgstr ""
+
+#: lib/planner_web/live/task_live/index.ex:12
+#: lib/planner_web/live/task_live/index.ex:40
+#, elixir-autogen, elixir-format
+msgid "Planner"
+msgstr ""
+
+#: lib/planner_web/live/task_live/form.ex:16
+#, elixir-autogen, elixir-format
+msgid "Save task"
+msgstr ""
+
+#: lib/planner_web/live/task_live/form.ex:15
+#, elixir-autogen, elixir-format
+msgid "Saving..."
+msgstr ""
+
+#: lib/planner_web/live/task_live/form.ex:47
+#, elixir-autogen, elixir-format
+msgid "Task created successfully"
+msgstr ""
+
+#: lib/planner_web/live/task_live/form.ex:13
+#, elixir-autogen, elixir-format
+msgid "Title"
 msgstr ""
