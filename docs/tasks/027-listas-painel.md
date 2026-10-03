@@ -1,6 +1,6 @@
 ---
 id: "TASK-027"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Representa snapshot autorizado em streams e contadores coerentes após recarga."
 specs: ["SPEC-002", "SPEC-004"]
@@ -48,3 +48,7 @@ TDD: **2 falhas iniciais** por ausência de hoje/retry/cota; depois **8 testes L
 Autoavaliação pelo fluxo de review: aceites atendidos, sem achados bloqueantes no diff da entrega. Não houve alteração de domínio, inferência de cota pelas pendências ou sincronização automática. Limitações: testes LiveView/HTML, sem navegador real; visibilidade dos estados vazios usa padrão `hidden only:block` dos streams. Operações de seleção/devolução/ordem/conclusão e acesso ao histórico aguardam tarefas próprias.
 
 Estado `in_review`, encaminhado à conferência superficial e integração do coordenador, sem revisão independente alegada. Conforme pedido do usuário para parar na próxima tarefa, nenhuma tarefa seguinte foi iniciada.
+
+### Conferência operacional — 03/10/2026
+
+Coordenador `/root`: registro e resumo conferidos superficialmente; gates locais relatados aprovados (114 testes, cobertura 91,16%), sem impedimentos. Entrega integrada em `4611036`; TASK-028 elegível, mas não iniciada por pedido explícito de parada. Restam TASK-028, TASK-029, TASK-030, TASK-032 e TASK-008 para o MVP. Sem revisão independente ou verificação de CI remoto.
