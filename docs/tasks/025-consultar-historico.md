@@ -1,6 +1,6 @@
 ---
 id: "TASK-025"
-status: "planned"
+status: "in_review"
 execution_level: "standard"
 execution_rationale: "Consulta conclusões do proprietário com preload e desempate estável."
 specs: ["SPEC-003", "SPEC-006"]
@@ -34,4 +34,15 @@ Escrever o teste de intenção antes dos ajustes; preservar testes gerados perti
 
 ## Evidência e revisão
 
-Pendentes. Registrar teste antes/depois, precommit e CI com cobertura mínima de 70%, revisor independente, alvo/base, critérios, achados e integração. Não liberar consumidora antes de revisão aprovada e integração.
+Implementador `/root/implement_task025`, em 03/10/2026. Base `dd10653`, com TASK-007 integrada em `1c4f886` e aceite operacional registrado na base. Alvo: diff local de `lib/planner/tasks.ex`, `test/planner/tasks_test.exs` e este registro. Sem staging/commit; encaminhado ao coordenador para conferência superficial e integração, conforme orientação explícita do usuário. Não houve revisão independente nem criação de revisor.
+
+Contrato `history-query`: `Planner.Tasks.list_history(%Planner.Accounts.User{})` recebe proprietário resolvido no servidor e retorna lista de tarefas concluídas, com `labels` carregadas, ordenada por `completed_on` e `id` decrescentes. Lista vazia para conta sem conclusões. Consulta somente os dados persistidos, sem recalcular datas, alterar consumo ou oferecer mutações históricas.
+
+| Aceite | Evidência |
+| --- | --- |
+| CA-003-06 | Testes consultam conclusões produzidas por `select_today`/`complete_task`; verificam ordem por data mesmo quando diverge da ordem de IDs e desempate por ID decrescente. Reinício real do Repo/pool troca processo e backend PostgreSQL, conserva a lista inteira, labels, datas e consumo anterior após consultar um novo dia. |
+| CA-006-05 / isolamento | Duas labels mantêm IDs e vêm carregadas na consulta; tarefas sem labels retornam lista vazia. Backlog, retry e pendência corrente são excluídos. Consultas de duas contas recebem somente suas conclusões, e uma terceira recebe lista vazia. Recarga mantém o resultado. |
+
+TDD: após corrigir a limpeza das associações da fixture de reinício e remover somente os dados criados pela tentativa inicial, a fase vermelha limpa apresentou **46 aprovados e 2 falhas**, ambas por ausência de `list_history/1`. Implementação mínima deixou **48 testes de Tasks aprovados**. Ajuda de `test`, `precommit`, `ci` e `run` consultada antes do uso. `rtk mix precommit` e `rtk mix ci`: **105 testes aprovados**, compilação/formatação/Credo estrito aprovados, **89,42% de cobertura total**, Tasks **98,31%**, mínimo de 70% preservado. `rtk git diff --check` aprovado.
+
+Autoavaliação pelo fluxo de review: critérios atendidos, escopo preservado e nenhum bloqueador identificado. Teste reinicia Repo/pool, não o servidor PostgreSQL nem todo o sistema operacional; a consulta lê registros persistidos e não depende de cache. Nenhuma aprovação independente alegada. Integração e liberação de consumidoras dependem da conferência operacional do coordenador autorizada pelo usuário.

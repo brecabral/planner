@@ -19,6 +19,84 @@ defmodule Planner.TasksTest do
     %{user: user_fixture()}
   end
 
+  test "list_history returns only owned completions with labels in date and ID order", %{
+    user: user
+  } do
+    day = ~D[2026-10-01]
+    labels = [label_fixture(user), label_fixture(user)]
+    newer_first = task_fixture(user, %{label_ids: Enum.map(labels, & &1.id)})
+    older = task_fixture(user)
+    newer_last = task_fixture(user)
+
+    for {task, date} <- [{older, Date.add(day, -1)}, {newer_first, day}, {newer_last, day}] do
+      assert {:ok, _} = Tasks.select_today(user, task.id, date)
+      assert {:ok, _} = Tasks.complete_task(user, task.id, date)
+    end
+
+    task_fixture(user)
+    task_fixture(user) |> schedule(Date.add(day, -1), 1)
+    task_fixture(user) |> schedule(day, 1)
+    assert {:ok, _} = Tasks.snapshot(user, day)
+    other = user_fixture()
+    foreign = task_fixture(other)
+    assert {:ok, _} = Tasks.select_today(other, foreign.id, day)
+    assert {:ok, _} = Tasks.complete_task(other, foreign.id, day)
+
+    assert [last, first, previous] = history = Tasks.list_history(user)
+    assert Enum.map(history, & &1.id) == [newer_last.id, newer_first.id, older.id]
+    assert Enum.map(history, & &1.completed_on) == [day, day, Date.add(day, -1)]
+    assert Enum.sort(Enum.map(first.labels, & &1.id)) == Enum.sort(Enum.map(labels, & &1.id))
+    assert last.labels == []
+    assert previous.labels == []
+    assert Enum.map(Tasks.list_history(other), & &1.id) == [foreign.id]
+    assert Tasks.list_history(user_fixture()) == []
+    assert Tasks.list_history(user) == history
+  end
+
+  test "list_history preserves completion dates, labels and tie order after a repository restart" do
+    name = __MODULE__.HistoryRestartRepo
+
+    spec =
+      Supervisor.child_spec({Repo, name: name, pool: DBConnection.ConnectionPool, pool_size: 1},
+        id: name
+      )
+
+    first_pid = start_supervised!(spec)
+    original_repo = Repo.put_dynamic_repo(name)
+    user = user_fixture()
+
+    try do
+      day = ~D[2026-10-01]
+      label = label_fixture(user)
+      tasks = for _ <- 1..2, do: task_fixture(user, %{label_ids: [label.id]})
+
+      for task <- tasks do
+        assert {:ok, _} = Tasks.select_today(user, task.id, day)
+        assert {:ok, _} = Tasks.complete_task(user, task.id, day)
+      end
+
+      history = Tasks.list_history(user)
+      assert Enum.map(history, & &1.id) == Enum.reverse(Enum.map(tasks, & &1.id))
+      assert Enum.all?(history, &(&1.completed_on == day and &1.labels == [label]))
+      backend = Repo.query!("SELECT pg_backend_pid()").rows
+      monitor = Process.monitor(first_pid)
+      stop_supervised!(name)
+      assert_receive {:DOWN, ^monitor, :process, ^first_pid, :shutdown}
+      assert start_supervised!(spec) != first_pid
+      assert Repo.query!("SELECT pg_backend_pid()").rows != backend
+      assert {:ok, %{used_choices: 0}} = Tasks.snapshot(user, Date.add(day, 1))
+      assert Tasks.list_history(user) == history
+      assert Repo.get_by!(DailyPlan, user_id: user.id, day: day).used_choices == 2
+    after
+      Repo.delete_all(from link in TaskLabel, where: link.user_id == ^user.id)
+      Repo.delete_all(from t in Task, where: t.user_id == ^user.id)
+      Repo.delete_all(from p in DailyPlan, where: p.user_id == ^user.id)
+      Repo.delete_all(from l in Label, where: l.user_id == ^user.id)
+      Repo.delete!(user)
+      Repo.put_dynamic_repo(original_repo)
+    end
+  end
+
   test "completing one of three selected tasks does not make room for a fourth", %{user: user} do
     day = ~D[2026-10-01]
     label = label_fixture(user)

@@ -16,6 +16,21 @@ defmodule Planner.Tasks do
   alias Planner.UserTransaction
 
   @doc """
+  Lists the user's completed tasks with labels, newest completion date first.
+
+  IDs descend for tasks completed on the same date. Reads persisted dates without
+  recalculating them; the user must be resolved on the server.
+  """
+  def list_history(%User{id: user_id}) do
+    Repo.all(
+      from task in Task,
+        where: task.user_id == ^user_id and not is_nil(task.completed_on),
+        order_by: [desc: task.completed_on, desc: task.id],
+        preload: [:labels]
+    )
+  end
+
+  @doc """
   Completes a current pending task without refunding a daily choice.
 
   Returns `{:ok, task}` and preserves the original date on repeated completion.
