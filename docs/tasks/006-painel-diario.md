@@ -1,6 +1,6 @@
 ---
 id: "TASK-006"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Integra LiveViews geradas a APIs existentes e remove superfícies CRUD fora do escopo."
 specs: ["SPEC-001", "SPEC-002", "SPEC-004", "SPEC-005"]
@@ -67,3 +67,7 @@ Autoavaliação pelo fluxo de review: aceites atendidos, sem achados bloqueantes
 Arquivos de implementação para integração seletiva: `lib/planner_web/live/task_live/index.ex`, `lib/planner_web/live/task_live/form.ex`, `lib/planner_web/router.ex`, `lib/planner_web/controllers/page_html/home.html.heex`, `priv/gettext/default.pot`, `priv/gettext/pt_BR/LC_MESSAGES/default.po`, `test/planner_web/live/task_live_test.exs` e `test/planner_web/controllers/task_controller_test.exs`, além deste registro e documentação de BLOCK-003. Alterações preexistentes do usuário em instruções/fluxos/skills/formato foram preservadas e não constituem implementação desta tarefa.
 
 Estado `in_review`, sem staging/commit. Encaminhado ao coordenador para conferência superficial e integração; nenhuma revisão independente alegada. TASK-026 ainda não iniciada nem liberada por esta autoavaliação.
+
+### Conferência operacional — 03/10/2026
+
+Coordenador `/root`: registro e resumo conferidos superficialmente; gates locais relatados aprovados (109 testes, cobertura 90,40%), sem impedimentos pendentes. Entrega integrada em `ca84dfd`. TASK-026 liberada. Sem revisão independente ou verificação de CI remoto; alterações preexistentes de instruções preservadas fora do commit.
