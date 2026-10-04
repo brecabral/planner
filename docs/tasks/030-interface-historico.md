@@ -1,6 +1,6 @@
 ---
 id: "TASK-030"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Integra conclusão e consulta histórica existentes sem alterar a regra de consumo."
 specs: ["SPEC-003", "SPEC-004", "SPEC-006"]
@@ -44,3 +44,7 @@ Implementador `/root/implement_mvp`, 04/10/2026. Base `7f51200` com TASK-029 int
 - Gates: `mix precommit` e `mix ci` aprovados, 125 testes, Credo estrito sem achados; cobertura total 91,91%, Index 97,64% (antes 91,60%/97,22%), limiar de 70% preservado. Gettext extraído/mesclado em pt_BR; `git diff --check` aprovado.
 - Autoavaliação pelo fluxo de review: aceites funcionais atendidos, sem achados bloqueantes. Sem teste visual em navegador de teclado, foco e viewport 360px; verificação estrutural por template/testes. Persistência após reinício real e concorrência são contratos cobertos nas tarefas do domínio, não repetidos nesta integração de interface.
 - Alterações operacionais preexistentes preservadas; TASK-032 não iniciada.
+
+### Conferência operacional — 04/10/2026
+
+Coordenador `/root`: registro e resumo conferidos superficialmente, sem impedimentos. Gates locais relatados aprovados: 125 testes, cobertura 91,91%. Entrega integrada na branch `feat/mvp` em `7b98d09`; TASK-032 liberada. Sem revisão independente ou verificação de CI remoto. Verificações de navegador e reinício seguem nas etapas de acessibilidade e aceite final.
