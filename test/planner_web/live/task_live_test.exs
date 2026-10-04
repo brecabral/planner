@@ -6,6 +6,7 @@ defmodule PlannerWeb.TaskLiveTest do
   import Planner.LabelsFixtures
   import Planner.TasksFixtures
 
+  alias Ecto.Adapters.SQL
   alias Planner.Labels
   alias Planner.Repo
   alias Planner.Tasks
@@ -45,7 +46,6 @@ defmodule PlannerWeb.TaskLiveTest do
       refute has_element?(view, "#tasks-#{foreign.id}")
       refute has_element?(view, "#tasks-#{first.id}")
       refute has_element?(view, "#tasks-#{retry.id}")
-      refute has_element?(view, "[phx-click='select']")
     end
   end
 
@@ -70,6 +70,122 @@ defmodule PlannerWeb.TaskLiveTest do
       assert has_element?(view, "#quota-exhausted", "esgotadas")
       refute has_element?(view, "[data-task-title]")
     end
+  end
+
+  test "selects backlog and retry, refunds only once and preserves identity and labels", %{
+    conn: conn,
+    user: user
+  } do
+    label = label_fixture(user)
+    task = task_fixture(user, %{label_ids: [label.id]})
+    retry = task_fixture(user)
+    Tasks.select_today(user, retry.id, Date.add(Date.utc_today(), -1))
+    {:ok, view, _} = live(conn, "/tasks")
+
+    assert has_element?(
+             view,
+             "#select-button-#{task.id}[phx-disable-with='Salvando...']",
+             "Trazer para hoje"
+           )
+
+    view |> form("#select-#{task.id}") |> render_submit()
+    assert has_element?(view, "#today-#{task.id} [data-label]", label.name)
+    refute has_element?(view, "#tasks-#{task.id}")
+    assert has_element?(view, "#used-choices", "1")
+    render_submit(view, "select", %{"task_id" => to_string(task.id)})
+    assert has_element?(view, "#used-choices", "1")
+    view |> form("#select-#{retry.id}") |> render_submit()
+    assert has_element?(view, "#today-#{retry.id}")
+    assert has_element?(view, "#used-choices", "2")
+    view |> form("#return-#{task.id}") |> render_submit()
+    render_submit(view, "return", %{"task_id" => to_string(task.id)})
+    assert has_element?(view, "#tasks-#{task.id} [data-label]", label.name)
+    assert has_element?(view, "#used-choices", "1")
+    refute has_element?(view, "#retry-#{task.id}")
+    assert has_element?(view, "#today-#{retry.id} [data-priority]", "1")
+    {:ok, reload, _} = live(recycle(conn), "/tasks")
+    assert has_element?(reload, "#tasks-#{task.id}")
+    assert has_element?(reload, "#used-choices", "1")
+  end
+
+  test "quota rejection and stale events refresh authoritative state without accepting forged ownership",
+       %{conn: conn, user: user} do
+    tasks = for _ <- 1..4, do: task_fixture(user)
+    foreign_user = user_fixture()
+    foreign = task_fixture(foreign_user)
+    {:ok, view, _} = live(conn, "/tasks")
+    for task <- Enum.take(tasks, 3), do: Tasks.select_today(user, task.id)
+    Tasks.complete_task(user, hd(tasks).id)
+    view |> form("#select-#{List.last(tasks).id}") |> render_submit()
+    assert has_element?(view, "#planning-error[role=alert]", "esgotadas")
+    assert has_element?(view, "#used-choices", "3")
+    assert has_element?(view, "#today-count", "2")
+    refute has_element?(view, "#tasks-#{hd(tasks).id}")
+
+    for id <- [to_string(foreign.id), "bad", "-1"] do
+      render_submit(view, "select", %{
+        "task_id" => id,
+        "user_id" => foreign_user.id,
+        "date" => "2099-01-01"
+      })
+
+      assert has_element?(view, "#planning-error[role=alert]", "atualizado")
+      refute has_element?(view, "#today-#{foreign.id}")
+    end
+
+    render_submit(view, "return", %{"task_id" => to_string(hd(tasks).id)})
+    assert has_element?(view, "#planning-error[role=alert]", "atualizado")
+    assert Tasks.get_task!(foreign_user, foreign.id).kind == :backlog
+    assert has_element?(view, "#used-choices", "3")
+  end
+
+  test "failed persistence keeps the task and quota unchanged and reports an accessible error", %{
+    conn: conn,
+    user: user
+  } do
+    task = task_fixture(user)
+    {:ok, view, _} = live(conn, "/tasks")
+
+    SQL.query!(
+      Repo,
+      "ALTER TABLE daily_plans ADD CONSTRAINT reject_ui_consumption CHECK (used_choices = 0) NOT VALID"
+    )
+
+    view |> form("#select-#{task.id}") |> render_submit()
+    assert has_element?(view, "#planning-error[role=alert]", "Não foi possível")
+    assert has_element?(view, "#tasks-#{task.id}")
+    refute has_element?(view, "#today-#{task.id}")
+    assert has_element?(view, "#used-choices", "0")
+    assert Tasks.get_task!(user, task.id).kind == :backlog
+  end
+
+  test "return failure keeps the selected task and does not refund a choice", %{
+    conn: conn,
+    user: user
+  } do
+    task = task_fixture(user)
+    Tasks.select_today(user, task.id)
+    {:ok, view, _} = live(conn, "/tasks")
+
+    assert has_element?(
+             view,
+             "#return-button-#{task.id}[phx-disable-with='Salvando...']",
+             "Devolver ao backlog"
+           )
+
+    assert has_element?(view, "#backlog-heading[tabindex='-1']")
+
+    SQL.query!(
+      Repo,
+      "ALTER TABLE daily_plans ADD CONSTRAINT reject_ui_refund CHECK (used_choices = 1) NOT VALID"
+    )
+
+    view |> form("#return-#{task.id}") |> render_submit()
+    assert has_element?(view, "#planning-error[role=alert]", "Não foi possível")
+    assert has_element?(view, "#today-#{task.id}")
+    refute has_element?(view, "#tasks-#{task.id}")
+    assert has_element?(view, "#used-choices", "1")
+    assert Tasks.get_task!(user, task.id).kind == :today
   end
 
   test "registers multiple existing and new labels together", %{conn: conn, user: user} do

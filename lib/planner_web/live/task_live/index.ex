@@ -20,8 +20,11 @@ defmodule PlannerWeb.TaskLive.Index do
           </.link>
         </:actions>
       </.header>
+      <p :if={@planning_error} id="planning-error" role="alert" class="text-red-700">
+        {@planning_error}
+      </p>
       <section aria-labelledby="today-heading" class="rounded-xl border-2 border-indigo-500 p-4">
-        <h2 id="today-heading" class="text-xl font-semibold">{gettext("Today")}</h2>
+        <h2 id="today-heading" tabindex="-1" class="text-xl font-semibold">{gettext("Today")}</h2>
         <p id="used-choices">{gettext("Choices used: %{count} of 3", count: @used_choices)}</p>
         <p id="available-choices">
           {ngettext("%{count} choice available", "%{count} choices available", @available_choices)}
@@ -44,11 +47,14 @@ defmodule PlannerWeb.TaskLive.Index do
             <span data-priority class="mr-2 font-bold">{task.position}.</span>
             <span data-task-title>{task.title}</span>
             <.task_labels task={task} />
+            <.planning_action task={task} action="return" />
           </div>
         </div>
       </section>
       <section aria-labelledby="backlog-heading">
-        <h2 id="backlog-heading" class="mb-4 text-lg font-semibold">{gettext("Backlog")}</h2>
+        <h2 id="backlog-heading" tabindex="-1" class="mb-4 text-lg font-semibold">
+          {gettext("Backlog")}
+        </h2>
         <p id="backlog-count">
           {ngettext("%{count} pending task", "%{count} pending tasks", @backlog_count)}
         </p>
@@ -63,6 +69,7 @@ defmodule PlannerWeb.TaskLive.Index do
           >
             <span data-task-title>{task.title}</span>
             <.task_labels task={task} />
+            <.planning_action task={task} action="select" />
           </div>
         </div>
       </section>
@@ -82,6 +89,7 @@ defmodule PlannerWeb.TaskLive.Index do
           >
             <span data-task-title>{task.title}</span>
             <.task_labels task={task} />
+            <.planning_action task={task} action="select" />
           </div>
         </div>
       </section>
@@ -98,14 +106,103 @@ defmodule PlannerWeb.TaskLive.Index do
      socket
      |> assign(:user, user)
      |> assign(:page_title, gettext("Planner"))
-     |> assign(:used_choices, snapshot.used_choices)
-     |> assign(:available_choices, snapshot.available_choices)
-     |> assign(:today_count, length(snapshot.today))
-     |> assign(:backlog_count, length(snapshot.backlog))
-     |> assign(:retry_count, length(snapshot.retry))
-     |> stream(:tasks, snapshot.backlog)
-     |> stream(:today, snapshot.today)
-     |> stream(:retry, snapshot.retry)}
+     |> assign(:planning_error, nil)
+     |> assign_snapshot(snapshot)}
+  end
+
+  @impl true
+  def handle_event(action, params, socket) when action in ["select", "return"] do
+    result = run_action(action, socket.assigns.user, Map.get(params, "task_id"))
+
+    error =
+      case result do
+        {:ok, _task} ->
+          nil
+
+        {:error, :quota_exhausted} ->
+          gettext("Today's choices are exhausted.")
+
+        {:error, reason} when reason in [:not_found, :invalid_state] ->
+          gettext("This task is no longer available for this action. The panel has been updated.")
+
+        {:error, _reason} ->
+          gettext("Could not save the change. Please try again.")
+      end
+
+    socket = assign(socket, :planning_error, error)
+
+    {:noreply, refresh_snapshot(socket)}
+  end
+
+  defp run_action(action, user, id) do
+    case action do
+      "select" -> Tasks.select_today(user, id)
+      "return" -> Tasks.return_to_backlog(user, id)
+    end
+  rescue
+    _error in [
+      Ecto.ConstraintError,
+      Ecto.StaleEntryError,
+      Postgrex.Error,
+      DBConnection.ConnectionError
+    ] ->
+      {:error, :persistence}
+  end
+
+  defp refresh_snapshot(socket) do
+    case Tasks.snapshot(socket.assigns.user) do
+      {:ok, snapshot} ->
+        assign_snapshot(socket, snapshot)
+
+      {:error, _reason} ->
+        assign(socket, :planning_error, gettext("Could not refresh the panel. Please reload."))
+    end
+  rescue
+    _error in [
+      Ecto.ConstraintError,
+      Ecto.StaleEntryError,
+      Postgrex.Error,
+      DBConnection.ConnectionError
+    ] ->
+      assign(socket, :planning_error, gettext("Could not refresh the panel. Please reload."))
+  end
+
+  defp assign_snapshot(socket, snapshot) do
+    socket
+    |> assign(:used_choices, snapshot.used_choices)
+    |> assign(:available_choices, snapshot.available_choices)
+    |> assign(:today_count, length(snapshot.today))
+    |> assign(:backlog_count, length(snapshot.backlog))
+    |> assign(:retry_count, length(snapshot.retry))
+    |> stream(:tasks, snapshot.backlog, reset: true)
+    |> stream(:today, snapshot.today, reset: true)
+    |> stream(:retry, snapshot.retry, reset: true)
+  end
+
+  attr :task, Planner.Tasks.Task, required: true
+  attr :action, :string, required: true
+
+  defp planning_action(assigns) do
+    ~H"""
+    <form
+      id={"#{@action}-#{@task.id}"}
+      phx-submit={
+        JS.push(@action)
+        |> JS.focus(to: if(@action == "select", do: "#today-heading", else: "#backlog-heading"))
+      }
+      class="mt-3"
+    >
+      <input type="hidden" name="task_id" value={@task.id} />
+      <button
+        id={"#{@action}-button-#{@task.id}"}
+        type="submit"
+        phx-disable-with={gettext("Saving...")}
+        class="max-w-full whitespace-normal rounded-lg border border-indigo-700 px-3 py-2 text-indigo-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-700 disabled:opacity-50"
+      >
+        {if @action == "select", do: gettext("Bring to today"), else: gettext("Return to backlog")}
+      </button>
+    </form>
+    """
   end
 
   attr :task, Planner.Tasks.Task, required: true
