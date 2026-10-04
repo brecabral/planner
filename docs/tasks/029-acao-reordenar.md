@@ -1,6 +1,6 @@
 ---
 id: "TASK-029"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Converte ações de teclado em permutações e recupera a lista após conflito."
 specs: ["SPEC-002", "SPEC-004"]
@@ -43,3 +43,7 @@ Entrega pelo implementador `/root/implement_mvp` em 04/10/2026; base `d3b7168` c
 - Gates: `mix precommit` e `mix ci` aprovados com 121 testes, Credo estrito sem achados, cobertura total 91,60% e Index 97,22% (anterior: 91,14%/96,34%). Limiar de 70% preservado. Extração e mesclagem Gettext pt_BR atualizadas; `git diff --check` aprovado.
 - Autoavaliação segundo fluxo de review: critérios funcionais atendidos, sem achados bloqueantes. Rejeição atômica/concorrência são fornecidas e testadas pelo contrato integrado de TASK-024; não houve alteração do contexto. Comandos compartilham tratamento de falhas de persistência já exercitado pela TASK-028. Coleções continuam em streams; apenas IDs do conjunto limitado de hoje são mantidos para construir a permutação correspondente à tela.
 - Alterações operacionais preexistentes preservadas. TASK-030 não iniciada; aguarda liberação após integração.
+
+### Conferência operacional — 04/10/2026
+
+Coordenador `/root`: registro e resumo conferidos superficialmente, sem impedimentos. Gates locais relatados aprovados: 121 testes, cobertura 91,60%. Entrega integrada na branch `feat/mvp` em `8a23edf`; TASK-030 liberada. Sem revisão independente ou verificação de CI remoto. Validação visual permanece para a etapa de acessibilidade.
