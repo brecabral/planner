@@ -52,6 +52,7 @@ defmodule PlannerWeb.TaskLive.Index do
               <.order_action task={task} direction="down" disabled={task.position == @today_count} />
             </div>
             <.planning_action task={task} action="return" />
+            <.planning_action task={task} action="complete" />
           </div>
         </div>
       </section>
@@ -97,6 +98,32 @@ defmodule PlannerWeb.TaskLive.Index do
           </div>
         </div>
       </section>
+      <section aria-labelledby="history-heading">
+        <h2 id="history-heading" tabindex="-1" class="mb-4 text-lg font-semibold">
+          {gettext("History")}
+        </h2>
+        <p id="history-count">
+          {ngettext("%{count} completed task", "%{count} completed tasks", @history_count)}
+        </p>
+        <div id="history" phx-update="stream" class="space-y-3">
+          <p id="history-empty" class="hidden only:block">{gettext("No completed tasks yet.")}</p>
+          <div
+            :for={{id, task} <- @streams.history}
+            id={id}
+            class="break-words rounded-lg border border-slate-300 p-4"
+          >
+            <span data-task-title>{task.title}</span>
+            <p>
+              {gettext("Completed on")}
+              <time datetime={Date.to_iso8601(task.completed_on)}>{Calendar.strftime(
+                task.completed_on,
+                "%d/%m/%Y"
+              )}</time>
+            </p>
+            <.task_labels task={task} />
+          </div>
+        </div>
+      </section>
     </Layouts.app>
     """
   end
@@ -115,7 +142,7 @@ defmodule PlannerWeb.TaskLive.Index do
   end
 
   @impl true
-  def handle_event(action, params, socket) when action in ["select", "return"] do
+  def handle_event(action, params, socket) when action in ["select", "return", "complete"] do
     result = run_action(action, socket.assigns.user, Map.get(params, "task_id"))
 
     finish_action(socket, result)
@@ -173,6 +200,7 @@ defmodule PlannerWeb.TaskLive.Index do
       "select" -> Tasks.select_today(user, id)
       "return" -> Tasks.return_to_backlog(user, id)
       "reorder" -> Tasks.reorder_today(user, id)
+      "complete" -> Tasks.complete_task(user, id)
     end
   rescue
     _error in [
@@ -203,7 +231,11 @@ defmodule PlannerWeb.TaskLive.Index do
   end
 
   defp assign_snapshot(socket, snapshot) do
+    history = Tasks.list_history(socket.assigns.user)
+
     socket
+    |> assign(:history_count, length(history))
+    |> stream(:history, history, reset: true)
     |> assign(:used_choices, snapshot.used_choices)
     |> assign(:available_choices, snapshot.available_choices)
     |> assign(:today_count, length(snapshot.today))
@@ -249,12 +281,21 @@ defmodule PlannerWeb.TaskLive.Index do
   attr :action, :string, required: true
 
   defp planning_action(assigns) do
+    {label, focus} =
+      case assigns.action do
+        "select" -> {gettext("Bring to today"), "#today-heading"}
+        "return" -> {gettext("Return to backlog"), "#backlog-heading"}
+        "complete" -> {gettext("Complete task"), "#history-heading"}
+      end
+
+    assigns = assign(assigns, label: label, focus: focus)
+
     ~H"""
     <form
       id={"#{@action}-#{@task.id}"}
       phx-submit={
         JS.push(@action)
-        |> JS.focus(to: if(@action == "select", do: "#today-heading", else: "#backlog-heading"))
+        |> JS.focus(to: @focus)
       }
       class="mt-3"
     >
@@ -265,7 +306,7 @@ defmodule PlannerWeb.TaskLive.Index do
         phx-disable-with={gettext("Saving...")}
         class="max-w-full whitespace-normal rounded-lg border border-indigo-700 px-3 py-2 text-indigo-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-700 disabled:opacity-50"
       >
-        {if @action == "select", do: gettext("Bring to today"), else: gettext("Return to backlog")}
+        {@label}
       </button>
     </form>
     """

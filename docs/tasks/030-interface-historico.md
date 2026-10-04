@@ -1,6 +1,6 @@
 ---
 id: "TASK-030"
-status: "planned"
+status: "in_review"
 execution_level: "standard"
 execution_rationale: "Integra conclusão e consulta histórica existentes sem alterar a regra de consumo."
 specs: ["SPEC-003", "SPEC-004", "SPEC-006"]
@@ -34,4 +34,13 @@ Escrever o teste de intenção antes dos ajustes; preservar testes gerados perti
 
 ## Evidência e revisão
 
-Pendentes. Registrar teste antes/depois, precommit e CI com cobertura mínima de 70%, revisor independente, alvo/base, critérios, achados e integração. Não liberar consumidora antes de revisão aprovada e integração.
+Implementador `/root/implement_mvp`, 04/10/2026. Base `7f51200` com TASK-029 integrada; alvo da autoavaliação: diff local de `index.ex`, catálogos Gettext e `task_live_test.exs`. Sem staging/commit; integração e conferência operacional pendentes. Autoavaliação não é aprovação independente nem altera seu marco.
+
+- Critério 1: teste conclui pela interface e repete evento com data forjada. Histórico contém uma tarefa, título/labels originais e data persistida, com consumo mantido após remontagem. Outro teste repete conclusão de ontem e confirma a data original e a ordenação, sem refundir consumo de hoje.
+- Critério 2: três conclusões pela interface deixam hoje vazio e escolhas esgotadas; histórico permanece ordenado por data/ID decrescentes, inclui apenas tarefas próprias e persiste na remontagem. Teste anterior de vazio foi ajustado para limitar sua ausência de títulos à seção hoje, pois títulos concluídos agora aparecem no histórico.
+- Conflitos e falhas: devolução por outra sessão torna conclusão antiga inválida e recompõe backlog/cota; IDs alheios/malformados/inexistentes e proprietário forjado não produzem conclusão. Constraint SQL temporária força falha real de gravação e verifica tarefa ainda pendente, histórico vazio e consumo mantido com erro acessível.
+- Interface: conclusão usa botão/formulário nativo, bloqueio durante envio, foco visível e destino no cabeçalho do histórico. Histórico é seção nomeada com estado vazio, contagem traduzida, labels e `<time datetime>` com data pt-BR, sem hora/reabertura/exclusão. Coleção usa stream; consulta é sempre limitada ao usuário do servidor. Não há timer ou atualização automática de outras abas.
+- TDD: 15 testes existentes aprovados e 4 novos falhando por controles/histórico ausentes antes da implementação; depois 19 testes LiveView aprovados.
+- Gates: `mix precommit` e `mix ci` aprovados, 125 testes, Credo estrito sem achados; cobertura total 91,91%, Index 97,64% (antes 91,60%/97,22%), limiar de 70% preservado. Gettext extraído/mesclado em pt_BR; `git diff --check` aprovado.
+- Autoavaliação pelo fluxo de review: aceites funcionais atendidos, sem achados bloqueantes. Sem teste visual em navegador de teclado, foco e viewport 360px; verificação estrutural por template/testes. Persistência após reinício real e concorrência são contratos cobertos nas tarefas do domínio, não repetidos nesta integração de interface.
+- Alterações operacionais preexistentes preservadas; TASK-032 não iniciada.

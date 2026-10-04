@@ -68,7 +68,7 @@ defmodule PlannerWeb.TaskLiveTest do
       assert has_element?(view, "#used-choices", "3")
       assert has_element?(view, "#available-choices", "0")
       assert has_element?(view, "#quota-exhausted", "esgotadas")
-      refute has_element?(view, "[data-task-title]")
+      refute has_element?(view, "#today [data-task-title]")
     end
   end
 
@@ -266,6 +266,119 @@ defmodule PlannerWeb.TaskLiveTest do
                "#{index}."
              )
     end
+  end
+
+  test "completes once, preserves quota and shows the original date and labels after reload", %{
+    conn: conn,
+    user: user
+  } do
+    label = label_fixture(user, %{name: "Read original"})
+    task = task_fixture(user, %{title: "Original title", label_ids: [label.id]})
+    Tasks.select_today(user, task.id)
+    {:ok, view, _} = live(conn, "/tasks")
+    assert has_element?(view, "#history-empty", "Nenhuma tarefa concluída")
+
+    assert has_element?(
+             view,
+             "#complete-button-#{task.id}[phx-disable-with='Salvando...']",
+             "Concluir"
+           )
+
+    view |> form("#complete-#{task.id}") |> render_submit()
+    render_submit(view, "complete", %{"task_id" => to_string(task.id), "date" => "2099-01-01"})
+    refute has_element?(view, "#today-#{task.id}")
+    assert has_element?(view, "#history-#{task.id} [data-task-title]", "Original title")
+    assert has_element?(view, "#history-#{task.id} [data-label]", "Read original")
+
+    assert has_element?(
+             view,
+             "#history-#{task.id} time[datetime='#{Date.utc_today()}']",
+             Calendar.strftime(Date.utc_today(), "%d/%m/%Y")
+           )
+
+    assert has_element?(view, "#history-count", "1")
+    assert has_element?(view, "#used-choices", "1")
+    refute has_element?(view, "#history-#{task.id} button")
+    {:ok, reload, _} = live(recycle(conn), "/tasks")
+    assert has_element?(reload, "#history-#{task.id}")
+    assert has_element?(reload, "#history-count", "1")
+    assert has_element?(reload, "#used-choices", "1")
+  end
+
+  test "three UI completions exhaust quota and history remains owned and ordered by original date",
+       %{conn: conn, user: user} do
+    yesterday = Date.add(Date.utc_today(), -1)
+    old = task_fixture(user)
+    Tasks.select_today(user, old.id, yesterday)
+    Tasks.complete_task(user, old.id, yesterday)
+    tasks = for _ <- 1..3, do: task_fixture(user)
+    for task <- tasks, do: Tasks.select_today(user, task.id)
+    foreign_user = user_fixture()
+    foreign = task_fixture(foreign_user)
+    Tasks.select_today(foreign_user, foreign.id)
+    Tasks.complete_task(foreign_user, foreign.id)
+    {:ok, view, _} = live(conn, "/tasks")
+    for task <- tasks, do: view |> form("#complete-#{task.id}") |> render_submit()
+    render_submit(view, "complete", %{"task_id" => to_string(old.id)})
+
+    for panel <- [view, elem(live(recycle(conn), "/tasks"), 1)] do
+      assert has_element?(panel, "#today-count", "0")
+      assert has_element?(panel, "#used-choices", "3")
+      assert has_element?(panel, "#quota-exhausted", "esgotadas")
+      assert has_element?(panel, "#history-count", "4")
+      refute has_element?(panel, "#history-#{foreign.id}")
+      assert has_element?(panel, "#history-#{old.id} time[datetime='#{yesterday}']")
+
+      for {task, index} <- Enum.with_index(Enum.reverse(tasks) ++ [old], 2) do
+        assert has_element?(panel, "#history > #history-#{task.id}:nth-child(#{index})")
+      end
+    end
+  end
+
+  test "stale and forged completion events refresh state without inventing a completion", %{
+    conn: conn,
+    user: user
+  } do
+    task = task_fixture(user)
+    Tasks.select_today(user, task.id)
+    foreign_user = user_fixture()
+    foreign = task_fixture(foreign_user)
+    Tasks.select_today(foreign_user, foreign.id)
+    {:ok, view, _} = live(conn, "/tasks")
+    Tasks.return_to_backlog(user, task.id)
+    view |> form("#complete-#{task.id}") |> render_submit()
+    assert has_element?(view, "#planning-error[role=alert]")
+    assert has_element?(view, "#tasks-#{task.id}")
+
+    for id <- [to_string(foreign.id), "bad", "-1"] do
+      render_submit(view, "complete", %{"task_id" => id, "user_id" => foreign_user.id})
+      assert has_element?(view, "#planning-error[role=alert]")
+      assert has_element?(view, "#history-count", "0")
+      assert has_element?(view, "#used-choices", "0")
+    end
+
+    assert Tasks.get_task!(foreign_user, foreign.id).completed_on == nil
+  end
+
+  test "completion write failure preserves pending task, history and consumption", %{
+    conn: conn,
+    user: user
+  } do
+    task = task_fixture(user)
+    Tasks.select_today(user, task.id)
+    {:ok, view, _} = live(conn, "/tasks")
+
+    SQL.query!(
+      Repo,
+      "ALTER TABLE tasks ADD CONSTRAINT reject_ui_completion CHECK (completed_on IS NULL) NOT VALID"
+    )
+
+    view |> form("#complete-#{task.id}") |> render_submit()
+    assert has_element?(view, "#planning-error[role=alert]", "Não foi possível")
+    assert has_element?(view, "#today-#{task.id}")
+    assert has_element?(view, "#history-count", "0")
+    assert has_element?(view, "#used-choices", "1")
+    assert Tasks.get_task!(user, task.id).completed_on == nil
   end
 
   test "registers multiple existing and new labels together", %{conn: conn, user: user} do

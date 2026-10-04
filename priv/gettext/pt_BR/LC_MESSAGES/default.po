@@ -107,12 +107,12 @@ msgstr "Site"
 msgid "close"
 msgstr "fechar"
 
-#: lib/planner_web/live/task_live/index.ex:67
+#: lib/planner_web/live/task_live/index.ex:68
 #, elixir-autogen, elixir-format
 msgid "Add a task to start your backlog."
 msgstr "Cadastre uma tarefa para começar seu backlog."
 
-#: lib/planner_web/live/task_live/index.ex:60
+#: lib/planner_web/live/task_live/index.ex:61
 #, elixir-autogen, elixir-format
 msgid "Backlog"
 msgstr "Backlog"
@@ -134,7 +134,7 @@ msgid "Open planner"
 msgstr "Abrir planejamento"
 
 #: lib/planner_web/live/task_live/index.ex:12
-#: lib/planner_web/live/task_live/index.ex:112
+#: lib/planner_web/live/task_live/index.ex:139
 #, elixir-autogen, elixir-format
 msgid "Planner"
 msgstr "Planejamento"
@@ -145,8 +145,8 @@ msgid "Save task"
 msgstr "Cadastrar tarefa"
 
 #: lib/planner_web/live/task_live/form.ex:46
-#: lib/planner_web/live/task_live/index.ex:234
-#: lib/planner_web/live/task_live/index.ex:265
+#: lib/planner_web/live/task_live/index.ex:266
+#: lib/planner_web/live/task_live/index.ex:306
 #, elixir-autogen, elixir-format
 msgid "Saving..."
 msgstr "Salvando..."
@@ -184,8 +184,8 @@ msgstr[0] "%{count} escolha disponível"
 msgstr[1] "%{count} escolhas disponíveis"
 
 #: lib/planner_web/live/task_live/index.ex:36
-#: lib/planner_web/live/task_live/index.ex:63
-#: lib/planner_web/live/task_live/index.ex:83
+#: lib/planner_web/live/task_live/index.ex:64
+#: lib/planner_web/live/task_live/index.ex:84
 #, elixir-autogen, elixir-format
 msgid "%{count} pending task"
 msgid_plural "%{count} pending tasks"
@@ -197,7 +197,7 @@ msgstr[1] "%{count} tarefas pendentes"
 msgid "Choices used: %{count} of 3"
 msgstr "Escolhas usadas: %{count} de 3"
 
-#: lib/planner_web/live/task_live/index.ex:278
+#: lib/planner_web/live/task_live/index.ex:319
 #, elixir-autogen, elixir-format
 msgid "Labels"
 msgstr "Labels"
@@ -207,12 +207,12 @@ msgstr "Labels"
 msgid "No tasks for today. Choose from backlog or retry."
 msgstr "Nenhuma tarefa para hoje. Escolha no backlog ou em tentar novamente."
 
-#: lib/planner_web/live/task_live/index.ex:87
+#: lib/planner_web/live/task_live/index.ex:88
 #, elixir-autogen, elixir-format
 msgid "No unfinished tasks from previous days."
 msgstr "Nenhuma tarefa pendente de dias anteriores."
 
-#: lib/planner_web/live/task_live/index.ex:81
+#: lib/planner_web/live/task_live/index.ex:82
 #, elixir-autogen, elixir-format
 msgid "Retry"
 msgstr "Tentar novamente"
@@ -223,58 +223,85 @@ msgid "Today"
 msgstr "Hoje"
 
 #: lib/planner_web/live/task_live/index.ex:33
-#: lib/planner_web/live/task_live/index.ex:157
+#: lib/planner_web/live/task_live/index.ex:184
 #, elixir-autogen, elixir-format
 msgid "Today's choices are exhausted."
 msgstr "As escolhas de hoje estão esgotadas."
 
-#: lib/planner_web/live/task_live/index.ex:268
+#: lib/planner_web/live/task_live/index.ex:286
 #, elixir-autogen, elixir-format
 msgid "Bring to today"
 msgstr "Trazer para hoje"
 
-#: lib/planner_web/live/task_live/index.ex:193
-#: lib/planner_web/live/task_live/index.ex:202
+#: lib/planner_web/live/task_live/index.ex:221
+#: lib/planner_web/live/task_live/index.ex:230
 #, elixir-autogen, elixir-format
 msgid "Could not refresh the panel. Please reload."
 msgstr "Não foi possível atualizar o painel. Recarregue a página."
 
-#: lib/planner_web/live/task_live/index.ex:163
+#: lib/planner_web/live/task_live/index.ex:190
 #, elixir-autogen, elixir-format
 msgid "Could not save the change. Please try again."
 msgstr "Não foi possível salvar a alteração. Tente novamente."
 
-#: lib/planner_web/live/task_live/index.ex:268
+#: lib/planner_web/live/task_live/index.ex:287
 #, elixir-autogen, elixir-format
 msgid "Return to backlog"
 msgstr "Devolver ao backlog"
 
-#: lib/planner_web/live/task_live/index.ex:160
+#: lib/planner_web/live/task_live/index.ex:187
 #, elixir-autogen, elixir-format
 msgid "This task is no longer available for this action. The panel has been updated."
 msgstr "Esta tarefa não está mais disponível para esta ação. O painel foi atualizado."
 
-#: lib/planner_web/live/task_live/index.ex:238
+#: lib/planner_web/live/task_live/index.ex:270
 #, elixir-autogen, elixir-format
 msgid "Move %{title} down"
 msgstr "Descer %{title}"
 
-#: lib/planner_web/live/task_live/index.ex:237
+#: lib/planner_web/live/task_live/index.ex:269
 #, elixir-autogen, elixir-format
 msgid "Move %{title} up"
 msgstr "Subir %{title}"
 
-#: lib/planner_web/live/task_live/index.ex:242
+#: lib/planner_web/live/task_live/index.ex:274
 #, elixir-autogen, elixir-format
 msgid "Move down"
 msgstr "Descer"
 
-#: lib/planner_web/live/task_live/index.ex:242
+#: lib/planner_web/live/task_live/index.ex:274
 #, elixir-autogen, elixir-format
 msgid "Move up"
 msgstr "Subir"
 
-#: lib/planner_web/live/task_live/index.ex:152
+#: lib/planner_web/live/task_live/index.ex:179
 #, elixir-autogen, elixir-format
 msgid "Priorities have changed or this movement is unavailable. The panel has been updated."
 msgstr "As prioridades mudaram ou este movimento não está disponível. O painel foi atualizado."
+
+#: lib/planner_web/live/task_live/index.ex:106
+#, elixir-autogen, elixir-format
+msgid "%{count} completed task"
+msgid_plural "%{count} completed tasks"
+msgstr[0] "%{count} tarefa concluída"
+msgstr[1] "%{count} tarefas concluídas"
+
+#: lib/planner_web/live/task_live/index.ex:288
+#, elixir-autogen, elixir-format
+msgid "Complete task"
+msgstr "Concluir tarefa"
+
+#: lib/planner_web/live/task_live/index.ex:117
+#, elixir-autogen, elixir-format
+msgid "Completed on"
+msgstr "Concluída em"
+
+#: lib/planner_web/live/task_live/index.ex:103
+#, elixir-autogen, elixir-format
+msgid "History"
+msgstr "Histórico"
+
+#: lib/planner_web/live/task_live/index.ex:109
+#, elixir-autogen, elixir-format
+msgid "No completed tasks yet."
+msgstr "Nenhuma tarefa concluída ainda."
