@@ -1,6 +1,6 @@
 ---
 id: "TASK-028"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Integra duas transições existentes ao painel com tratamento de limite, conflito e falha."
 specs: ["SPEC-002", "SPEC-004"]
@@ -45,3 +45,7 @@ Implementação entregue para conferência operacional do coordenador em 04/10/2
 - Gates: `mix precommit` aprovado; `mix ci` aprovado com Credo sem achados, 118 testes e cobertura total de 91,14%, `PlannerWeb.TaskLive.Index` 96,34% (limiar preservado em 70%). `git diff --check` aprovado. Extração Gettext e mesclagem pt_BR atualizadas.
 - Autoavaliação: critérios de domínio atendidos, sem achados bloqueantes. Caminhos de indisponibilidade da leitura têm mensagem explícita e preservam snapshot anterior, mas não receberam injeção de falha nesta entrega. Concorrência/virada permanecem contratos transacionais cobertos pelo contexto; não foram reimplementados na interface.
 - Alterações operacionais preexistentes fora do escopo foram preservadas. Consumidora aguarda conferência e integração pelo coordenador.
+
+### Conferência operacional — 04/10/2026
+
+Coordenador `/root`: registro e resumo conferidos superficialmente, sem impedimentos. Gates locais relatados aprovados: 118 testes, cobertura 91,14%. Entrega integrada na branch `feat/mvp` em `788a018`; TASK-029 liberada. Sem revisão independente ou verificação de CI remoto. Validação visual permanece para a etapa de acessibilidade.
