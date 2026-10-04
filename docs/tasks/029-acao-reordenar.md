@@ -1,6 +1,6 @@
 ---
 id: "TASK-029"
-status: "planned"
+status: "in_review"
 execution_level: "standard"
 execution_rationale: "Converte ações de teclado em permutações e recupera a lista após conflito."
 specs: ["SPEC-002", "SPEC-004"]
@@ -34,4 +34,12 @@ Escrever o teste de intenção antes dos ajustes; preservar testes gerados perti
 
 ## Evidência e revisão
 
-Pendentes. Registrar teste antes/depois, precommit e CI com cobertura mínima de 70%, revisor independente, alvo/base, critérios, achados e integração. Não liberar consumidora antes de revisão aprovada e integração.
+Entrega pelo implementador `/root/implement_mvp` em 04/10/2026; base `d3b7168` com TASK-028 integrada. Alvo da autoavaliação: alterações locais em `index.ex`, `task_live_test.exs`, POT e catálogo pt_BR; este registro acompanha a entrega. Sem staging/commit. Conferência e integração pelo coordenador pendentes; não constitui revisão independente nem altera seu marco.
+
+- Critério 1: teste LiveView seleciona três tarefas, sobe a terceira, desce a primeira, verifica ordem efetiva dos filhos no DOM e posições numeradas, recompõe o painel e confirma persistência. Confere botões desabilitados nas extremidades e cota inalterada. Controles são formulários/botões nativos, com nomes acessíveis incluindo o título, foco visível, `phx-disable-with` e foco útil no cabeçalho estável de hoje. Layout usa `flex-wrap`. Teclado físico, foco executado pelo cliente e viewport 360px não foram exercitados em navegador; inspecionados no template.
+- Critério 2: outra sessão devolve a primeira tarefa antes da reordenação; o conjunto guardado na sessão é recusado pelo contexto e a interface recompõe a ordem atual, backlog e cota (duas escolhas). Nova tentativa com conjunto atualizado sucede, preserva cota e remove o erro.
+- Entrada forjada: IDs alheios/malformados, proprietário arbitrário, direção inválida, movimento além da borda e evento sem parâmetros são rejeitados, sem mover tarefas próprias/alheias nem consumir escolhas. O servidor constrói a permutação completa a partir do snapshot da sessão e passa o usuário resolvido ao contexto; não relê antes de construir a permutação, preservando a detecção de conjunto antigo.
+- TDD: primeira execução teve 12 testes existentes aprovados e 3 novos falhando por controles/evento ausentes. Após implementar e traduzir, 15 testes LiveView aprovados.
+- Gates: `mix precommit` e `mix ci` aprovados com 121 testes, Credo estrito sem achados, cobertura total 91,60% e Index 97,22% (anterior: 91,14%/96,34%). Limiar de 70% preservado. Extração e mesclagem Gettext pt_BR atualizadas; `git diff --check` aprovado.
+- Autoavaliação segundo fluxo de review: critérios funcionais atendidos, sem achados bloqueantes. Rejeição atômica/concorrência são fornecidas e testadas pelo contrato integrado de TASK-024; não houve alteração do contexto. Comandos compartilham tratamento de falhas de persistência já exercitado pela TASK-028. Coleções continuam em streams; apenas IDs do conjunto limitado de hoje são mantidos para construir a permutação correspondente à tela.
+- Alterações operacionais preexistentes preservadas. TASK-030 não iniciada; aguarda liberação após integração.

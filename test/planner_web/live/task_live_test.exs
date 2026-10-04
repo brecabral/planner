@@ -188,6 +188,86 @@ defmodule PlannerWeb.TaskLiveTest do
     assert Tasks.get_task!(user, task.id).kind == :today
   end
 
+  test "moves priorities with named controls, respects boundaries and persists the order", %{
+    conn: conn,
+    user: user
+  } do
+    [first, second, third] = tasks = for _ <- 1..3, do: task_fixture(user)
+    for task <- tasks, do: Tasks.select_today(user, task.id)
+    {:ok, view, _} = live(conn, "/tasks")
+    assert has_element?(view, "#move-up-#{first.id} button[disabled]", "Subir")
+    assert has_element?(view, "#move-down-#{third.id} button[disabled]", "Descer")
+    view |> form("#move-up-#{third.id}") |> render_submit()
+    assert_today_order(view, [first, third, second])
+    view |> form("#move-down-#{first.id}") |> render_submit()
+    assert_today_order(view, [third, first, second])
+    assert has_element?(view, "#used-choices", "3")
+    assert has_element?(view, "#move-up-#{third.id} button[disabled]")
+    assert has_element?(view, "#move-down-#{second.id} button[disabled]")
+    {:ok, reload, _} = live(recycle(conn), "/tasks")
+    assert_today_order(reload, [third, first, second])
+  end
+
+  test "stale priority set is rejected and refreshed without changing quota", %{
+    conn: conn,
+    user: user
+  } do
+    [first, second, third] = tasks = for _ <- 1..3, do: task_fixture(user)
+    for task <- tasks, do: Tasks.select_today(user, task.id)
+    {:ok, view, _} = live(conn, "/tasks")
+    Tasks.return_to_backlog(user, first.id)
+    view |> form("#move-up-#{third.id}") |> render_submit()
+    assert has_element?(view, "#planning-error[role=alert]", "prioridades")
+    assert_today_order(view, [second, third])
+    assert has_element?(view, "#tasks-#{first.id}")
+    assert has_element?(view, "#used-choices", "2")
+    view |> form("#move-up-#{third.id}") |> render_submit()
+    assert_today_order(view, [third, second])
+    refute has_element?(view, "#planning-error")
+    assert has_element?(view, "#used-choices", "2")
+  end
+
+  test "forged priority movements cannot change another user's tasks or move past boundaries", %{
+    conn: conn,
+    user: user
+  } do
+    task = task_fixture(user)
+    Tasks.select_today(user, task.id)
+    foreign_user = user_fixture()
+    foreign = task_fixture(foreign_user)
+    Tasks.select_today(foreign_user, foreign.id)
+    {:ok, view, _} = live(conn, "/tasks")
+
+    for params <- [
+          %{
+            "task_id" => to_string(foreign.id),
+            "direction" => "up",
+            "user_id" => foreign_user.id
+          },
+          %{"task_id" => to_string(task.id), "direction" => "up"},
+          %{"task_id" => to_string(task.id), "direction" => "sideways"},
+          %{"task_id" => "bad", "direction" => "down"},
+          %{}
+        ] do
+      render_submit(view, "reorder", params)
+      assert has_element?(view, "#planning-error[role=alert]")
+      assert_today_order(view, [task])
+      assert has_element?(view, "#used-choices", "1")
+    end
+
+    assert Tasks.get_task!(foreign_user, foreign.id).position == 1
+  end
+
+  defp assert_today_order(view, tasks) do
+    for {task, index} <- Enum.with_index(tasks, 1) do
+      assert has_element?(
+               view,
+               "#today > #today-#{task.id}:nth-child(#{index + 1}) [data-priority]",
+               "#{index}."
+             )
+    end
+  end
+
   test "registers multiple existing and new labels together", %{conn: conn, user: user} do
     first = label_fixture(user, %{name: "Reading"})
     second = label_fixture(user, %{name: "Writing"})

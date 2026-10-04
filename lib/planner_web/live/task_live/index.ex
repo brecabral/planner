@@ -47,6 +47,10 @@ defmodule PlannerWeb.TaskLive.Index do
             <span data-priority class="mr-2 font-bold">{task.position}.</span>
             <span data-task-title>{task.title}</span>
             <.task_labels task={task} />
+            <div class="mt-3 flex flex-wrap gap-2">
+              <.order_action task={task} direction="up" disabled={task.position == 1} />
+              <.order_action task={task} direction="down" disabled={task.position == @today_count} />
+            </div>
             <.planning_action task={task} action="return" />
           </div>
         </div>
@@ -114,10 +118,40 @@ defmodule PlannerWeb.TaskLive.Index do
   def handle_event(action, params, socket) when action in ["select", "return"] do
     result = run_action(action, socket.assigns.user, Map.get(params, "task_id"))
 
+    finish_action(socket, result)
+  end
+
+  def handle_event("reorder", params, socket) do
+    ids = move_priority(socket.assigns.today_ids, params)
+    finish_action(socket, run_action("reorder", socket.assigns.user, ids))
+  end
+
+  defp move_priority(ids, %{"task_id" => id, "direction" => direction})
+       when direction in ["up", "down"] do
+    index = Enum.find_index(ids, &(to_string(&1) == id))
+    offset = if direction == "up", do: -1, else: 1
+
+    if index != nil and index + offset >= 0 and index + offset < length(ids) do
+      target = index + offset
+
+      ids
+      |> List.replace_at(index, Enum.at(ids, target))
+      |> List.replace_at(target, Enum.at(ids, index))
+    end
+  end
+
+  defp move_priority(_ids, _params), do: nil
+
+  defp finish_action(socket, result) do
     error =
       case result do
         {:ok, _task} ->
           nil
+
+        {:error, :invalid_order} ->
+          gettext(
+            "Priorities have changed or this movement is unavailable. The panel has been updated."
+          )
 
         {:error, :quota_exhausted} ->
           gettext("Today's choices are exhausted.")
@@ -138,6 +172,7 @@ defmodule PlannerWeb.TaskLive.Index do
     case action do
       "select" -> Tasks.select_today(user, id)
       "return" -> Tasks.return_to_backlog(user, id)
+      "reorder" -> Tasks.reorder_today(user, id)
     end
   rescue
     _error in [
@@ -172,11 +207,42 @@ defmodule PlannerWeb.TaskLive.Index do
     |> assign(:used_choices, snapshot.used_choices)
     |> assign(:available_choices, snapshot.available_choices)
     |> assign(:today_count, length(snapshot.today))
+    |> assign(:today_ids, Enum.map(snapshot.today, & &1.id))
     |> assign(:backlog_count, length(snapshot.backlog))
     |> assign(:retry_count, length(snapshot.retry))
     |> stream(:tasks, snapshot.backlog, reset: true)
     |> stream(:today, snapshot.today, reset: true)
     |> stream(:retry, snapshot.retry, reset: true)
+  end
+
+  attr :task, Planner.Tasks.Task, required: true
+  attr :direction, :string, required: true
+  attr :disabled, :boolean, required: true
+
+  defp order_action(assigns) do
+    ~H"""
+    <form
+      id={"move-#{@direction}-#{@task.id}"}
+      phx-submit={JS.push("reorder") |> JS.focus(to: "#today-heading")}
+    >
+      <input type="hidden" name="task_id" value={@task.id} />
+      <input type="hidden" name="direction" value={@direction} />
+      <button
+        id={"move-#{@direction}-button-#{@task.id}"}
+        type="submit"
+        disabled={@disabled}
+        phx-disable-with={gettext("Saving...")}
+        aria-label={
+          if @direction == "up",
+            do: gettext("Move %{title} up", title: @task.title),
+            else: gettext("Move %{title} down", title: @task.title)
+        }
+        class="rounded-lg border border-indigo-700 px-3 py-2 text-indigo-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-700 disabled:opacity-50"
+      >
+        {if @direction == "up", do: gettext("Move up"), else: gettext("Move down")}
+      </button>
+    </form>
+    """
   end
 
   attr :task, Planner.Tasks.Task, required: true
