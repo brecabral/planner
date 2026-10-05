@@ -1,6 +1,6 @@
 ---
 id: "TASK-032"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Ajusta mensagens e estrutura acessível do painel, com testes LiveView, sem modificar regras de domínio."
 specs: ["SPEC-001", "SPEC-004"]
@@ -50,3 +50,7 @@ Implementador `/root/implement_032`; base `69d4a20`, com TASK-030 integrada em `
 - Gates: `rtk mix precommit` e `rtk mix ci` aprovados com 127 testes; Credo estrito sem achados. Cobertura total 92,12%, Form 97,73%, Index 97,66%, mantendo limiar de 70% (evidência anterior da TASK-030: total 91,91%, Index 97,64%). `rtk git diff --check` aprovado. A métrica é de linhas, não comprova todos os ramos nem experiência assistiva.
 - Autoavaliação: critérios estruturais e funcionais atendidos, sem achados bloqueantes; conclusão técnica `approved` somente como autoavaliação. Inspeção do diff confirma escopo restrito à apresentação, sem alteração de domínio, persistência ou autorização. Não avança o marco de revisão independente.
 - Limitações: sem execução de navegador, teclado, foco, layout ou tecnologia assistiva real. Essas verificações estão fora dos gates por decisão registrada no BLOCK-004 e permanecem na validação humana do PRD. `in_review` aguarda conferência operacional e integração do coordenador.
+
+### Conferência operacional — 05/10/2026
+
+Coordenador `/root`: registro e resumo conferidos superficialmente, sem impedimentos. Gates locais relatados aprovados: 127 testes e cobertura de 92,12%. Entrega integrada na base de trabalho em `616b72d`; TASK-008 liberada. Sem revisão independente ou verificação de CI remoto. Validação humana da interface permanece pendente fora dos gates. Alterações documentais preexistentes fora desta tarefa foram preservadas.
