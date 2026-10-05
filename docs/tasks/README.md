@@ -32,8 +32,9 @@ Gate GitHub e base limpa têm aceite humano registrado. As TASK-036, TASK-002, T
 | [028 — Ligar seleção e devolução no painel](028-acoes-selecionar-devolver.md) |
 | [029 — Adicionar subir e descer prioridades](029-acao-reordenar.md) |
 | [030 — Ligar conclusão e consulta de histórico](030-interface-historico.md) |
-| [032 — Ajustar teclado, responsividade e mensagens do painel](032-acessibilidade-painel.md) |
+| [032 — Validar estrutura e mensagens do painel](032-acessibilidade-painel.md) |
 | [008 — Executar o aceite do MVP mínimo](008-aceite-mvp.md) |
+| [037 — Criar usuário padrão no primeiro acesso em desenvolvimento](037-usuario-padrao-dev.md) |
 
 ## Uma spec, vários passos
 
@@ -43,7 +44,7 @@ Gate GitHub e base limpa têm aceite humano registrado. As TASK-036, TASK-002, T
 | SPEC-002 — Planejamento | 005 scaffold, 020 cota, 021 snapshot, 022 seleção, 023 devolução, 024 ordem, 028/029 interface. |
 | SPEC-003 — Data e histórico | 016 data, 021 normalização, 007 conclusão, 025 consulta, 030 interface; recarga usa 006/027. |
 | SPEC-004 — Painel | 006 scaffold, 026 formulário, 027 listas, 028/029/030 ações, 032 acessibilidade. |
-| SPEC-005 — Usuário padrão | 009 cria/resgata identidade; 006 a resolve no servidor sem login. |
+| SPEC-005 — Usuário padrão | 009 cria/resgata identidade; 006 a resolve no servidor sem login; 037 adiciona criação automática no acesso em dev. |
 | SPEC-006 — Labels | 010 catálogo, 018 relação, 019 cadastro atômico, 026 formulário. |
 
 TASK-008 verifica CA01–CA13 e CA15, incluindo persistência após reinício e cobertura mínima de 70% exigida pelo CI.

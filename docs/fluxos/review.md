@@ -41,7 +41,7 @@ Registrar o resumo no campo de revisão da tarefa, com identidade do revisor, al
 
 ## Autoavaliação
 
-Implementadores aplicam os mesmos critérios, registram resultados e encaminham para revisão independente. Não podem preencher sua própria aprovação como revisão independente. Falhas de infraestrutura tornam a verificação correspondente bloqueada, não aprovada; não ampliar escopo só para mascarar a falha.
+Implementadores aplicam os mesmos critérios, registram resultados e encaminham ao coordenador para conferência operacional. Revisão independente ocorre quando explicitamente solicitada. Não podem preencher sua própria aprovação como revisão independente. Falhas de infraestrutura tornam a verificação correspondente bloqueada, não aprovada; não ampliar escopo só para mascarar a falha.
 
 ## Tarefas humanas
 

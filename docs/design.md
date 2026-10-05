@@ -24,7 +24,7 @@ Persistir cota por usuário/data separada das pendências. Seleção, devoluçã
 
 ## D08 — Usuário padrão e data
 
-Contexto Accounts contém somente identidade persistente e resolução/criação idempotente do usuário padrão. Não gerar autenticação agora. Data de negócio é Date.utc_today(), com valor controlável nos testes; não persistir fuso nem horário de seleção/conclusão. Normalizar virada na leitura/comando, sem depender de processo web.
+Contexto Accounts contém somente identidade persistente e resolução/criação idempotente do usuário padrão. A resolução nas telas terá criação idempotente habilitada somente pela configuração de desenvolvimento, desabilitada por padrão. Reutilizar a operação existente de criação e o índice único; preservar a consulta estrita `get_default_user!/0` e os seeds explícitos. Não consultar `Mix.env()` no código de runtime nem criar outra variável `ENV`. Não adicionar criação na inicialização da aplicação, para preservar a execução de preparação/migrations sem acesso antecipado às tabelas. Incremento planejado na TASK-037. Não gerar autenticação agora. Data de negócio é Date.utc_today(), com valor controlável nos testes; não persistir fuso nem horário de seleção/conclusão. Normalizar virada na leitura/comando, sem depender de processo web.
 
 ## D09 — Gettext fixo em pt-BR
 

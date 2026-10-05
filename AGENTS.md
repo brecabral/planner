@@ -11,7 +11,7 @@ São condutas de trabalho, não permissões de filesystem, credenciais ou troca 
 | Revisor | Agente de ponta | Alvo e base da revisão, diff/commits, tarefa, critérios/specs e evidências de testes | [Review](docs/fluxos/review.md) |
 | Implementador | Nível mínimo declarado na tarefa: `basic`, `standard` ou `advanced` | Tarefa completa, regras de spec indicadas, contratos das dependências, arquivos de entrada e referências técnicas aplicáveis | [Implementação](docs/fluxos/implementacao.md) |
 
-Carregar apenas o fluxo ativo. Qualquer validação de código segue o fluxo de review, inclusive autoavaliação do implementador; isso não transforma autoavaliação em aprovação independente. O planejador define o nível mínimo e justifica a escolha; todos os implementadores seguem o mesmo fluxo e critérios de qualidade. Se a capacidade ou o contrato forem insuficientes, registrar o impedimento e devolver para decomposição ou agente mais capaz, sem presumir uma troca de modelo.
+Carregar apenas o fluxo ativo. A coordenação padrão confere superficialmente conclusão e liberação de dependências, sem revisar código ou spawnar revisores; revisão independente só ocorre quando explicitamente solicitada. Qualquer validação de código segue o fluxo de review, inclusive autoavaliação do implementador; isso não transforma autoavaliação em aprovação independente. O planejador define o nível mínimo e justifica a escolha; todos os implementadores seguem o mesmo fluxo e critérios de qualidade. Se a capacidade ou o contrato forem insuficientes, registrar o impedimento e devolver para decomposição ou agente mais capaz, sem presumir uma troca de modelo.
 
 ## Execução exclusiva por humano
 

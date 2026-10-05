@@ -56,3 +56,8 @@ Autoavaliação pelo fluxo de review: aceites atendidos, sem bloqueadores identi
 ### Conferência e integração — 01/10/2026
 
 Coordenador `/root`: código/testes conferidos contra os três aceites, incluindo CA-002-02 por APIs reais, preservação de consumo/data, compactação, rejeições, rollback e disputa com devolução. Gates relatados: 103 testes, 89,39%; diff check aprovado. Integrada em `1c4f88659d47c32fae5f55375f446aaf25e8877d`. Conforme autorização explícita do usuário, conclusão operacional e liberação da TASK-025 por conferência do coordenador; revisão independente pendente para o final, sem aprovação presumida do revisor.
+
+
+### Revisão independente de prontidão — 05/10/2026
+
+Revisor `/root`; alvo `ce0f72bb59eb27efa0a60e867f93242c2e805916`, base `aafed16d7b7a09000404e716cc98dcc43763510e`. Nenhum achado adicional neste escopo; o aceite global do MVP permanece com alterações solicitadas por R1 no cadastro. CI e precommit reproduzidos: 136 testes aprovados; cobertura total 92,16%. Evidências, reprodução, critérios e limites no [relatório de revisão](../review.md#revisão-de-prontidão-do-mvp--05102026). Registro operacional anterior preservado; esta revisão não presume validação humana ou CI remoto.

@@ -22,3 +22,4 @@ O coordenador só encerra o relatório quando a condição de retomada estiver c
 - [BLOCK-002 — Escopo da tradução da interface base](002-escopo-traducao-interface-base.md).
 
 - [BLOCK-003 — Escopo do teste de rotas do painel](003-escopo-teste-rotas-painel.md).
+- [BLOCK-004 — Validação de acessibilidade em navegador](004-validacao-navegador-acessibilidade.md).

@@ -13,8 +13,8 @@ Ler a tarefa inteira e seus metadados; as regras/critério da spec indicados; co
 3. Transformar critérios em testes de intenção antes de implementar comportamento. Antes da primeira execução que possa aplicar uma migration nova, completar sua estrutura e invariantes previstas no contrato, conforme [TDD e migrations](../referencias/ecto.md#tdd-e-migrations). Não aplicar scaffold incompleto para provocar a fase vermelha. Executar o teste inicial e verificar que a falha representa o comportamento ausente, não erro de setup. Para mudanças somente documentais ou mecânicas, usar validação adequada sem criar testes artificiais.
 4. Implementar a menor mudança completa dentro do contrato. Reutilizar recursos fornecidos por dependências e convenções técnicas. Não alterar uma regra para fazer o teste passar; não adicionar dependência, abstração ou funcionalidade fora do escopo.
 5. Executar testes específicos, `mix precommit` e o gate `mix ci`, corrigindo problemas da entrega. Revisar o próprio diff e avaliar cada critério usando o [fluxo de review](review.md), inclusive cobertura/evals quando aplicáveis. Não atribuir aprovação independente a essa autoavaliação.
-6. Preencher evidências por critério: teste/comando/inspeção, resultado e limitações. Marcar `in_review` e encaminhar o diff/base para revisor de ponta. Registrar o que falta para retomada por outro agente.
-7. Corrigir achados autorizados, repetir validação afetada e reenviar a revisão. `done` exige gate aprovado e integração; só então consumidoras podem iniciar.
+6. Preencher evidências por critério: teste/comando/inspeção, resultado e limitações. Marcar `in_review` e encaminhar a entrega e suas evidências para conferência operacional do coordenador. Registrar o que falta para retomada por outro agente.
+7. Corrigir achados autorizados, repetir validação afetada e reenviar a entrega ao coordenador. `done` exige gate aprovado e integração; só então consumidoras podem iniciar.
 
 ## Quando devolver ao planejamento
 

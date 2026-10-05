@@ -69,3 +69,8 @@ CI foi reproduzido localmente; não há verificação de execução remota nesta
 ### Conferência operacional — 05/10/2026
 
 Coordenador `/root`: registro, matriz e resumo conferidos superficialmente, sem impedimentos. Gates locais relatados aprovados: 127 testes e cobertura de 92,12%; persistência demonstrada entre dois processos separados. Evidências integradas na base de trabalho em `d8770e5`, com TASK-032 concluída e integrada. TASK-008 concluída operacionalmente, encerrando a fila autorizada do MVP. Sem revisão independente ou verificação de CI remoto. Evoluções futuras permanecem fora do escopo; validação humana da interface continua pendente conforme PRD.
+
+
+### Revisão independente de prontidão — 05/10/2026
+
+Revisor `/root`; alvo `ce0f72bb59eb27efa0a60e867f93242c2e805916`, base `aafed16d7b7a09000404e716cc98dcc43763510e`. Achado R1 no cadastro impede o aceite integral do MVP. CI e precommit reproduzidos: 136 testes aprovados; cobertura total 92,16%. Evidências, reprodução, critérios e limites no [relatório de revisão](../review.md#revisão-de-prontidão-do-mvp--05102026). Registro operacional anterior preservado; esta revisão não presume validação humana ou CI remoto.

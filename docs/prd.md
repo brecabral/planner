@@ -25,13 +25,13 @@ Permitir cadastrar tarefas, escolher até três ações para o dia, ordenar, dev
 - Backlog contém tarefas disponíveis, inclusive as retiradas manualmente de hoje. Retry recebe apenas tarefas que permaneceram em hoje sem conclusão quando o servidor observar um novo dia.
 - Usar `Date.utc_today()` do Elixir para a data corrente, sem fuso configurável ou horário de negócio.
 - Normalizar a virada ao consultar ou executar um comando. Página ociosa pode ficar desatualizada; o usuário recarrega quando precisar. Não há timer ou atualização automática entre abas.
-- Todas as visitas usam o mesmo usuário padrão criado para testes. Tarefas, labels e cota pertencem a ele; proprietário é atribuído pelo servidor.
+- Todas as visitas usam o mesmo usuário padrão criado para testes. Em desenvolvimento, o primeiro acesso ao painel ou ao cadastro cria essa identidade se ausente, sem exigir seeds; os demais ambientes mantêm preparação explícita. Tarefas, labels e cota pertencem a ele; proprietário é atribuído pelo servidor.
 - Interface somente pt-BR pelo Gettext existente, seguindo o padrão Phoenix. Sem seletor de idioma; conteúdo digitado não é traduzido.
 - Histórico preserva conclusões. Reabrir/excluir tarefas, editar/excluir labels e gestão completa de projetos ficam fora do MVP.
 
 ## 4. Experiência
 
-Hoje tem destaque, prioridades numeradas e escolhas disponíveis. Backlog e retry são listas distintas com ação de selecionar. Cadastro aceita título e várias labels; histórico permanece acessível. Ações funcionam por teclado e em celular, com validação e erros sem falso sucesso.
+Hoje tem destaque, prioridades numeradas e escolhas disponíveis. Backlog e retry são listas distintas com ação de selecionar. Cadastro aceita título e várias labels; histórico permanece acessível. Ações apresentam validação e erros sem falso sucesso. A avaliação em navegador de teclado, foco, responsividade e anúncios por tecnologias assistivas fica a cargo da validação humana abaixo.
 
 ## 5. Arquitetura e qualidade
 
@@ -52,11 +52,21 @@ A entrega exige testes relevantes, verificações do repositório e **cobertura 
 | CA07 | Reiniciar mantém tarefas, labels, histórico e consumo por data. |
 | CA08 | Após mudar a data, recarregar mostra pendências anteriores em retry; comando de tela antiga revalida o dia antes de gravar. |
 | CA09 | Falha informa erro e preserva estado anterior, inclusive cota e novas labels. |
-| CA10 | Cadastro, seleção, ordem, devolução e conclusão funcionam em pt-BR, por teclado e em celular. |
+| CA10 | Cadastro, seleção, ordem, devolução e conclusão funcionam em pt-BR, com comportamento e estrutura verificados pelos testes existentes. |
 | CA11 | Precommit e CI passam, com cobertura de testes de pelo menos 70%. |
 | CA12 | Aplicação executa no ambiente de teste com configuração externa e sem segredos versionados. |
 | CA13 | Abrir painel usa usuário padrão sem login; repetir seeds não o duplica e parâmetros não trocam o proprietário. |
 | CA15 | Cadastro com várias labels existentes/novas persiste todos os vínculos; label incompatível rejeita a transação. |
+
+### Validação humana da interface — fora das tarefas
+
+Por decisão do responsável em 05/10/2026, a avaliação real em navegador fica reservada à pessoa responsável pelo produto, fora das tarefas e dos gates de execução dos agentes. Não exige nova ferramenta ou infraestrutura no pipeline.
+
+- Operar cadastro, seleção, reordenação, devolução e conclusão por teclado; observar foco visível e destino do foco após ações.
+- Conferir layout e acesso às ações em 360px e desktop, sem transbordamento que impeça o uso.
+- Conferir anúncios de erros e estados vazios por tecnologias assistivas.
+
+Estado: pendente de validação humana; nenhum desses resultados é presumido pelos testes LiveView. Esta pendência não bloqueia a fila nem o aceite automatizado do MVP. Eventuais problemas encontrados poderão ser encaminhados posteriormente para planejamento.
 
 ## 7. Solução final, fora do MVP
 

@@ -12,11 +12,11 @@ Agente de ponta responsável por distribuir trabalho autorizado, avaliar aceite 
 
 ## Aceite e commit
 
-1. Conferir o diff real e as evidências de cada critério. A mensagem de conclusão do implementador não comprova aceite. Validar também escopo, regressões e cobertura mínima de 70% no gate definido pelo projeto.
-2. Encaminhar a entrega a um revisor independente de ponta, seguindo o [fluxo de review](review.md). O coordenador pode assumir essa revisão se não participou da implementação; caso contrário, deve spawnar outro revisor. Autoavaliação do implementador nunca substitui aprovação independente.
-3. Devolver achados corrigíveis ao implementador e revisar novamente as alterações. Integrar somente a entrega aprovada na base das consumidoras; validar o resultado integrado. Mudanças relevantes após a revisão exigem nova avaliação.
-4. Realizar um commit por tarefa aceita, incluindo apenas seus arquivos, testes e registro de evidências, com o ID da tarefa na mensagem. Inspecionar o conteúdo staged; preservar alterações de outras tarefas e do usuário. Não fazer commit de uma entrega bloqueada como se estivesse concluída. Não reescrever commits existentes apenas para adequá-los a este fluxo.
-5. Só liberar consumidoras após aprovação, gate verde, commit bem-sucedido e integração verificada. Registrar a conclusão na tarefa e informar o SHA da entrega no retorno. Se o registro de conclusão precisar de atualização posterior ao commit, fazê-la em commit documental identificado com a mesma tarefa. Falha no commit ou integração mantém a entrega pendente. Push, publicação e merge remoto exigem autorização própria do pedido.
+1. Fazer somente uma conferência operacional superficial: verificar o registro de conclusão, o resumo da entrega, as evidências relatadas de autoavaliação e gates e a ausência de impedimentos. Não revisar código, reproduzir testes ou auditar cada critério no fluxo padrão.
+2. Não spawnar revisores nem assumir revisão independente automaticamente. Revisão de código ocorre apenas quando solicitada explicitamente, pelo [fluxo de review](review.md); se reservada como condição de aceite pelo usuário, aguardar seu resultado. A conferência operacional não é aprovação técnica independente.
+3. Conferir que a entrega está disponível na base das consumidoras. Evidências de gate reprovado ou incompleto mantêm a tarefa pendente; encaminhar ao implementador ou ao planejador conforme a causa. Os gates e a cobertura mínima de 70% continuam obrigatórios e são executados pelo implementador.
+4. Realizar um commit por tarefa concluída operacionalmente, incluindo apenas seus arquivos, testes e registro de evidências, com o ID da tarefa na mensagem. Conferir os arquivos staged para preservar alterações de outras tarefas e do usuário. Não fazer commit de uma entrega bloqueada como se estivesse concluída. Não reescrever commits existentes apenas para adequá-los a este fluxo.
+5. Registrar `done` após conferência operacional, gates relatados aprovados, commit bem-sucedido e integração verificada. Informar o SHA e recalcular quais consumidoras têm todas as dependências concluídas e nenhum impedimento. Se o registro precisar de atualização posterior ao commit, usar commit documental identificado com a mesma tarefa. Falha no commit ou integração mantém a entrega pendente. Push, publicação e merge remoto exigem autorização própria do pedido.
 
 ## Impedimentos
 
@@ -24,4 +24,4 @@ Ao receber um impedimento, confirmar que o implementador parou a tarefa e regist
 
 Quando houver tarefa de correção aprovada no plano, distribuí-la antes das afetadas. Ela pode partir da base com a falha que seu próprio contrato manda corrigir; isso não dispensa seus critérios finais nem autoriza consumidores a prosseguir. Evitar ciclos: uma correção do gate sobre código já presente na base não deve depender do aceite da entrega que esse mesmo gate impede.
 
-Após a correção integrada e as evidências de resolução, encerrar o bloqueio e retomar a fase interrompida, incluindo revisão pendente. Enquanto isso, apenas outras tarefas independentes e autorizadas podem ser distribuídas.
+Após a correção integrada e as evidências de resolução, encerrar o bloqueio e retomar a fase interrompida, incluindo revisão apenas quando explicitamente solicitada. Enquanto isso, apenas outras tarefas independentes e autorizadas podem ser distribuídas.

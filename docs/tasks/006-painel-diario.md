@@ -71,3 +71,8 @@ Estado `in_review`, sem staging/commit. Encaminhado ao coordenador para conferê
 ### Conferência operacional — 03/10/2026
 
 Coordenador `/root`: registro e resumo conferidos superficialmente; gates locais relatados aprovados (109 testes, cobertura 90,40%), sem impedimentos pendentes. Entrega integrada em `ca84dfd`. TASK-026 liberada. Sem revisão independente ou verificação de CI remoto; alterações preexistentes de instruções preservadas fora do commit.
+
+
+### Revisão independente de prontidão — 05/10/2026
+
+Revisor `/root`; alvo `ce0f72bb59eb27efa0a60e867f93242c2e805916`, base `aafed16d7b7a09000404e716cc98dcc43763510e`. Achado R1 no cadastro impede o aceite integral do MVP. CI e precommit reproduzidos: 136 testes aprovados; cobertura total 92,16%. Evidências, reprodução, critérios e limites no [relatório de revisão](../review.md#revisão-de-prontidão-do-mvp--05102026). Registro operacional anterior preservado; esta revisão não presume validação humana ou CI remoto.

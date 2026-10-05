@@ -1,16 +1,53 @@
 ---
-review_base_commit: "ed37fdbe7c91fed6cb6eb9c1ab95ee1deda125d8"
-reviewed_commit: "aafed16d7b7a09000404e716cc98dcc43763510e"
+review_base_commit: "aafed16d7b7a09000404e716cc98dcc43763510e"
+reviewed_commit: "ce0f72bb59eb27efa0a60e867f93242c2e805916"
 last_approved_commit: "aafed16d7b7a09000404e716cc98dcc43763510e"
-reviewed_at: "2026-10-01"
-reviewer: "/root/review_task021 — revisão independente"
-status: approved
-reviewed_tasks: ["TASK-021"]
+reviewed_at: "2026-10-05"
+reviewer: "/root — revisão independente do MVP"
+status: changes_requested
+reviewed_tasks: ["TASK-006", "TASK-007", "TASK-008", "TASK-022", "TASK-023", "TASK-024", "TASK-025", "TASK-026", "TASK-027", "TASK-028", "TASK-029", "TASK-030", "TASK-032", "TASK-037"]
 ---
 
 # Revisão incremental das tarefas concluídas
 
-## Marco atual — TASK-021
+## Revisão de prontidão do MVP — 05/10/2026
+
+Resultado: **changes_requested**. O fluxo principal está implementado e os gates automatizados existentes passam, mas o tratamento de falha de gravação no cadastro impede aprovar integralmente o CA09. Revisão independente por `/root`, sem implementação de produto nesta sessão. Os estados operacionais históricos das tarefas não equivalem à aprovação desta revisão.
+
+### Base e escopo
+
+Base `aafed16d7b7a09000404e716cc98dcc43763510e`, último marco aprovado, confirmada como ancestral do alvo `ce0f72bb59eb27efa0a60e867f93242c2e805916`. Inspecionados os comandos de planejamento, transação compartilhada, migration de posições, formulário, painel, resolução de usuário e testes relevantes das tarefas listadas no cabeçalho. Código executável local idêntico ao alvo; alterações locais preexistentes são documentais e foram preservadas separadamente: AGENTS, fluxos/skills/formato, PRD/design, SPEC-004/005, índices e BLOCK-004. Elas registram coordenação sem revisão automática, validação humana fora dos gates e bootstrap em desenvolvimento. Não recebem aprovação de código pelo SHA.
+
+O último marco aprovado permanece na TASK-021. Revisões anteriores e suas exclusões continuam válidas apenas nos respectivos escopos; esta rodada não é certificação de todos os workflows/skills históricos.
+
+### Achado bloqueante de aceite
+
+**R1 — P2: tratar exceções de persistência no cadastro.** Local: [form.ex:113](../lib/planner_web/live/task_live/form.ex#L113), chamada a `Tasks.create_task/2` no evento `save` (linhas 112–123). Se a gravação lança `Ecto.ConstraintError`, `Postgrex.Error` ou erro de conexão, o callback não trata a exceção e a LiveView encerra, em vez de manter o formulário com erro visível em pt-BR. O tratamento existente cobre somente retorno de changeset; o painel já captura falhas de persistência. Contraria PRD CA09 e SPEC-004 RN04/CA-004-03. Não se atribui perda de dados persistidos: a transação protege atomicidade; a falha comprovada é na resposta da interface.
+
+Reprodução em teste temporário `/tmp/planner_review_registration_test.exs`, usando ConnCase e SQL Sandbox existentes: criar fixture `default`, abrir `/tasks/new`, adicionar dentro da transação de teste a constraint `ALTER TABLE tasks ADD CONSTRAINT reject_review_registration CHECK (title <> 'Review failure') NOT VALID`, submeter `#task-form` com título `Review failure` e nova label `Keep label`. Esperado: formulário ativo, entrada preservada e alerta traduzido. Obtido: `Ecto.ConstraintError` em `form.ex:113`, encerramento do processo e teste interrompido antes das asserções de UI. `rtk mix test /tmp/planner_review_registration_test.exs`: **1 teste, 1 falha**, saída 2. Constraint temporária revertida pelo sandbox; nenhuma migration ou código de produção alterado. A injeção reproduz a mesma classe de falha já usada pelos testes do painel, sem alegar que a constraint artificial existe no produto.
+
+Correção esperada: converter as exceções de persistência pertinentes em resposta controlada no formulário, preservar entradas e apresentar erro via Gettext, mantendo rollback e sem falso sucesso; acrescentar teste de intenção para esse caminho. O handler foi introduzido em `ca84dfd` (TASK-006) e estendido em `b3cbf7e` (TASK-026); a lacuna não foi introduzida pelo bootstrap da TASK-037 nem pelo diff documental local. Código não corrigido nesta revisão.
+
+### Critérios e evidências
+
+| Escopo | Resultado |
+| --- | --- |
+| CA01/02/13/15 | Cadastro válido/inválido, labels, identidade, isolamento e remontagem cobertos por contexto/LiveView; bootstrap dev nas duas entradas e concorrência cobertos. |
+| CA03–06/08 | Cota durável, restituição única, conclusão sem restituição, permutação exata, rollback e revalidação do dia conferidos no código e testes; concorrência usa conexões PostgreSQL distintas. |
+| CA07 | Testes de reinício de Repo/pool reproduzidos no CI. Ensaio de dois processos BEAM da TASK-008 consultado como evidência relatada, não repetido nesta rodada. |
+| CA09 | Parcial: painel trata falha e contexto reverte gravações; cadastro tem R1. |
+| CA10 | Eventos, estrutura e mensagens cobertos por LiveViewTest. Teclado, foco, layout e anúncios reais permanecem reservados à validação humana, fora do gate conforme PRD/BLOCK-004. |
+| CA11/12 | Gates locais aprovados com configuração externa existente; nenhuma dependência ou política de cobertura alterada. CI remoto não consultado. |
+
+Ajuda Mix e aliases inspecionados antes da execução. `rtk mix ci`: **136 testes aprovados**, cobertura de linhas **92,16%**, compilação, formato e Credo estrito aprovados. Tasks 98,31%, Index 97,66%, Form 97,73%, Accounts/UserTransaction 100%. Mínimo de 70% mantido; base não medida novamente, sem afirmação de variação. `rtk mix precommit`: **136 testes aprovados**, sem mudanças em código/lockfile. `rtk git diff --check`: aprovado. O teste exploratório de R1 é adicional à suíte existente e sua falha impede concluir que o gate verde cobre todo o contrato.
+
+### Observações documentais e limites
+
+Não bloqueantes: README ainda afirma que a implementação não começou (linhas 3 e 57), PRD linha 3 declara implementação pendente e SPEC-005 encerra dizendo que TASK-037 não foi implementada, embora integrada. TASK-029 ainda menciona teclado no aceite; prevalece a decisão posterior do PRD que reserva essa validação ao humano. Recomenda-se reconciliar esses textos; não se presume validação humana concluída.
+
+Tarefas humanas TASK-003/TASK-012 tiveram apenas suas evidências históricas consultadas; nenhuma execução ou reset repetido. Publicação, autenticação e demais evoluções permanecem fora do MVP. O commit solicitado registra o estado e esta revisão, sem constituir aprovação, correção ou publicação remota.
+
+## Revisão anterior preservada — TASK-021
 
 Revisor independente `/root/review_task021`: **approved**, sem achados bloqueantes no diff da base `ed37fdbe7c91fed6cb6eb9c1ab95ee1deda125d8`, integrado sem alterações executáveis em `aafed16d7b7a09000404e716cc98dcc43763510e`. Normalização antes do callback, rollback, isolamento e ordenação atendidos. CI reproduzido: 77 testes, 87,46% total, Tasks 98,15%, UserTransaction 100%; diff check aprovado. Reinício cobre Repo/pool; comando antigo usa callback. Comandos futuros fora do escopo. Evidências completas na TASK-021.
 
