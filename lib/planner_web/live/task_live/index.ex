@@ -45,7 +45,7 @@ defmodule PlannerWeb.TaskLive.Index do
             class="break-words rounded-lg border border-slate-300 p-4"
           >
             <span data-priority class="mr-2 font-bold">{task.position}.</span>
-            <span data-task-title>{task.title}</span>
+            <span id={"task-title-#{task.id}"} data-task-title>{task.title}</span>
             <.task_labels task={task} />
             <div class="mt-3 flex flex-wrap gap-2">
               <.order_action task={task} direction="up" disabled={task.position == 1} />
@@ -72,7 +72,7 @@ defmodule PlannerWeb.TaskLive.Index do
             id={id}
             class="break-words rounded-lg border border-slate-300 p-4"
           >
-            <span data-task-title>{task.title}</span>
+            <span id={"task-title-#{task.id}"} data-task-title>{task.title}</span>
             <.task_labels task={task} />
             <.planning_action task={task} action="select" />
           </div>
@@ -92,7 +92,7 @@ defmodule PlannerWeb.TaskLive.Index do
             id={id}
             class="break-words rounded-lg border border-slate-300 p-4"
           >
-            <span data-task-title>{task.title}</span>
+            <span id={"task-title-#{task.id}"} data-task-title>{task.title}</span>
             <.task_labels task={task} />
             <.planning_action task={task} action="select" />
           </div>
@@ -112,7 +112,7 @@ defmodule PlannerWeb.TaskLive.Index do
             id={id}
             class="break-words rounded-lg border border-slate-300 p-4"
           >
-            <span data-task-title>{task.title}</span>
+            <span id={"task-title-#{task.id}"} data-task-title>{task.title}</span>
             <p>
               {gettext("Completed on")}
               <time datetime={Date.to_iso8601(task.completed_on)}>{Calendar.strftime(
@@ -302,6 +302,7 @@ defmodule PlannerWeb.TaskLive.Index do
       <input type="hidden" name="task_id" value={@task.id} />
       <button
         id={"#{@action}-button-#{@task.id}"}
+        aria-labelledby={"#{@action}-button-#{@task.id} task-title-#{@task.id}"}
         type="submit"
         phx-disable-with={gettext("Saving...")}
         class="max-w-full whitespace-normal rounded-lg border border-indigo-700 px-3 py-2 text-indigo-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-700 disabled:opacity-50"

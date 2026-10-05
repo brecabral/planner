@@ -15,6 +15,64 @@ defmodule PlannerWeb.TaskLiveTest do
     %{user: user_fixture(%{identifier: "default"})}
   end
 
+  test "field errors are associated with inputs and clear after correction", %{conn: conn} do
+    {:ok, view, _} = live(conn, "/tasks/new")
+    refute has_element?(view, "[aria-invalid='true']")
+    assert has_element?(view, "#task_new_label_names[aria-describedby='new-labels-help']")
+
+    view |> form("#task-form", task: %{title: ""}) |> render_submit()
+
+    assert has_element?(
+             view,
+             "#task_title[aria-invalid='true'][aria-describedby='task_title-errors']"
+           )
+
+    assert has_element?(view, "#task_title-errors[role='alert']", "não pode ficar em branco")
+
+    view |> form("#task-form", task: %{title: "My book"}) |> render_change()
+    refute has_element?(view, "#task_title[aria-invalid='true']")
+    refute has_element?(view, "#task_title-errors")
+
+    render_submit(view, "save", %{
+      "task" => %{
+        "title" => "My book",
+        "label_ids" => ["-1"],
+        "new_label_names" => "Original"
+      }
+    })
+
+    assert has_element?(
+             view,
+             "#task_label_ids[aria-invalid='true'][aria-describedby='task_label_ids-errors']"
+           )
+
+    assert has_element?(view, "#task_label_ids-errors[role='alert']", "é inválido")
+    assert has_element?(view, "#task_new_label_names", "Original")
+
+    view
+    |> form("#task-form", task: %{title: "My book", label_ids: [], new_label_names: "Valid\n   "})
+    |> render_submit()
+
+    assert has_element?(
+             view,
+             "#task_new_label_names[aria-invalid='true'][aria-describedby='new-labels-help task_new_label_names-errors']"
+           )
+
+    assert has_element?(view, "#task_new_label_names-errors[role='alert']", "é inválido")
+    assert has_element?(view, "#task_title[value='My book']")
+  end
+
+  test "empty panel offers registration and translated sections and plurals", %{conn: conn} do
+    {:ok, view, _} = live(conn, "/tasks")
+    assert has_element?(view, "#new-task[href='/tasks/new']", "Nova tarefa")
+    assert has_element?(view, "#tasks-empty", "Cadastre uma tarefa")
+    assert has_element?(view, "#today-empty", "Nenhuma tarefa")
+    assert has_element?(view, "#retry-empty", "Nenhuma tarefa")
+    assert has_element?(view, "#history-empty", "Nenhuma tarefa concluída")
+    assert has_element?(view, "#available-choices", "3 escolhas disponíveis")
+    assert has_element?(view, "#history-count", "0 tarefa concluída")
+  end
+
   test "panel separates pending collections, priorities, labels and persisted quota", %{
     conn: conn,
     user: user
@@ -88,6 +146,12 @@ defmodule PlannerWeb.TaskLiveTest do
              "Trazer para hoje"
            )
 
+    assert has_element?(
+             view,
+             "#select-button-#{task.id}[aria-labelledby='select-button-#{task.id} task-title-#{task.id}']"
+           )
+
+    assert has_element?(view, "#task-title-#{task.id}", task.title)
     view |> form("#select-#{task.id}") |> render_submit()
     assert has_element?(view, "#today-#{task.id} [data-label]", label.name)
     refute has_element?(view, "#tasks-#{task.id}")
@@ -97,6 +161,20 @@ defmodule PlannerWeb.TaskLiveTest do
     view |> form("#select-#{retry.id}") |> render_submit()
     assert has_element?(view, "#today-#{retry.id}")
     assert has_element?(view, "#used-choices", "2")
+
+    assert has_element?(
+             view,
+             "#return-button-#{task.id}[aria-labelledby='return-button-#{task.id} task-title-#{task.id}']",
+             "Devolver"
+           )
+
+    assert has_element?(
+             view,
+             "#complete-button-#{task.id}[aria-labelledby='complete-button-#{task.id} task-title-#{task.id}']",
+             "Concluir"
+           )
+
+    assert has_element?(view, "#available-choices", "1 escolha disponível")
     view |> form("#return-#{task.id}") |> render_submit()
     render_submit(view, "return", %{"task_id" => to_string(task.id)})
     assert has_element?(view, "#tasks-#{task.id} [data-label]", label.name)

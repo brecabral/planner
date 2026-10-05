@@ -11,14 +11,14 @@ defmodule PlannerWeb.TaskLive.Form do
     <Layouts.app flash={@flash}>
       <.header>{@page_title}</.header>
       <.form for={@form} id="task-form" phx-change="validate" phx-submit="save" class="space-y-4">
-        <.input
+        <.accessible_input
           field={@form[:title]}
           type="text"
           label={gettext("Title")}
           class="w-full rounded-lg border border-slate-400 px-3 py-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-700"
         />
         <div id="task-existing-labels">
-          <.input
+          <.accessible_input
             field={@label_form[:label_ids]}
             type="select"
             multiple
@@ -28,11 +28,11 @@ defmodule PlannerWeb.TaskLive.Form do
           />
         </div>
         <div id="task-new-labels">
-          <.input
+          <.accessible_input
             field={@label_form[:new_label_names]}
             type="textarea"
             label={gettext("New labels")}
-            aria-describedby="new-labels-help"
+            description="new-labels-help"
             class="w-full rounded-lg border border-slate-400 px-3 py-2 focus-visible:outline-2 focus-visible:outline-indigo-700"
           />
           <p id="new-labels-help" class="text-sm">
@@ -56,6 +56,38 @@ defmodule PlannerWeb.TaskLive.Form do
         </footer>
       </.form>
     </Layouts.app>
+    """
+  end
+
+  attr :field, Phoenix.HTML.FormField, required: true
+  attr :description, :string, default: nil
+  attr :rest, :global, include: ~w(type label class options multiple)
+
+  defp accessible_input(assigns) do
+    errors = if used_input?(assigns.field), do: assigns.field.errors, else: []
+    error_id = "#{assigns.field.id}-errors"
+
+    assigns =
+      assigns
+      |> assign(:errors, Enum.map(errors, &translate_error/1))
+      |> assign(:error_id, error_id)
+      |> assign(
+        :described_by,
+        [assigns.description, if(errors != [], do: error_id)]
+        |> Enum.reject(&is_nil/1)
+        |> Enum.join(" ")
+      )
+
+    ~H"""
+    <.input
+      field={%{@field | errors: []}}
+      aria-invalid={if @errors != [], do: "true"}
+      aria-describedby={if @described_by != "", do: @described_by}
+      {@rest}
+    />
+    <div :if={@errors != []} id={@error_id} role="alert" class="text-sm text-red-700">
+      <p :for={error <- @errors}>{error}</p>
+    </div>
     """
   end
 
