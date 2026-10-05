@@ -1,6 +1,6 @@
 ---
 id: "TASK-008"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Consolida critérios do MVP local e evidências de comportamento e cobertura."
 specs: ["SPEC-001", "SPEC-002", "SPEC-003", "SPEC-004", "SPEC-005", "SPEC-006"]
@@ -65,3 +65,7 @@ Ensaio temporário `/tmp/planner_accept_008.exs`, com assertions ExUnit e conex�
 Critérios 1–3 atendidos pela matriz e pelo ensaio; autoavaliação técnica `approved`, sem achados bloqueantes. `rtk mix precommit` (seed 197296) e `rtk mix ci` (seed 534041) passaram. Cobertura: total 92,12%, Tasks 98,31%, UserTransaction e Accounts 100%, Index 97,66%, Form 97,73%; igual à evidência integrada da TASK-032. Cobertura de linhas não demonstra todos os ramos. Nenhum código foi modificado por esta tarefa.
 
 CI foi reproduzido localmente; não há verificação de execução remota nesta entrega. Gates humanos TASK-003/TASK-012 não foram reabertos. Teclado, foco, layout e anúncios assistivos reais permanecem pendentes da validação humana do PRD, fora dos gates. Tarefa em `in_review`, aguardando conferência operacional e integração pelo coordenador; sem staging/commit pelo implementador.
+
+### Conferência operacional — 05/10/2026
+
+Coordenador `/root`: registro, matriz e resumo conferidos superficialmente, sem impedimentos. Gates locais relatados aprovados: 127 testes e cobertura de 92,12%; persistência demonstrada entre dois processos separados. Evidências integradas na base de trabalho em `d8770e5`, com TASK-032 concluída e integrada. TASK-008 concluída operacionalmente, encerrando a fila autorizada do MVP. Sem revisão independente ou verificação de CI remoto. Evoluções futuras permanecem fora do escopo; validação humana da interface continua pendente conforme PRD.
