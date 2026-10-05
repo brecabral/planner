@@ -1,6 +1,6 @@
 ---
 id: "TASK-037"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Integra configuração por ambiente, resolução no contexto e duas entradas LiveView, reutilizando criação idempotente existente."
 specs: ["SPEC-005"]
@@ -50,3 +50,7 @@ Implementada em 05/10/2026 sobre a base `2af94b6`; aguardando conferência opera
 - Gates: ajuda de test/precommit/ci consultada antes do uso. `rtk mix precommit` aprovado com 136 testes; `rtk mix ci` aprovado com 136 testes, Credo sem achados e cobertura total 92,16% (mínimo 70% preservado). Accounts 100%, Index 97,66%, Form 97,73%. Primeiro CI apontou três sugestões de alias no teste, corrigidas antes da repetição dos gates. `rtk git diff --check` sem erros.
 - Autoavaliação pelo implementador `/root/implement_037`, fluxo de review: alvo é o diff local dos arquivos acima contra `2af94b6`, sem alterações documentais alheias; critérios satisfeitos, sem achados bloqueantes. Configuração só no servidor, índice único e preparação idempotente reutilizados; nenhuma captura de erros de persistência nem `Mix.env()` no runtime. Esta é autoavaliação, não aprovação independente nem avanço do marco de revisão.
 - Limitações: execução pelo LiveViewTest e banco de testes; banco de desenvolvimento não alterado. Validação visual humana permanece fora desta tarefa. Não se inferiu aceite deste incremento a partir da TASK-008. Commit e conferência operacional pendentes do coordenador.
+
+### Conferência operacional — 05/10/2026
+
+Coordenador `/root`: registro e resumo conferidos superficialmente, sem impedimentos. Gates locais relatados aprovados: 136 testes, cobertura de 92,16% e Credo sem achados. Entrega integrada na base de trabalho em `015eb6d`, com dependência TASK-008 concluída e integrada. Tarefa concluída operacionalmente; sem revisão independente ou verificação de CI remoto. Alterações documentais preexistentes fora do escopo foram preservadas.
