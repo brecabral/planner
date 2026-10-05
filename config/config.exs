@@ -8,6 +8,7 @@
 import Config
 
 config :planner,
+  auto_create_default_user: false,
   ecto_repos: [Planner.Repo],
   generators: [timestamp_type: :utc_datetime]
 

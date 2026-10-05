@@ -11,8 +11,77 @@ defmodule PlannerWeb.TaskLiveTest do
   alias Planner.Repo
   alias Planner.Tasks
 
-  setup do
-    %{user: user_fixture(%{identifier: "default"})}
+  setup tags do
+    previous = Application.fetch_env(:planner, :auto_create_default_user)
+
+    on_exit(fn ->
+      case previous do
+        {:ok, value} -> Application.put_env(:planner, :auto_create_default_user, value)
+        :error -> Application.delete_env(:planner, :auto_create_default_user)
+      end
+    end)
+
+    Application.put_env(:planner, :auto_create_default_user, tags[:bootstrap] || false)
+    if tags[:without_default], do: %{}, else: %{user: user_fixture(%{identifier: "default"})}
+  end
+
+  for {path, selector} <- [{"/tasks", "#new-task"}, {"/tasks/new", "#task-form"}] do
+    @tag bootstrap: true, without_default: true
+    test "first access to #{path} creates one persistent default across mounts", %{conn: conn} do
+      assert Repo.aggregate(Planner.Accounts.User, :count) == 0
+      disconnected = get(conn, unquote(path))
+      user = Planner.Accounts.get_default_user!()
+      assert {:ok, view, _} = live(disconnected)
+      assert has_element?(view, unquote(selector))
+      assert {:ok, reloaded, _} = live(recycle(conn), unquote(path))
+      assert has_element?(reloaded, unquote(selector))
+      assert Planner.Accounts.get_default_user!() == user
+      assert Repo.aggregate(Planner.Accounts.User, :count) == 1
+      assert Tasks.list_tasks(user) == []
+      assert Labels.list_labels(user) == []
+    end
+
+    @tag without_default: true
+    test "disabled bootstrap rejects unprepared #{path} even with browser flags", %{conn: conn} do
+      assert_raise Ecto.NoResultsError, fn ->
+        live(conn, unquote(path) <> "?auto_create_default_user=true")
+      end
+
+      assert Repo.aggregate(Planner.Accounts.User, :count) == 0
+    end
+  end
+
+  @tag bootstrap: true
+  test "bootstrap preserves the default identity, timestamps and planning", %{
+    conn: conn,
+    user: user
+  } do
+    user = user |> Ecto.Changeset.change(updated_at: ~U[2020-01-01 00:00:00Z]) |> Repo.update!()
+    label = label_fixture(user)
+    task = task_fixture(user, %{label_ids: [label.id]})
+
+    for path <- ["/tasks", "/tasks/new", "/tasks"] do
+      assert {:ok, _, _} = live(recycle(conn), path)
+      assert Planner.Accounts.get_default_user!() == user
+      assert Tasks.list_tasks(user) == [task]
+      assert Labels.list_labels(user) == [label]
+      assert Repo.preload(task, :labels).labels == [label]
+    end
+  end
+
+  @tag bootstrap: true, without_default: true
+  test "bootstrap creates default without assuming or modifying another identity", %{conn: conn} do
+    other = user_fixture()
+    label = label_fixture(other)
+    task = task_fixture(other, %{label_ids: [label.id]})
+    assert {:ok, view, _} = live(conn, "/tasks?user_id=#{other.id}")
+    default = Planner.Accounts.get_default_user!()
+    assert default.id != other.id
+    refute has_element?(view, "#tasks-#{task.id}")
+    assert Repo.get!(Planner.Accounts.User, other.id) == other
+    assert Tasks.list_tasks(other) == [task]
+    assert Labels.list_labels(other) == [label]
+    assert Repo.aggregate(Planner.Accounts.User, :count) == 2
   end
 
   test "field errors are associated with inputs and clear after correction", %{conn: conn} do

@@ -93,7 +93,7 @@ defmodule PlannerWeb.TaskLive.Form do
 
   @impl true
   def mount(_params, _session, socket) do
-    user = Accounts.get_default_user!()
+    user = Accounts.resolve_default_user!()
 
     {:ok,
      socket

@@ -20,6 +20,17 @@ defmodule Planner.Accounts do
   end
 
   @doc """
+  Resolves the default user, preparing it only when enabled by server configuration.
+  """
+  def resolve_default_user! do
+    if Application.get_env(:planner, :auto_create_default_user, false) do
+      ensure_default_user!()
+    else
+      get_default_user!()
+    end
+  end
+
+  @doc """
   Returns the persisted default user, raising if data has not been prepared.
   """
   def get_default_user! do

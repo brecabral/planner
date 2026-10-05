@@ -130,7 +130,7 @@ defmodule PlannerWeb.TaskLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    user = Accounts.get_default_user!()
+    user = Accounts.resolve_default_user!()
     {:ok, snapshot} = Tasks.snapshot(user)
 
     {:ok,

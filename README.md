@@ -46,9 +46,11 @@ Alterar credenciais no `.env` não altera um volume já inicializado: ajuste tam
 
 ## Usuário padrão do MVP
 
-Depois de preparar o banco com `mix ecto.setup` (também chamado por `mix setup`), os seeds garantem uma identidade persistente com identificador `default`. Para repetir somente essa preparação em um banco já migrado, execute `mix run priv/repo/seeds.exs`. Isso não duplica o usuário nem substitui seus dados.
+Em desenvolvimento, com banco criado e migrations aplicadas, abrir `/tasks` ou diretamente `/tasks/new` cria o usuário de identificador `default` se ele ainda não existir. Novos acessos e conexões reutilizam a mesma identidade, preservando timestamps, tarefas e labels. Não é necessário executar seeds antes desse primeiro acesso; o boot do servidor não cria usuários.
 
-O servidor consulta essa identidade por `Planner.Accounts.get_default_user!/0`; `Planner.Accounts.ensure_default_user!/0` a cria de forma idempotente durante a preparação. Não há autenticação ou escolha de conta. Os testes criam usuários isolados por fixture, sem depender dos seeds globais.
+A opção `:auto_create_default_user` da aplicação `:planner` fica desabilitada em `config/config.exs` e habilitada somente em `config/dev.exs`. `Planner.Accounts.resolve_default_user!/0` aplica essa configuração nas duas telas. Em `test` e `prod`, a ausência da identidade continua gerando erro e exige preparação explícita; banco e migrations permanecem pré-requisitos em todos os ambientes.
+
+`mix ecto.setup` (também chamado por `mix setup`) continua executando os seeds. Para repetir somente essa preparação em um banco já migrado, execute `mix run priv/repo/seeds.exs`: `Planner.Accounts.ensure_default_user!/0` garante a identidade sem duplicar ou substituir dados. A consulta `Planner.Accounts.get_default_user!/0` permanece estrita. Não há autenticação ou escolha de conta; testes usam fixtures isoladas, sem seeds globais.
 
 ## Sobre o projeto
 
