@@ -1,14 +1,43 @@
 ---
 review_base_commit: "aafed16d7b7a09000404e716cc98dcc43763510e"
-reviewed_commit: "ce0f72bb59eb27efa0a60e867f93242c2e805916"
-last_approved_commit: "aafed16d7b7a09000404e716cc98dcc43763510e"
+reviewed_commit: "2b8ba19ce2657126423256d3fd2596875c7ca661"
+last_approved_commit: "2b8ba19ce2657126423256d3fd2596875c7ca661"
 reviewed_at: "2026-10-05"
-reviewer: "/root — revisão independente do MVP"
-status: changes_requested
-reviewed_tasks: ["TASK-006", "TASK-007", "TASK-008", "TASK-022", "TASK-023", "TASK-024", "TASK-025", "TASK-026", "TASK-027", "TASK-028", "TASK-029", "TASK-030", "TASK-032", "TASK-037"]
+reviewer: "/root/review_mvp_readiness — revisão independente do MVP"
+status: approved
+reviewed_tasks: ["TASK-006", "TASK-007", "TASK-008", "TASK-022", "TASK-023", "TASK-024", "TASK-025", "TASK-026", "TASK-027", "TASK-028", "TASK-029", "TASK-030", "TASK-032", "TASK-037", "TASK-038"]
 ---
 
 # Revisão incremental das tarefas concluídas
+
+## Revalidação de prontidão do MVP — 05/10/2026
+
+Resultado: **approved**. O MVP está pronto no escopo local definido pelo PRD, com os critérios automatizados atendidos e sem achados bloqueantes identificados. R1 foi corrigido pela TASK-038 e revalidado independentemente por `/root/review_mvp_readiness`, que não implementou o produto. A avaliação humana de teclado, foco, layout e anúncios continua pendente, fora do gate por decisão explícita do PRD; esta aprovação não a presume nem autoriza publicação.
+
+### Base, alvo e separação do estado local
+
+Base `aafed16d7b7a09000404e716cc98dcc43763510e`, confirmada como ancestral do alvo `2b8ba19ce2657126423256d3fd2596875c7ca661`. Conferidos o diff acumulado e os contratos de cadastro, comandos de planejamento, transação compartilhada, posições, histórico, formulário, painel e usuário padrão. A correção integrada em `190dd9bf0860188dff92820d4bca68ec2ca359f6` recebe revisão específica dos quatro aceites da TASK-038. As aprovações anteriores sustentam seus próprios escopos; workflows/skills históricos e evoluções futuras não recebem certificação implícita.
+
+O código executável local coincide com o alvo. Seis arquivos documentais já estavam modificados: `README.md`, `docs/prd.md`, `docs/specs/005-contas-e-acesso.md`, `docs/tasks/008-aceite-mvp.md`, `docs/tasks/029-acao-reordenar.md` e `docs/tasks/README.md`. Foram lidos como contexto vigente e preservados sem edição; não integram a aprovação de código pelo SHA. Esta revisão modifica somente este relatório e o registro da TASK-038.
+
+### Critérios e evidências
+
+| Critério | Conferência e resultado |
+| --- | --- |
+| CA01/02/13/15 | Cadastro, rejeições, labels próprias, rollback, parâmetros sem autoridade de proprietário, identidade padrão e bootstrap dev conferidos no código e nos testes aprovados. |
+| CA03–06/08 | Cota persistente, restituição única, conclusão sem restituição, permutação exata, posições, virada e revalidação verificadas; testes de concorrência usam conexões PostgreSQL distintas e espera por lock real. |
+| CA07 | Testes de reinício de Repo/pool executados novamente. Ensaio entre dois processos BEAM da TASK-008 consultado como evidência histórica relatada, sem repetição nesta rodada. |
+| CA09 / TASK-038 aceites 1–4 | Captura específica de `Ecto.ConstraintError`, `Postgrex.Error` e `DBConnection.ConnectionError` fora da transação; três testes aprovados verificam o mesmo processo LiveView, alerta pt-BR, entradas preservadas, ausência de falso sucesso, rollback e reenvio único. Constraint e trigger falham depois de gravações parciais; indisponibilidade de conexão é reproduzida mantendo ocupado o checkout do Sandbox. Painel mantém tratamento de falhas e recuperação de estado. R1 encerrado. |
+| CA10 | Eventos, controles, estrutura de erros e traduções cobertos por LiveViewTest. Teclado, foco, layout e anúncios efetivos não foram avaliados. |
+| CA11/12 | Gates locais reproduzidos com configuração externa existente; nenhuma alteração em dependências, configuração, limiar ou código executável. CI remoto não consultado. |
+
+Ajuda de `ci` e `precommit` e aliases inspecionados antes da execução. `rtk mix ci`: saída 0, **139 testes aprovados**, seed 775364, cobertura de linhas **92,25%**, compilação, formato e Credo estrito aprovados. Form 98,00%, Index 97,66%, Tasks 98,31%, Accounts e UserTransaction 100%. Mínimo de 70% mantido; base não medida nesta rodada, sem alegação de variação. `rtk mix precommit`: saída 0, **139 testes aprovados**, seed 921072, sem alteração em código ou lockfile. `rtk git diff --check`: aprovado.
+
+### Pendências não bloqueantes e limites
+
+Os seis documentos locais foram preservados. README, abertura do PRD, encerramento da SPEC-005, índice de tarefas e reconciliação histórica da TASK-008 ainda mencionam R1 pendente; cabe reconciliar a apresentação do estado atual com esta aprovação, mantendo o histórico. Não é falha funcional nem reabre R1.
+
+Cobertura por linhas não prova todos os ramos ou interleavings. O teste de conexão cobre falha de aquisição, não perda de comunicação durante commit. Testes LiveView não executam JavaScript em navegador. O reinício do PostgreSQL, recuperação de backup, autenticação e publicação estão fora do MVP. TASK-003/TASK-012 têm aceite humano histórico; nenhuma execução humana ou reset foi repetido. O marco avança apenas para o código e os escopos declarados, preservando as exclusões anteriores. Nenhum código corrigido, commit criado ou publicação executada nesta revisão.
 
 ## Revisão de prontidão do MVP — 05/10/2026
 

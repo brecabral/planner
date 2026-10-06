@@ -1,6 +1,6 @@
 ---
 id: "SPEC-003"
-status: ready
+status: implemented
 requirements: ["RF04", "RF05", "CA06", "CA07", "CA08"]
 ---
 

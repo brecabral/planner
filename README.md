@@ -1,6 +1,6 @@
 # Planner
 
-Planner pessoal para escolher prioridades do dia, manter um backlog e consultar tarefas concluídas. O produto está em especificação; a implementação do domínio ainda não começou.
+Planner pessoal para escolher prioridades do dia, manter um backlog e consultar tarefas concluídas. O MVP local está concluído e aprovado em [revisão independente](docs/review.md).
 
 A aplicação usa Phoenix, Elixir e PostgreSQL. O servidor roda na máquina; o banco local roda em Docker, com dados persistidos em volume.
 
@@ -54,7 +54,7 @@ A opção `:auto_create_default_user` da aplicação `:planner` fica desabilitad
 
 ## Sobre o projeto
 
-O fluxo planejado é selecionar tarefas do backlog para hoje, ordenar prioridades e registrar conclusões. O escopo mínimo está no [PRD](docs/prd.md): usuário padrão sem login, interface pt-BR com Gettext, data corrente sem configuração de fuso e recarga manual. Essas mudanças ainda serão implementadas.
+O fluxo implementado permite selecionar tarefas do backlog para hoje, ordenar prioridades e registrar conclusões. O escopo mínimo está no [PRD](docs/prd.md): usuário padrão sem login, interface pt-BR com Gettext, data corrente sem configuração de fuso e recarga manual. A correção de falhas no cadastro foi concluída na [TASK-038](docs/tasks/038-tratar-falha-cadastro.md). A validação humana da interface permanece pendente, fora do gate do MVP.
 
 Consulte as [decisões de arquitetura](docs/design.md), o [vocabulário do domínio](docs/ddd.md) e as [tarefas planejadas](docs/tasks/README.md) para acompanhar a evolução.
 

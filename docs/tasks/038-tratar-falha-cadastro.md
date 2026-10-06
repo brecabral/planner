@@ -38,9 +38,9 @@ Preservar tratamento de changesets, proprietário resolvido no servidor, seleç�
 
 Aplicar TDD enxuto: registrar a falha observável do teste de R1 antes do ajuste e sua aprovação depois. Consultar ajuda Mix antes das tarefas; executar os gates do [README](../../README.md), incluindo precommit e CI com cobertura mínima de 70%. Registrar testes, cobertura, autoavaliação conforme o fluxo de review e limitações reais nesta tarefa. Conferência operacional e integração seguem o fluxo de coordenação; a implementação não altera o review histórico nem seu marco de aprovação.
 
-## Estado do planejamento
+## Planejamento inicial — histórico
 
-Planejada em 05/10/2026 a partir de R1. Dependência integrada e specs prontas; próxima tarefa elegível do MVP. Nenhuma correção de código ou revalidação de CA09 foi executada nesta etapa. Após a entrega, nova revisão pode verificar R1 sobre o diff integrado sem presumir aprovação pelo gate automatizado.
+Planejada em 05/10/2026 a partir de R1. Naquele momento, dependência integrada e specs prontas tornavam esta a próxima tarefa elegível do MVP. Nenhuma correção de código ou revalidação de CA09 foi executada nesta etapa. Após a entrega, nova revisão pode verificar R1 sobre o diff integrado sem presumir aprovação pelo gate automatizado.
 
 
 ## Implementação e evidências — 05/10/2026
@@ -71,3 +71,9 @@ Limitações: cobertura por linhas não prova todos os cenários de conexão; o 
 ### Conferência operacional — 05/10/2026
 
 Coordenador `/root/coordinate_task038`: registro de implementação, resumo da entrega, autoavaliação e gates relatados conferidos superficialmente, sem impedimentos. Precommit e CI locais relatados aprovados com 139 testes, Credo sem achados e cobertura total de 92,25%; testes não foram reproduzidos pelo coordenador. Entrega integrada na branch `feat/mvp` em `190dd9bf0860188dff92820d4bca68ec2ca359f6`, após a dependência TASK-037. Conclusão operacional registrada após commit bem-sucedido e presença da entrega na base confirmada. Não existem tarefas consumidoras de TASK-038 no grafo atual. Alterações documentais preexistentes foram preservadas fora do commit. Não houve revisão independente, atualização do marco histórico, CI remoto ou publicação.
+
+### Revisão independente — 05/10/2026
+
+Revisor `/root/review_mvp_readiness`: **approved**. Alvo `2b8ba19ce2657126423256d3fd2596875c7ca661`, base global `aafed16d7b7a09000404e716cc98dcc43763510e`; correção específica integrada em `190dd9bf0860188dff92820d4bca68ec2ca359f6`. Quatro aceites conferidos no código e nos três testes reais de falha: processo e entradas preservados, erro traduzido, rollback integral, reenvio único e tratamento existente de campos/labels mantido. R1 encerrado, sem novos achados bloqueantes.
+
+CI independente reproduzido: 139 testes aprovados, cobertura total 92,25%, Form 98,00%, Tasks 98,31%, Credo estrito sem achados e limiar de 70% mantido. Precommit independente: 139 testes aprovados, sem alteração executável; diff check aprovado. Evidências e limites no [relatório de revalidação](../review.md#revalidação-de-prontidão-do-mvp--05102026). Falha de conexão avaliada na aquisição; não se presume perda durante commit, validação humana de navegador ou CI remoto. Nenhuma implementação ou publicação nesta revisão.

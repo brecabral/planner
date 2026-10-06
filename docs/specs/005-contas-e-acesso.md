@@ -1,6 +1,6 @@
 ---
 id: "SPEC-005"
-status: ready
+status: implemented
 requirements: ["CA13"]
 ---
 
@@ -37,4 +37,4 @@ O MVP de teste usa um usuário padrão persistente definido no servidor, sem tel
 
 Gerar somente contexto/schema de usuário e ajustar seed/resolução no servidor. `phx.gen.auth` não é executado no MVP. A solução final de contas será especificada antes de retomar suas tarefas futuras.
 
-Incremento solicitado em 05/10/2026: criação automática em desenvolvimento, planejada na [TASK-037](../tasks/037-usuario-padrao-dev.md), ainda não implementada.
+Criação automática em desenvolvimento implementada e integrada em `015eb6d`, conforme as evidências da [TASK-037](../tasks/037-usuario-padrao-dev.md). O MVP local foi aprovado na [revalidação independente](../review.md#revalidação-de-prontidão-do-mvp--05102026), após encerramento de R1 no cadastro.

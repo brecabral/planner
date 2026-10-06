@@ -74,3 +74,13 @@ Coordenador `/root`: registro, matriz e resumo conferidos superficialmente, sem 
 ### Revisão independente de prontidão — 05/10/2026
 
 Revisor `/root`; alvo `ce0f72bb59eb27efa0a60e867f93242c2e805916`, base `aafed16d7b7a09000404e716cc98dcc43763510e`. Achado R1 no cadastro impede o aceite integral do MVP. CI e precommit reproduzidos: 136 testes aprovados; cobertura total 92,16%. Evidências, reprodução, critérios e limites no [relatório de revisão](../review.md#revisão-de-prontidão-do-mvp--05102026). Registro operacional anterior preservado; esta revisão não presume validação humana ou CI remoto.
+
+### Reconciliação anterior ao encerramento de R1 — 05/10/2026
+
+A matriz acima preserva o aceite operacional histórico. Para CA09, a evidência de erro de cadastro não cobre exceções de persistência: R1 demonstrou encerramento da LiveView nesse caminho. O aceite integral permanece pendente; correção e revalidação estão na [TASK-038](038-tratar-falha-cadastro.md), sem invalidar os resultados já reproduzidos nos demais critérios. O estado `done` registra a execução histórica desta tarefa, não aprovação global da revisão.
+
+### Fechamento do MVP local — 05/10/2026
+
+Por solicitação do responsável, MVP local encerrado com base na [revalidação independente aprovada](../review.md#revalidação-de-prontidão-do-mvp--05102026) por `/root/review_mvp_readiness`, alvo integrado `2b8ba19ce2657126423256d3fd2596875c7ca661`. A TASK-038 encerrou R1 e completou o aceite de CA09; a ressalva histórica acima está superada. CI e precommit reproduzidos pelo revisor: 139 testes aprovados, cobertura de 92,25% e Credo sem achados.
+
+Specs do MVP registradas como implementadas com base no código integrado e no aceite verificado. A documentação de estado foi reconciliada com a aprovação; histórico e marco de revisão foram preservados. Validação humana da interface continua pendente, fora do gate por decisão do PRD. CI remoto e publicação não foram verificados nem executados; evoluções futuras continuam fora do fechamento.

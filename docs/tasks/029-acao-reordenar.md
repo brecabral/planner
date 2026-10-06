@@ -2,7 +2,7 @@
 id: "TASK-029"
 status: "done"
 execution_level: "standard"
-execution_rationale: "Converte ações de teclado em permutações e recupera a lista após conflito."
+execution_rationale: "Converte eventos dos controles de reordenação em permutações e recupera a lista após conflito."
 specs: ["SPEC-002", "SPEC-004"]
 depends_on: ["TASK-028"]
 provides: ["planning-order-ui"]
@@ -27,7 +27,7 @@ Adicionar controles acessíveis de subir/descer que enviem permutação completa
 
 ## Aceite e teste de intenção
 
-1. Teclado reordena três tarefas e recarga preserva ordem; extremidades não oferecem movimento impossível.
+1. Nos testes LiveView, os controles subir/descer reordenam três tarefas e a remontagem preserva a ordem; extremidades não oferecem movimento impossível. Teclado e foco reais permanecem na [validação humana do PRD](../prd.md#validação-humana-da-interface--fora-das-tarefas), fora deste aceite.
 2. Conjunto antigo é rejeitado e atualizado sem alterar cota.
 
 Escrever o teste de intenção antes dos ajustes; preservar testes gerados pertinentes e finalizar com `mix precommit`.

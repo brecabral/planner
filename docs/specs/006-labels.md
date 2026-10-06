@@ -1,6 +1,6 @@
 ---
 id: "SPEC-006"
-status: ready
+status: implemented
 requirements: ["RF10", "CA15"]
 ---
 

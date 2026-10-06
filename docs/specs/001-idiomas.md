@@ -1,6 +1,6 @@
 ---
 id: "SPEC-001"
-status: ready
+status: implemented
 requirements: ["CA10"]
 ---
 

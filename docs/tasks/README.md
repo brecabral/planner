@@ -4,6 +4,8 @@ O MVP contém somente o fluxo de planejamento com usuário padrão, pt-BR via Ge
 
 ## MVP
 
+MVP local encerrado em 05/10/2026: entregas integradas e [revisão independente aprovada](../review.md#revalidação-de-prontidão-do-mvp--05102026) no alvo `2b8ba19`, com R1 encerrado pela TASK-038. Gates reproduzidos pelo revisor: 139 testes aprovados, cobertura de 92,25% e Credo sem achados. Validação humana da interface permanece pendente e fora do gate; evoluções futuras não foram iniciadas.
+
 Gate GitHub e base limpa têm aceite humano registrado. As TASK-036, TASK-002, TASK-001, TASK-009, TASK-016 e TASK-010 estão concluídas e integradas, com [revisão independente aprovada](../review.md) no escopo dessas entregas. O [BLOCK-001](../blocks/001-cobertura-apos-remocao-crud.md) está resolvido. A seleção das próximas tarefas deve respeitar suas dependências e bloqueios atuais. O MVP não depende de escolhas de autenticação, idiomas ou fuso. As demais etapas mantêm produtor único e serializam arquivos compartilhados.
 
 | Incremento |
@@ -35,6 +37,7 @@ Gate GitHub e base limpa têm aceite humano registrado. As TASK-036, TASK-002, T
 | [032 — Validar estrutura e mensagens do painel](032-acessibilidade-painel.md) |
 | [008 — Executar o aceite do MVP mínimo](008-aceite-mvp.md) |
 | [037 — Criar usuário padrão no primeiro acesso em desenvolvimento](037-usuario-padrao-dev.md) |
+| [038 — Tratar falha de persistência no cadastro](038-tratar-falha-cadastro.md) |
 
 ## Uma spec, vários passos
 
@@ -43,7 +46,7 @@ Gate GitHub e base limpa têm aceite humano registrado. As TASK-036, TASK-002, T
 | SPEC-001 — Interface pt-BR | 001 configura Gettext e traduz layouts e página inicial preservada; telas futuras traduzem seus próprios textos. |
 | SPEC-002 — Planejamento | 005 scaffold, 020 cota, 021 snapshot, 022 seleção, 023 devolução, 024 ordem, 028/029 interface. |
 | SPEC-003 — Data e histórico | 016 data, 021 normalização, 007 conclusão, 025 consulta, 030 interface; recarga usa 006/027. |
-| SPEC-004 — Painel | 006 scaffold, 026 formulário, 027 listas, 028/029/030 ações, 032 acessibilidade. |
+| SPEC-004 — Painel | 006 scaffold, 026 formulário, 027 listas, 028/029/030 ações, 032 acessibilidade, 038 tratamento de falha no cadastro. |
 | SPEC-005 — Usuário padrão | 009 cria/resgata identidade; 006 a resolve no servidor sem login; 037 adiciona criação automática no acesso em dev. |
 | SPEC-006 — Labels | 010 catálogo, 018 relação, 019 cadastro atômico, 026 formulário. |
 

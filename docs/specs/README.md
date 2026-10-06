@@ -11,6 +11,8 @@ Specs agregam arquitetura, invariantes e casos de uso; tarefas entregam passos p
 | [005 — Usuário padrão do MVP](005-contas-e-acesso.md) | Contrato do MVP; implementação em várias tarefas. |
 | [006 — Labels reutilizáveis por usuário](006-labels.md) | Contrato do MVP; implementação em várias tarefas. |
 
+As seis specs estão implementadas no código integrado e com aceite verificado pela [revalidação independente do MVP](../review.md#revalidação-de-prontidão-do-mvp--05102026), alvo `2b8ba19`, em 05/10/2026. A validação humana de interface permanece fora do gate conforme o PRD.
+
 ## Como escrever
 
 Usar [o modelo](modelo.md). Registrar origem (RF/CA ou decisão), atores, entradas, regras numeradas, estados/transições quando existirem e exemplos Dado/Quando/Então. Incluir falhas e concorrência somente quando relevantes. Explicitar escopo excluído, efeitos sobre dados e perguntas bloqueantes. Separar regra confirmada de proposta.

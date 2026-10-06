@@ -1,6 +1,6 @@
 # PRD — MVP de prioridades diárias
 
-Escopo mínimo definido pelo responsável em 23/09/2026. Implementação pendente.
+Escopo mínimo definido pelo responsável em 23/09/2026. MVP local concluído em 05/10/2026, com aceite aprovado na [revisão independente de prontidão](review.md#revalidação-de-prontidão-do-mvp--05102026), após a correção de CA09 na [TASK-038](tasks/038-tratar-falha-cadastro.md). A validação humana abaixo permanece pendente e fora do gate.
 
 ## 1. Objetivo
 
