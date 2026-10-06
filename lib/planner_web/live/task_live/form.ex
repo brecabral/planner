@@ -110,7 +110,9 @@ defmodule PlannerWeb.TaskLive.Form do
   end
 
   def handle_event("save", %{"task" => task_params}, socket) do
-    case Tasks.create_task(socket.assigns.user, registration_params(task_params)) do
+    socket = clear_flash(socket, :error)
+
+    case create_task(socket.assigns.user, registration_params(task_params)) do
       {:ok, _task} ->
         {:noreply,
          socket
@@ -119,7 +121,22 @@ defmodule PlannerWeb.TaskLive.Form do
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign_forms(socket, changeset, task_params)}
+
+      {:error, :persistence} ->
+        changeset = Tasks.change_task(socket.assigns.user, task_params)
+
+        {:noreply,
+         socket
+         |> assign_forms(changeset, task_params)
+         |> put_flash(:error, gettext("Could not create the task. Please try again."))}
     end
+  end
+
+  defp create_task(user, params) do
+    Tasks.create_task(user, params)
+  rescue
+    _error in [Ecto.ConstraintError, Postgrex.Error, DBConnection.ConnectionError] ->
+      {:error, :persistence}
   end
 
   defp assign_forms(socket, changeset, params) do

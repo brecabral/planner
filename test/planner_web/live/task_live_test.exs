@@ -560,6 +560,103 @@ defmodule PlannerWeb.TaskLiveTest do
         do: assert(has_element?(next, "#task_label_ids option[value='#{label.id}']", label.name))
   end
 
+  for failure <- [:constraint, :postgres, :connection] do
+    test "registration survives #{failure} failure, rolls back and retries preserved input", %{
+      conn: conn,
+      user: user
+    } do
+      existing = label_fixture(user, %{name: "Existing"})
+      previous = task_fixture(user, %{title: "Previous", label_ids: [existing.id]})
+      {:ok, view, _} = live(conn, "/tasks/new")
+      pid = view.pid
+      monitor = Process.monitor(pid)
+
+      submission =
+        form(view, "#task-form",
+          task: %{
+            title: "Keep title",
+            label_ids: [to_string(existing.id)],
+            new_label_names: "  Research  \nNotes"
+          }
+        )
+
+      fail_registration(unquote(failure), existing.id, fn -> render_submit(submission) end)
+
+      refute_received {:DOWN, ^monitor, :process, ^pid, _reason}
+
+      assert has_element?(
+               view,
+               "#flash-error[role=alert]",
+               "Não foi possível cadastrar a tarefa. Tente novamente."
+             )
+
+      refute has_element?(view, "#flash-info")
+      assert has_element?(view, "#task_title[value='Keep title']")
+      assert has_element?(view, "#task_label_ids option[value='#{existing.id}'][selected]")
+
+      assert view
+             |> element("#task_new_label_names")
+             |> render()
+             |> LazyHTML.from_fragment()
+             |> LazyHTML.text() == "  Research  \nNotes"
+
+      assert Tasks.list_tasks(user) == [previous]
+      assert Labels.list_labels(user) == [existing]
+      assert Repo.aggregate(Planner.Tasks.TaskLabel, :count) == 1
+      assert Repo.preload(previous, :labels).labels == [existing]
+
+      assert {:ok, index, _} =
+               view
+               |> form("#task-form")
+               |> render_submit()
+               |> follow_redirect(conn, "/tasks")
+
+      assert has_element?(index, "#flash-info", "Tarefa cadastrada")
+      refute has_element?(index, "#flash-error")
+      assert [^previous, created] = Tasks.list_tasks(user)
+      assert created.title == "Keep title"
+
+      assert Enum.sort(Enum.map(Repo.preload(created, :labels).labels, & &1.name)) ==
+               ["Existing", "Notes", "Research"]
+
+      assert Repo.aggregate(Planner.Tasks.TaskLabel, :count) == 4
+      assert length(Labels.list_labels(user)) == 3
+    end
+  end
+
+  defp fail_registration(:constraint, existing_id, submit) do
+    SQL.query!(
+      Repo,
+      "ALTER TABLE task_labels ADD CONSTRAINT reject_registration CHECK (label_id = #{existing_id}) NOT VALID"
+    )
+
+    submit.()
+    SQL.query!(Repo, "ALTER TABLE task_labels DROP CONSTRAINT reject_registration")
+  end
+
+  defp fail_registration(:postgres, existing_id, submit) do
+    SQL.query!(Repo, """
+    CREATE FUNCTION pg_temp.reject_registration() RETURNS trigger AS $$
+    BEGIN
+      RAISE EXCEPTION 'Registration unavailable';
+    END;
+    $$ LANGUAGE plpgsql
+    """)
+
+    SQL.query!(Repo, """
+    CREATE TRIGGER reject_registration BEFORE INSERT ON task_labels
+    FOR EACH ROW WHEN (NEW.label_id <> #{existing_id})
+    EXECUTE FUNCTION pg_temp.reject_registration()
+    """)
+
+    submit.()
+    SQL.query!(Repo, "DROP TRIGGER reject_registration ON task_labels")
+  end
+
+  defp fail_registration(:connection, _existing_id, submit) do
+    Repo.checkout(fn -> submit.() end)
+  end
+
   test "label errors and invalid titles roll back registration and preserve input", %{
     conn: conn,
     user: user

@@ -122,7 +122,7 @@ msgstr "Backlog"
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: lib/planner_web/live/task_live/form.ex:69
+#: lib/planner_web/live/task_live/form.ex:101
 #: lib/planner_web/live/task_live/index.ex:19
 #, elixir-autogen, elixir-format
 msgid "New task"
@@ -146,12 +146,12 @@ msgstr "Cadastrar tarefa"
 
 #: lib/planner_web/live/task_live/form.ex:46
 #: lib/planner_web/live/task_live/index.ex:266
-#: lib/planner_web/live/task_live/index.ex:306
+#: lib/planner_web/live/task_live/index.ex:307
 #, elixir-autogen, elixir-format
 msgid "Saving..."
 msgstr "Salvando..."
 
-#: lib/planner_web/live/task_live/form.ex:85
+#: lib/planner_web/live/task_live/form.ex:119
 #, elixir-autogen, elixir-format
 msgid "Task created successfully"
 msgstr "Tarefa cadastrada com sucesso"
@@ -197,7 +197,7 @@ msgstr[1] "%{count} tarefas pendentes"
 msgid "Choices used: %{count} of 3"
 msgstr "Escolhas usadas: %{count} de 3"
 
-#: lib/planner_web/live/task_live/index.ex:319
+#: lib/planner_web/live/task_live/index.ex:320
 #, elixir-autogen, elixir-format
 msgid "Labels"
 msgstr "Labels"
@@ -305,3 +305,8 @@ msgstr "Histórico"
 #, elixir-autogen, elixir-format
 msgid "No completed tasks yet."
 msgstr "Nenhuma tarefa concluída ainda."
+
+#: lib/planner_web/live/task_live/form.ex:131
+#, elixir-autogen, elixir-format
+msgid "Could not create the task. Please try again."
+msgstr "Não foi possível cadastrar a tarefa. Tente novamente."
