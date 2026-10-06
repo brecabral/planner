@@ -1,6 +1,6 @@
 ---
 id: "TASK-038"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Integra tratamento delimitado de exceções no formulário com preservação de entradas, tradução e teste de rollback no contrato existente."
 specs: ["SPEC-004", "SPEC-006"]
@@ -67,3 +67,7 @@ Ajuda Mix consultada antes de test, gettext.extract, gettext.merge, precommit e 
 Autoavaliação conforme o fluxo de review: **approved como autoavaliação**, critérios atendidos e sem achado bloqueante identificado. Captura não abrange renderização, validação local nem erros de programação; dados continuam autorizados pelo usuário resolvido no servidor e o rollback permanece responsabilidade da transação existente. O marco de revisão independente e o relatório histórico não foram alterados.
 
 Limitações: cobertura por linhas não prova todos os cenários de conexão; o teste de conexão reproduz indisponibilidade na aquisição, não perda de comunicação durante commit. Testes via LiveViewTest, sem avaliação humana de navegador, teclado, foco ou anúncios por tecnologia assistiva. Não houve CI remoto nem publicação. Estado `in_review`, aguardando conferência operacional e commit local pelo coordenador.
+
+### Conferência operacional — 05/10/2026
+
+Coordenador `/root/coordinate_task038`: registro de implementação, resumo da entrega, autoavaliação e gates relatados conferidos superficialmente, sem impedimentos. Precommit e CI locais relatados aprovados com 139 testes, Credo sem achados e cobertura total de 92,25%; testes não foram reproduzidos pelo coordenador. Entrega integrada na branch `feat/mvp` em `190dd9bf0860188dff92820d4bca68ec2ca359f6`, após a dependência TASK-037. Conclusão operacional registrada após commit bem-sucedido e presença da entrega na base confirmada. Não existem tarefas consumidoras de TASK-038 no grafo atual. Alterações documentais preexistentes foram preservadas fora do commit. Não houve revisão independente, atualização do marco histórico, CI remoto ou publicação.
