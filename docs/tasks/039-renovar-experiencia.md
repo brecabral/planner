@@ -1,6 +1,6 @@
 ---
 id: "TASK-039"
-status: in_review
+status: done
 execution_level: advanced
 execution_rationale: "Renovação autorizada integra rotas, ciclo de vida de LiveComponent, diálogo modal e feedback sem alterar o domínio."
 specs: ["SPEC-001", "SPEC-004", "SPEC-006"]
@@ -62,3 +62,7 @@ Sem publicação remota, CI remoto ou revisão independente nesta entrega.
 ## Revisão independente — 10/10/2026
 
 Revisor `/root`, árvore local sobre `43ea80314c0a47a2a8357c17064cc01ac9ed5a40`. Sem achado bloqueante identificado no escopo automatizado e inspecionado. Ainda falta conferência operacional e integração; status `in_review` preservado. Gate reproduzido: `rtk mix ci`, 157 testes, cobertura 93,44%, Credo/build/npm audit aprovados. JavaScript inspecionado, sem navegador. Evidências, limites e achado em [docs/review.md](../review.md#revisão-das-entregas-locais--10102026). Nenhum código corrigido ou commit criado.
+
+## Conferência operacional e integração — 10/10/2026
+
+Conferência superficial por `/root`, para liberar a correção autorizada da TASK-040. Entrega presente na base local pelo commit `8f1402a` (snapshot anterior à correção), incluindo interface, testes e documentação. Conferidos os registros de autoavaliação e gates relatados aprovados e a revisão de 10/10 sem achado bloqueante atribuído à TASK-039. Sem pré-requisito humano ou impedimento aberto desta entrega. Não foram reproduzidos testes nesta conferência nem realizada nova revisão independente. O commit existente foi preservado, sem reescrita para separar as entregas. TASK-039 concluída operacionalmente; dependência da TASK-040 liberada. Sem publicação remota.
