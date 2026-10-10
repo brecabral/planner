@@ -33,3 +33,15 @@ Manter PlannerWeb.Gettext, mensagens-base em inglês e tradução pt_BR. Configu
 ## D14 — Scaffolds e incrementos pequenos
 
 Gerar contexto/schema e LiveViews, uma vez por recurso; usar --no-context na interface sobre domínio existente. Sem autenticação gerada, usar --no-scope e declarar user_id explicitamente nos recursos dependentes. Ajustar APIs para receber o usuário padrão do servidor e restringir campos permitidos. Comandos concretos ficam nas tarefas.
+
+## D15 — Tema semântico e cadastro sobre o planejamento
+
+Evolução autorizada em 09/10/2026: usar daisyUI já integrado ao Phoenix/Tailwind, com tema claro único `planner`. Cores ficam nos tokens semânticos do tema; componentes usam `base`, `primary`, `error` etc., preparando futuras paletas sem implementá-las. Remover controles e scripts de seleção de tema, inclusive leitura de preferências antigas. Nenhuma nova dependência.
+
+`/tasks` e `/tasks/new` pertencem a TaskLive.Index; patch controla presença do Form convertido em LiveComponent. O componente conserva validação e captura restrita das falhas do cadastro existente, recebe proprietário do pai e comunica sucesso para atualização do snapshot e flash. Diálogo HTML nativo e hook no bundle cuidam de modalidade, Escape e foco; regras de negócio continuam no servidor. O atributo `open` do diálogo/seção de labels é preservado durante patches via API LiveView; erros de labels forçam expansão. Histórico mantém streams montados em contêiner oculto, evitando perder itens ao expandir/recolher.
+
+A [SPEC-004](specs/004-experiencia-e-acesso.md#evolução-da-experiência--09102026) define o comportamento. Foco, atalhos e apresentação descritos aqui registram escolhas presentes na implementação, não requisitos ou critérios de aceite. Não há avaliação humana obrigatória, conforme o [PRD](prd.md#feedback-de-interface); ajustes estéticos dependem de feedback do responsável.
+
+## D16 — Movimentação persistida de pendências
+
+Plano autorizado em 09/10/2026: SortableJS via npm (licença MIT), instalado pelo responsável na retomada em 10/10/2026, com versão resolvida 1.15.7 no lockfile e importação pelo bundle existente. Hook mantém somente o DOM temporário do gesto, restaura os mesmos nós antes de enviar o evento e deixa streams aplicarem o estado confirmado. Não usar ignore nas listas de streams. Uma operação de domínio valida os conjuntos completos e aplica transferência/posições/cota sob o lock do usuário. Cadastro compartilha esse lock; posições de backlog/retry têm restrições próprias, preservando o índice de hoje por data. A virada acrescenta ao final de retry. Menu usa a mesma ordenação persistida e transferências ao final.

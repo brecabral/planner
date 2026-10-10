@@ -26,3 +26,7 @@ Retomada exige comprovar acesso autorizado ao navegador ou registrar decisão ex
 O responsável determinou: “deixe essas questoes para validação humana, fora das tasks”. Teclado, foco, layout em 360px/desktop e anúncios reais por tecnologias assistivas ficam na seção de validação humana do PRD, pendentes e fora dos gates das tarefas. PRD CA10, SPEC-004 CA-004-02 e TASK-032 foram alinhados para validação de comportamento e estrutura com os testes LiveView existentes, sem adicionar ferramentas ou infraestrutura.
 
 A decisão explícita e sua incorporação aos contratos resolvem a causa deste bloqueio; não houve correção técnica nem comprovação de navegador funcional. TASK-032 pode retomar em `in_progress` para executar o escopo remanescente, testes e gates já previstos. TASK-008 continua dependente da conclusão, revisão e integração de TASK-032. Nenhuma validação humana, tarefa ou entrega foi considerada concluída por esta alteração documental.
+
+## Atualização de escopo — 09/10/2026
+
+O responsável retirou a avaliação humana obrigatória da interface e os requisitos de foco/teclado, contraste, layout e questões estéticas. A [decisão vigente no PRD](../prd.md#feedback-de-interface) substitui a reserva de 05/10/2026. Este bloqueio continua resolvido; o histórico acima não cria pendência atual nem comprova avaliação executada.

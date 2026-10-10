@@ -1,6 +1,6 @@
 ---
 id: "SPEC-002"
-status: implemented
+status: ready
 requirements: ["RF02", "RF03", "RF06", "RF07", "CA01", "CA02", "CA03", "CA04", "CA05", "CA09"]
 ---
 
@@ -20,10 +20,10 @@ Uma fronteira transacional comum serializa alterações do mesmo usuário, inclu
 
 ## Regras
 
-- RN01: cadastrar título textual não vazio após remover espaços das extremidades cria tarefa no backlog do usuário. Títulos iguais não significam a mesma tarefa. O proprietário vem do usuário padrão no servidor, nunca de um campo do formulário.
-- RN02: backlog contém tarefas cadastradas ou retiradas manualmente de hoje. Retry recebe somente tarefas que permaneceram em hoje sem conclusão na virada do dia. Ambas permitem seleção para hoje; cada tarefa aparece em apenas uma coleção corrente. Listar cada uma por criação crescente e ID crescente como desempate.
-- RN03: cada transição aceita de backlog/retry para hoje consome uma das três escolhas da data do usuário. Concluir mantém esse consumo; devolver manualmente ao backlog restitui uma escolha. Reordenar não altera a cota. Nova seleção após devolução consome uma escolha novamente; repetir comando para tarefa já em hoje não consome nem duplica. A nova seleção ocupa a última posição.
-- RN04: reordenar exige exatamente os IDs das pendências atuais daquele usuário, uma vez cada. Aplicar posições consecutivas de 1 a N. Lista incompleta, duplicada, alheia, desconhecida ou com tarefa concluída é rejeitada integralmente. Comandos concorrentes válidos são serializados.
+- RN01: cadastrar título textual não vazio após remover espaços das extremidades cria tarefa no final do backlog do usuário. Títulos iguais não significam a mesma tarefa. O proprietário vem do usuário padrão no servidor, nunca de um campo do formulário.
+- RN02: backlog contém tarefas cadastradas ou retiradas manualmente de hoje. Retry recebe somente tarefas que permaneceram em hoje sem conclusão na virada do dia. Ambas permitem seleção para hoje; cada tarefa aparece em apenas uma coleção corrente. Listar cada uma pela posição persistida crescente.
+- RN03: cada transição aceita de backlog/retry para hoje consome uma das três escolhas da data do usuário. Concluir mantém esse consumo; devolver manualmente ao backlog restitui uma escolha. Reordenar não altera a cota. Nova seleção após devolução consome uma escolha novamente; repetir comando para tarefa já em hoje não consome nem duplica. A seleção pelo menu ocupa a última posição; arraste insere na posição escolhida.
+- RN04: reordenar exige exatamente os IDs das pendências atuais da lista (hoje, backlog ou retry) daquele usuário, uma vez cada. Aplicar posições consecutivas de 1 a N. Lista incompleta, duplicada, alheia, desconhecida ou com tarefa concluída é rejeitada integralmente. Comandos concorrentes válidos são serializados.
 - RN05: devolver manualmente uma pendência de hoje a coloca no backlog, preserva título, labels e identidade, compacta posições e restitui uma escolha da data corrente. Repetir retorno de tarefa já no backlog não altera nada nem restitui outra escolha. Retry, concluída ou inexistente é rejeitada. Se o dia já virou, revalidar a transição para retry antes do comando; não restituir escolha de hoje por uma seleção vencida.
 - RN06: a escolha e sua contabilização são atômicas. A cota vale por usuário/data e persiste independentemente do estado atual da tarefa. Consultas e mutações sempre exigem usuário resolvido pelo servidor; ID de outro usuário tem o mesmo resultado de ID inexistente, sem revelar seus dados.
 - RN07: todas as mutações revalidam dia e estado dentro da transação; falha não deixa tarefa movida, posição duplicada ou escolha consumida parcialmente.
@@ -46,3 +46,12 @@ Persistir proprietário, título, estado, ordem corrente, data da seleção e co
 ## Implementação
 
 Distribuída em tarefas pequenas; consultar o [mapa de entregas](../tasks/README.md). Esta spec permanece o contrato comum dos casos de uso acima.
+
+## Movimentação autorizada — 09/10/2026
+
+- RN08: arraste aceita reordenação nas três listas e somente backlog → hoje, retry → hoje e hoje → backlog. Recebe tarefa, origem, destino e ordens finais completas das listas afetadas. Validar transição, proprietário, IDs sem duplicatas e conjuntos atuais sob o lock por usuário; nenhuma outra tarefa muda de lista. Transferência, compactação da origem, ordem do destino e cota são atômicas.
+- RN09: posições são positivas, consecutivas e únicas por usuário/lista de pendências. Cadastro também usa o lock do usuário e acrescenta ao final do backlog. Migração inicializa backlog/retry pela criação/ID e preserva hoje e concluídas. `reorder_today/3` continua compatível.
+- RN10: conjuntos desatualizados são rejeitados; reordenações concorrentes do mesmo conjunto são serializadas e prevalece a última aceita. Erros de escrita revertem integralmente posições, transferência, normalização e cota.
+- CA-002-09: reordenar cada uma das três listas e recarregar preserva a permutação e a cota. Cadastro subsequente ocupa o final do backlog.
+- CA-002-10: transferir para início, meio, fim e destino vazio conserva identidade/labels, compacta origem e aplica consumo/restituição. Menu insere ao final.
+- CA-002-11: cota esgotada, destino proibido, IDs inválidos/alheios/duplicados, origem incorreta ou conjunto desatualizado rejeitam integralmente. Concorrência e falha de persistência não deixam estado parcial.

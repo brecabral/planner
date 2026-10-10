@@ -18,46 +18,8 @@
   themes: false;
 }
 
-/* daisyUI theme plugin.
-  We ship with two themes, a light one inspired on Phoenix colors and a dark one inspired
-  on Elixir colors. Build your own at: https://daisyui.com/theme-generator/ */
 @plugin "daisyui/packages/bundle/daisyui-theme" {
-  name: "dark";
-  default: false;
-  prefersdark: true;
-  color-scheme: "dark";
-  --color-base-100: oklch(30.33% 0.016 252.42);
-  --color-base-200: oklch(25.26% 0.014 253.1);
-  --color-base-300: oklch(20.15% 0.012 254.09);
-  --color-base-content: oklch(97.807% 0.029 256.847);
-  --color-primary: oklch(58% 0.233 277.117);
-  --color-primary-content: oklch(96% 0.018 272.314);
-  --color-secondary: oklch(58% 0.233 277.117);
-  --color-secondary-content: oklch(96% 0.018 272.314);
-  --color-accent: oklch(60% 0.25 292.717);
-  --color-accent-content: oklch(96% 0.016 293.756);
-  --color-neutral: oklch(37% 0.044 257.287);
-  --color-neutral-content: oklch(98% 0.003 247.858);
-  --color-info: oklch(58% 0.158 241.966);
-  --color-info-content: oklch(97% 0.013 236.62);
-  --color-success: oklch(60% 0.118 184.704);
-  --color-success-content: oklch(98% 0.014 180.72);
-  --color-warning: oklch(66% 0.179 58.318);
-  --color-warning-content: oklch(98% 0.022 95.277);
-  --color-error: oklch(58% 0.253 17.585);
-  --color-error-content: oklch(96% 0.015 12.422);
-  --radius-selector: 0.25rem;
-  --radius-field: 0.25rem;
-  --radius-box: 0.5rem;
-  --size-selector: 0.21875rem;
-  --size-field: 0.21875rem;
-  --border: 1.5px;
-  --depth: 1;
-  --noise: 0;
-}
-
-@plugin "daisyui/packages/bundle/daisyui-theme" {
-  name: "light";
+  name: "planner";
   default: true;
   prefersdark: false;
   color-scheme: "light";
@@ -65,8 +27,8 @@
   --color-base-200: oklch(96% 0.001 286.375);
   --color-base-300: oklch(92% 0.004 286.32);
   --color-base-content: oklch(21% 0.006 285.885);
-  --color-primary: oklch(70% 0.213 47.604);
-  --color-primary-content: oklch(98% 0.016 73.684);
+  --color-primary: oklch(48% 0.20 277);
+  --color-primary-content: oklch(99% 0 0);
   --color-secondary: oklch(55% 0.027 264.364);
   --color-secondary-content: oklch(98% 0.002 247.839);
   --color-accent: oklch(0% 0 0);
@@ -82,8 +44,8 @@
   --color-error: oklch(58% 0.253 17.585);
   --color-error-content: oklch(96% 0.015 12.422);
   --radius-selector: 0.25rem;
-  --radius-field: 0.25rem;
-  --radius-box: 0.5rem;
+  --radius-field: 0.75rem;
+  --radius-box: 1rem;
   --size-selector: 0.21875rem;
   --size-field: 0.21875rem;
   --border: 1.5px;
@@ -96,10 +58,89 @@
 @custom-variant phx-submit-loading (.phx-submit-loading&, .phx-submit-loading &);
 @custom-variant phx-change-loading (.phx-change-loading&, .phx-change-loading &);
 
-/* Use the data attribute for dark mode  */
-@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
-
 /* Make LiveView wrapper divs transparent for layout */
 [data-phx-session], [data-phx-teleported-src] { display: contents }
 
-/* This file is for your main application CSS */
+/* Shared surfaces and motion use semantic theme tokens only. */
+.planner-section {
+  padding: 1.5rem;
+  border: 1px solid var(--color-base-300);
+  border-radius: var(--radius-box);
+  background: var(--color-base-100);
+}
+
+.today-section {
+  border-top: 4px solid var(--color-primary);
+  box-shadow: 0 4px 20px color-mix(in oklch, var(--color-neutral) 4%, transparent);
+}
+
+.task-card {
+  overflow-wrap: anywhere;
+  padding: 1rem;
+  border: 1px solid var(--color-base-300);
+  border-radius: var(--radius-field);
+  background: var(--color-base-100);
+}
+
+.btn, a, input, textarea, summary {
+  transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.btn { min-height: 2.75rem; }
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 4px;
+}
+
+.task-drawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  width: 100%;
+  height: 100dvh;
+  max-height: 100dvh;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--color-base-100);
+  color: var(--color-base-content);
+  box-shadow: -12px 0 40px color-mix(in oklch, var(--color-neutral) 12%, transparent);
+}
+
+.task-drawer[open] { animation: drawer-enter 180ms ease-out; }
+
+.task-drawer::backdrop {
+  background: color-mix(in oklch, var(--color-neutral) 35%, transparent);
+}
+
+@media (min-width: 640px) {
+  .task-drawer { width: 32rem; }
+}
+
+@keyframes drawer-enter {
+  from { opacity: 0; transform: translateX(1rem); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Keep scrolling available outside the drag handle, including on touch screens. */
+.task-drag-handle { touch-action: none; cursor: grab; }
+.task-drag-handle:active { cursor: grabbing; }
+.task-drop-zone { min-height: 5rem; border-radius: var(--radius-box); }
+.task-drag-placeholder { opacity: 0.35; outline: 2px dashed var(--color-primary); }
+.task-drag-preview { box-shadow: 0 8px 24px color-mix(in srgb, var(--color-base-content) 20%, transparent); }
+[data-drop-allowed="true"] { outline: 2px dashed var(--color-primary); outline-offset: 4px; }
+[data-drop-allowed="false"] { outline: 2px dashed var(--color-error); outline-offset: 4px; }
+[data-movement-disabled="true"] .task-drag-handle { cursor: wait; opacity: 0.4; }
+[data-movement-disabled="true"] form,
+[data-dragging="true"] form { pointer-events: none; }

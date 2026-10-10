@@ -11,7 +11,7 @@ Specs agregam arquitetura, invariantes e casos de uso; tarefas entregam passos p
 | [005 — Usuário padrão do MVP](005-contas-e-acesso.md) | Contrato do MVP; implementação em várias tarefas. |
 | [006 — Labels reutilizáveis por usuário](006-labels.md) | Contrato do MVP; implementação em várias tarefas. |
 
-As seis specs estão implementadas no código integrado e com aceite verificado pela [revalidação independente do MVP](../review.md#revalidação-de-prontidão-do-mvp--05102026), alvo `2b8ba19`, em 05/10/2026. A validação humana de interface permanece fora do gate conforme o PRD.
+As seis specs estão implementadas no código integrado e com aceite verificado pela [revalidação independente do MVP](../review.md#revalidação-de-prontidão-do-mvp--05102026), alvo `2b8ba19`, em 05/10/2026. Não há avaliação humana obrigatória da interface, conforme o [PRD](../prd.md#feedback-de-interface).
 
 ## Como escrever
 
@@ -26,3 +26,5 @@ Uma spec está pronta quando outro agente consegue decidir o resultado dos cená
 Propostas pequenas começam como specs `draft`; não criar RFC, proposta e spec duplicadas. Atualizar a spec quando o comportamento mudar; manter justificativas relevantes em design. Ao decompor, atribuir cada entrega a uma tarefa e apontar as regras que ela cobre. Correções pequenas podem usar diretamente uma tarefa se o comportamento já estiver especificado.
 
 Consulta assistida: [skill de especificação](../skills/specify-feature/SKILL.md).
+
+Incremento autorizado de arraste: SPEC-002/003/004 em `ready` para a [TASK-040](../tasks/040-arrastar-tarefas.md); o aceite histórico do MVP não atesta essa implementação.

@@ -19,7 +19,7 @@ defmodule PlannerWeb.Router do
 
     get "/", PageController, :home
     live "/tasks", TaskLive.Index, :index
-    live "/tasks/new", TaskLive.Form, :new
+    live "/tasks/new", TaskLive.Index, :new
   end
 
   # Other scopes may use custom stacks.

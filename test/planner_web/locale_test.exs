@@ -7,15 +7,8 @@ defmodule PlannerWeb.LocaleTest do
       {:ok, view, html} = live_isolated(conn, PlannerWeb.LocaleFixtureLive)
       assert has_element?(view, "#locale", "pt_BR")
       assert has_element?(view, "#title[value='Keep my English title']")
-      assert has_element?(view, "a[href='https://phoenixframework.org/']", "Site")
-
-      assert has_element?(
-               view,
-               "a[href='https://phoenix.hexdocs.pm/overview.html']",
-               "Comece aqui"
-             )
-
-      assert has_element?(view, "button[aria-label='Tema do sistema']")
+      assert has_element?(view, "nav[aria-label='Navegação principal']")
+      assert has_element?(view, "nav a[href='/']", "Planner")
       assert html =~ "Tentando reconectar"
       GenServer.stop(view.pid)
     end

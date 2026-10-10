@@ -14,9 +14,9 @@ defmodule Planner.UserTransaction do
   @doc """
   Runs an operation with a coherent day and its persisted quota under a user lock.
 
-  Before invoking the operation, expired pending tasks become retry and lose
-  their positions. Their selection date, identity and completion data remain
-  unchanged. Normalization is rolled back together with a rejected operation.
+  Before invoking the operation, expired pending tasks append to retry in their
+  previous priority order. Their selection date, identity and completion data
+  remain unchanged. Normalization is rolled back together with a rejected operation.
 
   The operation receives `(day, daily_plan)` and returns `{:ok, value}` or
   `{:error, reason}`. An error rolls back all writes, including quota creation;
@@ -33,7 +33,7 @@ defmodule Planner.UserTransaction do
   """
   def run(%User{id: user_id}, operation, date \\ nil) when is_function(operation, 2) do
     Repo.transaction(fn ->
-      Repo.one!(from user in User, where: user.id == ^user_id, lock: "FOR UPDATE")
+      lock(%User{id: user_id})
       day = if is_nil(date), do: Day.current(), else: Day.current(date)
       plan = get_or_create_plan!(user_id, day)
       normalize_expired_tasks(user_id, day)
@@ -45,15 +45,32 @@ defmodule Planner.UserTransaction do
     end)
   end
 
+  @doc "Locks the owner row inside an existing transaction, including registration."
+  def lock(%User{id: user_id}) do
+    Repo.one!(from user in User, where: user.id == ^user_id, lock: "FOR UPDATE")
+  end
+
   defp normalize_expired_tasks(user_id, day) do
-    Repo.update_all(
-      from(task in Task,
+    last =
+      Repo.aggregate(
+        from(task in Task,
+          where: task.user_id == ^user_id and task.kind == :retry and is_nil(task.completed_on)
+        ),
+        :max,
+        :position
+      ) || 0
+
+    Repo.all(
+      from task in Task,
         where:
           task.user_id == ^user_id and task.kind == :today and
-            is_nil(task.completed_on) and task.scheduled_for < ^day
-      ),
-      set: [kind: :retry, position: nil, updated_at: DateTime.utc_now(:second)]
+            is_nil(task.completed_on) and task.scheduled_for < ^day,
+        order_by: [task.scheduled_for, task.position, task.id]
     )
+    |> Enum.with_index(last + 1)
+    |> Enum.each(fn {task, position} ->
+      task |> Ecto.Changeset.change(kind: :retry, position: position) |> Repo.update!()
+    end)
   end
 
   defp get_or_create_plan!(user_id, day) do

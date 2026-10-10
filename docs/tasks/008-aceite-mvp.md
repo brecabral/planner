@@ -13,9 +13,12 @@ blockers: []
 
 # 008 — Executar o aceite do MVP mínimo
 
+Nota de escopo — 09/10/2026: menções a avaliação humana pendente nas evidências datadas abaixo são históricas. A [decisão vigente](../prd.md#feedback-de-interface) retirou essa obrigação, sem alterar resultados ou presumir avaliação realizada.
+
+
 ## Objetivo e entrada
 
-Conferir PRD CA01–CA13 e CA15 e as evidências das produtoras. Executar fluxo no ambiente de teste com usuário padrão, sem depender de login, fuso, idioma alternativo, publicação ou backup. Não implementar correções aqui; devolvê-las à produtora. Não reabrir o gate humano já aceito. A validação humana da interface descrita no PRD fica fora desta tarefa e não condiciona seu aceite; usar as evidências de comportamento e estrutura dos testes existentes, sem exigir navegador ou nova infraestrutura.
+Conferir PRD CA01–CA13 e CA15 e as evidências das produtoras. Executar fluxo no ambiente de teste com usuário padrão, sem depender de login, fuso, idioma alternativo, publicação ou backup. Não implementar correções aqui; devolvê-las à produtora. Não reabrir o gate humano já aceito. Usar as evidências de comportamento e estrutura dos testes existentes, sem exigir navegador ou nova infraestrutura. Não há avaliação humana obrigatória da interface, conforme o [PRD](../prd.md#feedback-de-interface).
 
 ## Aceite
 

@@ -3,45 +3,18 @@ defmodule PlannerWeb.PageHTMLTest do
 
   import Phoenix.LiveViewTest
 
-  test "home renders framework resources, theme controls and reconnect notices" do
+  test "home renders Planner identity, entry point and reconnect notices" do
     html =
       render_component(&PlannerWeb.PageHTML.home/1, flash: %{})
       |> LazyHTML.from_fragment()
 
-    assert html |> LazyHTML.query("h1") |> LazyHTML.text() =~ "Phoenix Framework"
+    assert html |> LazyHTML.query("h1") |> LazyHTML.text() =~ "Espaço para o que importa."
+    assert html |> LazyHTML.query("nav a[href='/']") |> LazyHTML.text() =~ "Planner"
 
-    assert html |> LazyHTML.query("h1 small") |> LazyHTML.text() =~
-             "v#{Application.spec(:phoenix, :vsn)}"
+    assert html |> LazyHTML.query("#open-planner[href='/tasks']") |> LazyHTML.text() =~
+             "Abrir Planner"
 
-    for {url, label} <- [
-          {"https://elixirforum.com", "Converse no Elixir Forum"},
-          {"https://discord.gg/elixir", "Entre no nosso servidor do Discord"},
-          {"https://elixir-slack.community/", "Junte-se a nós no Slack"},
-          {"https://fly.io/docs/elixir/getting-started/", "Publique sua aplicação"},
-          {"https://phoenix.hexdocs.pm/overview.html", "Guias e documentação"},
-          {"https://github.com/phoenixframework/phoenix", "Código-fonte"},
-          {"https://github.com/phoenixframework/phoenix/blob/v#{Application.spec(:phoenix, :vsn)}/CHANGELOG.md",
-           "Histórico de alterações"}
-        ] do
-      assert html |> LazyHTML.query("a[href='#{url}']") |> LazyHTML.text() =~ label
-    end
-
-    for {theme, label} <- [
-          {"system", "Tema do sistema"},
-          {"light", "Tema claro"},
-          {"dark", "Tema escuro"}
-        ] do
-      assert html
-             |> LazyHTML.query("button[data-phx-theme='#{theme}']")
-             |> LazyHTML.attribute("aria-label") == [label]
-
-      [command] =
-        html
-        |> LazyHTML.query("button[data-phx-theme='#{theme}']")
-        |> LazyHTML.attribute("phx-click")
-
-      assert [["dispatch", %{"event" => "phx:set-theme"}]] = Jason.decode!(command)
-    end
+    assert html |> LazyHTML.query("a[href^='https://']") |> Enum.empty?()
 
     for {id, message} <- [
           {"client-error", "Não foi possível conectar à internet"},
@@ -57,6 +30,6 @@ defmodule PlannerWeb.PageHTMLTest do
     assert html |> LazyHTML.query("#flash-group[aria-live=polite]") |> Enum.count() == 1
     assert html |> LazyHTML.query("#client-error[role=alert][hidden]") |> Enum.count() == 1
     assert html |> LazyHTML.query("#server-error[role=alert][hidden]") |> Enum.count() == 1
-    assert html |> LazyHTML.query("button[data-phx-theme]") |> Enum.count() == 3
+    assert html |> LazyHTML.query("button[data-phx-theme]") |> Enum.count() == 0
   end
 end

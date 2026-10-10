@@ -1,6 +1,6 @@
 ---
 id: "SPEC-003"
-status: implemented
+status: ready
 requirements: ["RF04", "RF05", "CA06", "CA07", "CA08"]
 ---
 
@@ -15,7 +15,7 @@ Um contrato pequeno fornece a data corrente no servidor e permite controlá-la n
 ## Regras
 
 - RN01: cada consulta/comando usa uma data coerente obtida no servidor. Não aceitar data livre ou fuso do navegador como autoridade.
-- RN02: ao consultar ou executar comando num novo dia, pendências de data anterior passam a retry, sem conclusão automática. Isso funciona depois de parada/reinício; não requer processo em segundo plano.
+- RN02: ao consultar ou executar comando num novo dia, pendências de data anterior passam a retry, sem conclusão automática, acrescentadas ao final de retry na ordem de data de seleção e prioridade anterior, preservando a ordem de retry existente. Isso funciona depois de parada/reinício; não requer processo em segundo plano.
 - RN03: a cota pertence ao usuário/data. Uma data nova começa com zero escolhas, salvo se já houver consumo registrado nela. Recarga e reinício não zeram registros existentes.
 - RN04: concluir tarefa de hoje persiste a data corrente, retira a pendência e compacta a ordem atomicamente. Não restitui escolha. Backlog, retry e ID inválido são rejeitados.
 - RN05: repetir conclusão mantém resultado/data original. Disputa com devolução produz um único vencedor: conclusão mantém consumo; devolução ao backlog restitui uma escolha.
@@ -34,3 +34,5 @@ Um contrato pequeno fornece a data corrente no servidor e permite controlá-la n
 ## Implementação
 
 Contrato de data, normalização, conclusão, consulta e recarga são implementados em etapas no [mapa de tarefas](../tasks/README.md). Não há decisão de fuso bloqueando o MVP.
+
+- CA-003-07: com retry reordenado e pendências vencidas, normalizar conserva a ordem existente e acrescenta vencidas pela prioridade anterior; repetir não duplica nem altera posições. Histórico permanece somente consulta por conclusão.

@@ -1,14 +1,46 @@
 ---
-review_base_commit: "aafed16d7b7a09000404e716cc98dcc43763510e"
-reviewed_commit: "2b8ba19ce2657126423256d3fd2596875c7ca661"
+review_base_commit: "2b8ba19ce2657126423256d3fd2596875c7ca661"
+reviewed_commit: "43ea80314c0a47a2a8357c17064cc01ac9ed5a40"
 last_approved_commit: "2b8ba19ce2657126423256d3fd2596875c7ca661"
-reviewed_at: "2026-10-05"
-reviewer: "/root/review_mvp_readiness — revisão independente do MVP"
-status: approved
-reviewed_tasks: ["TASK-006", "TASK-007", "TASK-008", "TASK-022", "TASK-023", "TASK-024", "TASK-025", "TASK-026", "TASK-027", "TASK-028", "TASK-029", "TASK-030", "TASK-032", "TASK-037", "TASK-038"]
+reviewed_at: "2026-10-10"
+reviewer: "/root — revisão independente da árvore local TASK-039/TASK-040"
+status: changes_requested
+reviewed_tasks: ["TASK-039", "TASK-040"]
 ---
 
 # Revisão incremental das tarefas concluídas
+
+
+## Revisão das entregas locais — 10/10/2026
+
+Resultado: **changes_requested**. Revisão independente por `/root`, sem implementação nesta sessão. TASK-039 sem achado bloqueante identificado; TASK-040 requer correção do cancelamento do gesto. O MVP histórico continua aprovado no seu escopo.
+
+### Base e escopo
+
+Base aprovada `2b8ba19ce2657126423256d3fd2596875c7ca661`, confirmada como ancestral de HEAD `43ea80314c0a47a2a8357c17064cc01ac9ed5a40`. O intervalo commitado contém reconciliação documental. O alvo executável desta rodada é **a árvore local não commitada sobre HEAD**, incluindo TASK-039/TASK-040, hook, migration, testes e configuração npm/CI. Não havia alterações staged; os arquivos novos também foram lidos. O SHA de `reviewed_commit` identifica somente HEAD, não uma aprovação das alterações locais. Preservado `last_approved_commit`.
+
+Conferidos contratos atuais, cadastro/modal, eventos e menus, ordenação/transferências/cota, lock compartilhado, virada, migração, regressões e integração do hook com as fontes instaladas de LiveView/SortableJS. Decisões documentais posteriores dispensam avaliação humana obrigatória da interface; esta revisão não reabre esse requisito.
+
+### R2 — P2: cancelamento deixa resíduos do arraste no DOM
+
+Local: [assets/js/task_drag.js:124](../assets/js/task_drag.js#L124), especialmente chamadas a `destroy()` nas linhas 128–130. Durante um arraste ativo, um patch ou desconexão chama `cancelGesture()`. Com `forceFallback: true` e `fallbackOnBody: true`, há um elemento flutuante anexado ao body. O hook pressupõe que `destroy()` o remova, mas SortableJS 1.15.7 chama `_onDrop()` **sem evento** (`assets/node_modules/sortablejs/Sortable.js:2170`): remoção do ghost/clone e limpeza das classes do item estão dentro de `if (evt)` (linhas 1936–1961). `_nulling()` depois apaga as referências. `restore()` apenas reposiciona os nós capturados e limpa atributos das listas; não remove o elemento flutuante no body nem limpa as classes do item. O artefato pode permanecer após reconexão/patch, fora dos streams, até recarregar a página.
+
+Evidência por inspeção do caminho real da dependência instalada; não houve reprodução em navegador. Trata-se do cancelamento funcional exigido por RN16, não de preferência estética. Correção esperada: cancelar sem enviar movimento, remover os artefatos temporários e restaurar classes/estilos do item antes de perder as referências, preservando os mesmos nós dos streams. Cobrir cancelamento por patch e desconexão e garantir ausência de evento de movimento/fantasmas residuais. Não corrigido nesta revisão.
+
+### Validação reproduzida
+
+Ajuda de `mix ci`, aliases e política de qualidade lidos antes da execução. `rtk mix ci`: saída 0, **157 testes aprovados**, seed 826447, cobertura **93,44%**; Tasks/Index 98,31%, Form 97,26%, UserTransaction 100%. Compilação, formato sem correção, Credo estrito, build Tailwind/esbuild e npm audit aprovados, zero vulnerabilidades reportadas. Limiar de 70% preservado. `rtk git diff --check`: aprovado. Base não medida novamente; nenhuma alegação de variação de cobertura.
+
+Os testes exercitam permutações, destinos vazios/início/meio/fim, rejeições, rollback, concorrência e migração com dados anteriores em schema isolado. LiveViewTest cobre eventos, cadastro e feedback, mas não executa o hook. O gate verde não detecta R2. `precommit` não repetido por conter formatação e alteração de lockfile; suas evidências anteriores permanecem relatadas. Nenhum código de produto editado, navegador executado, reset humano, commit ou publicação. CI remoto não consultado.
+
+### Trabalho remanescente
+
+- **TASK-040:** corrigir R2 e revalidar; depois conferir integração e encerrar a tarefa. Continua `in_review`, com correção solicitada registrada abaixo e na tarefa.
+- **TASK-039:** sem correção funcional identificada nesta rodada; ainda requer conferência operacional/integração para mudar de `in_review` para `done`.
+- Tarefas do MVP, incluindo humanas TASK-003/TASK-012, têm conclusão histórica registrada; nenhuma execução humana pendente foi identificada.
+- TASK-004/011/013/014/015/017/031/033/034/035 são evolução futura, dependente de redefinição de contratos/produto, não trabalho obrigatório do escopo atual.
+
+Observação documental não bloqueante: TASK-040 sobrepõe arquivos e usa a interface local da TASK-039, mas declara somente TASK-038 em `depends_on`. Antes de distribuí-las separadamente, reconciliar essa relação para impedir execução concorrente em recursos compartilhados. Esta revisão não replaneja o grafo.
 
 ## Revalidação de prontidão do MVP — 05/10/2026
 

@@ -75,30 +75,132 @@ defmodule Planner.Tasks do
   is reloaded under the user lock, so stale, duplicate, missing and foreign IDs
   are rejected together. The optional date is server/test controlled.
   """
-  def reorder_today(%User{id: user_id} = user, ids, date \\ nil) do
+  def reorder_today(%User{} = user, ids, date \\ nil),
+    do: reorder_list(user, :today, ids, date)
+
+  @doc "Reorders the complete pending set of one list under the user's lock."
+  def reorder_list(%User{} = user, kind, ids, date \\ nil) do
     UserTransaction.run(
       user,
       fn day, _plan ->
-        tasks =
-          Repo.all(
-            from task in Task,
-              where:
-                task.user_id == ^user_id and task.kind == :today and
-                  task.scheduled_for == ^day and is_nil(task.completed_on),
-              order_by: [task.position, task.id]
-          )
-
-        parsed_ids = parse_order_ids(ids)
-
-        if is_list(parsed_ids) and length(parsed_ids) == length(tasks) and
-             MapSet.new(parsed_ids) == MapSet.new(tasks, & &1.id) do
-          {:ok, persist_order(tasks, parsed_ids)}
+        with {:ok, kind} <- list_kind(kind),
+             tasks = pending_tasks(user.id, kind, day),
+             parsed = parse_order_ids(ids),
+             true <- valid_order?(parsed, Enum.map(tasks, & &1.id)) do
+          {:ok, persist_order(tasks, parsed)}
         else
-          {:error, :invalid_order}
+          _ -> {:error, :invalid_order}
         end
       end,
       date
     )
+  end
+
+  @doc """
+  Moves one pending task using complete final orders for the affected lists.
+  The server-resolved owner, transition, membership and quota are revalidated
+  under the user lock. No browser date or owner is accepted.
+  """
+  def move_task(user, params, date \\ nil)
+
+  def move_task(
+        %User{} = user,
+        %{"task_id" => id, "from" => source, "to" => target, "orders" => orders},
+        date
+      )
+      when is_map(orders) do
+    UserTransaction.run(
+      user,
+      fn day, plan ->
+        with {:ok, source} <- list_kind(source),
+             {:ok, target} <- list_kind(target),
+             true <- allowed_move?(source, target),
+             %Task{} = task <- owned_task(user, id),
+             true <- task.kind == source and is_nil(task.completed_on),
+             true <- source != :today or task.scheduled_for == day do
+          move_with_orders(task, source, target, orders, day, plan)
+        else
+          _ -> {:error, :invalid_state}
+        end
+      end,
+      date
+    )
+  end
+
+  def move_task(%User{}, _params, _date), do: {:error, :invalid_order}
+
+  defp move_with_orders(task, source, target, orders, day, plan) do
+    kinds = Enum.uniq([source, target])
+    lists = Map.new(kinds, &{&1, pending_tasks(task.user_id, &1, day)})
+    parsed = Map.new(kinds, &{&1, parse_order_ids(orders[Atom.to_string(&1)])})
+
+    cond do
+      not valid_move_orders?(task.id, target, orders, lists, parsed) ->
+        {:error, :invalid_order}
+
+      source != target and target == :today and plan.used_choices >= 3 ->
+        {:error, :quota_exhausted}
+
+      true ->
+        case transfer_for_move(task, source, target, day, plan) do
+          {:error, reason} -> Repo.rollback(reason)
+          _ -> :ok
+        end
+
+        Enum.each(kinds, fn kind ->
+          persist_order(pending_tasks(task.user_id, kind, day), parsed[kind])
+        end)
+
+        {:ok, :moved}
+    end
+  end
+
+  defp valid_move_orders?(task_id, target, orders, lists, parsed) do
+    MapSet.new(Map.keys(orders)) == MapSet.new(Map.keys(lists), &Atom.to_string/1) and
+      Enum.all?(lists, fn {kind, tasks} ->
+        expected = tasks |> Enum.map(& &1.id) |> Enum.reject(&(&1 == task_id))
+        expected = if kind == target, do: expected ++ [task_id], else: expected
+        valid_order?(parsed[kind], expected)
+      end)
+  end
+
+  defp transfer_for_move(_task, kind, kind, _day, _plan), do: :ok
+  defp transfer_for_move(task, _source, :today, day, plan), do: select_task(task, day, plan)
+  defp transfer_for_move(task, :today, :backlog, day, plan), do: return_task(task, day, plan)
+
+  defp list_kind(kind) when kind in [:today, :backlog, :retry], do: {:ok, kind}
+  defp list_kind("today"), do: {:ok, :today}
+  defp list_kind("backlog"), do: {:ok, :backlog}
+  defp list_kind("retry"), do: {:ok, :retry}
+  defp list_kind(_), do: :error
+
+  defp allowed_move?(kind, kind), do: true
+  defp allowed_move?(source, :today) when source in [:backlog, :retry], do: true
+  defp allowed_move?(:today, :backlog), do: true
+  defp allowed_move?(_, _), do: false
+
+  defp valid_order?(ids, expected) do
+    is_list(ids) and length(ids) == length(expected) and
+      MapSet.new(ids) == MapSet.new(expected)
+  end
+
+  defp pending_tasks(user_id, kind, day) do
+    query =
+      from task in Task,
+        where: task.user_id == ^user_id and task.kind == ^kind and is_nil(task.completed_on),
+        order_by: [task.position, task.id]
+
+    query =
+      if kind == :today, do: from(task in query, where: task.scheduled_for == ^day), else: query
+
+    Repo.all(query)
+  end
+
+  defp next_position(user_id, kind, day) do
+    pending_tasks(user_id, kind, day)
+    |> Enum.map(& &1.position)
+    |> Enum.max(fn -> 0 end)
+    |> Kernel.+(1)
   end
 
   defp parse_order_ids(ids) when is_list(ids) do
@@ -160,7 +262,12 @@ defmodule Planner.Tasks do
 
   defp return_task(task, day, plan) do
     with {:ok, returned} <-
-           task |> Changeset.change(kind: :backlog, position: nil) |> Repo.update() do
+           task
+           |> Changeset.change(
+             kind: :backlog,
+             position: next_position(task.user_id, :backlog, day)
+           )
+           |> Repo.update() do
       compact_positions(task.user_id, day)
 
       case plan |> DailyPlan.changeset(%{used_choices: plan.used_choices - 1}) |> Repo.update() do
@@ -170,18 +277,9 @@ defmodule Planner.Tasks do
     end
   end
 
-  defp compact_positions(user_id, day) do
-    Repo.all(
-      from task in Task,
-        where:
-          task.user_id == ^user_id and task.kind == :today and
-            task.scheduled_for == ^day and is_nil(task.completed_on),
-        order_by: [task.position, task.id]
-    )
-    |> Enum.with_index(1)
-    |> Enum.each(fn {task, position} ->
-      task |> Changeset.change(position: position) |> Repo.update!()
-    end)
+  defp compact_positions(user_id, day, kind \\ :today) do
+    tasks = pending_tasks(user_id, kind, day)
+    persist_order(tasks, Enum.map(tasks, & &1.id))
   end
 
   @doc """
@@ -237,6 +335,7 @@ defmodule Planner.Tasks do
            |> Repo.update(),
          {:ok, _plan} <-
            plan |> DailyPlan.changeset(%{used_choices: plan.used_choices + 1}) |> Repo.update() do
+      compact_positions(task.user_id, day, task.kind)
       {:ok, selected}
     end
   end
@@ -246,8 +345,8 @@ defmodule Planner.Tasks do
 
   The result is `{:ok, snapshot}` with `day`, `used_choices`, `available_choices`,
   `backlog`, `today` and `retry`. Tasks include their labels; completed tasks are
-  excluded. Backlog and retry use creation order with ID as a tie-breaker, while
-  today's tasks use their positions. All reads share the user's transaction lock.
+  excluded. All pending lists use their persisted positions. All reads share
+  the user's transaction lock.
 
   The optional date is for controlled server-side calls/tests, never browser input.
   """
@@ -256,7 +355,7 @@ defmodule Planner.Tasks do
       user,
       fn day, plan ->
         pending = from task in Task, where: task.user_id == ^user_id and is_nil(task.completed_on)
-        creation_order = from task in pending, order_by: [task.inserted_at, task.id]
+        ordered_pending = from task in pending, order_by: [task.position, task.id]
 
         {:ok,
          %{
@@ -265,10 +364,12 @@ defmodule Planner.Tasks do
            available_choices: 3 - plan.used_choices,
            backlog:
              Repo.all(
-               from task in creation_order, where: task.kind == :backlog, preload: [:labels]
+               from task in ordered_pending, where: task.kind == :backlog, preload: [:labels]
              ),
            retry:
-             Repo.all(from task in creation_order, where: task.kind == :retry, preload: [:labels]),
+             Repo.all(
+               from task in ordered_pending, where: task.kind == :retry, preload: [:labels]
+             ),
            today:
              Repo.all(
                from task in pending,
@@ -309,7 +410,13 @@ defmodule Planner.Tasks do
   """
   def create_task(%User{} = user, attrs \\ %{}) do
     Repo.transaction(fn ->
-      case user |> change_task(attrs) |> Repo.insert() do
+      lock_registration_owner!(user, attrs)
+      position = next_position(user.id, :backlog, nil)
+
+      case user
+           |> change_task(attrs)
+           |> Changeset.put_change(:position, position)
+           |> Repo.insert() do
         {:ok, task} ->
           existing_ids = owned_label_ids!(user, attrs)
           new_ids = create_new_label_ids!(user, attrs)
@@ -320,6 +427,16 @@ defmodule Planner.Tasks do
           Repo.rollback(changeset)
       end
     end)
+  end
+
+  defp lock_registration_owner!(user, attrs) do
+    if is_nil(user.id) do
+      rollback_input(user, attrs, :user_id)
+    end
+
+    UserTransaction.lock(user)
+  rescue
+    Ecto.NoResultsError -> rollback_input(user, attrs, :user_id)
   end
 
   @doc """

@@ -4,7 +4,7 @@ O MVP contém somente o fluxo de planejamento com usuário padrão, pt-BR via Ge
 
 ## MVP
 
-MVP local encerrado em 05/10/2026: entregas integradas e [revisão independente aprovada](../review.md#revalidação-de-prontidão-do-mvp--05102026) no alvo `2b8ba19`, com R1 encerrado pela TASK-038. Gates reproduzidos pelo revisor: 139 testes aprovados, cobertura de 92,25% e Credo sem achados. Validação humana da interface permanece pendente e fora do gate; evoluções futuras não foram iniciadas.
+MVP local encerrado em 05/10/2026: entregas integradas e [revisão independente aprovada](../review.md#revalidação-de-prontidão-do-mvp--05102026) no alvo `2b8ba19`, com R1 encerrado pela TASK-038. Gates reproduzidos pelo revisor: 139 testes aprovados, cobertura de 92,25% e Credo sem achados. A renovação da interface posterior ao MVP está registrada abaixo. A avaliação humana obrigatória foi retirada por [decisão do responsável](../prd.md#feedback-de-interface); registros anteriores de pendência são históricos.
 
 Gate GitHub e base limpa têm aceite humano registrado. As TASK-036, TASK-002, TASK-001, TASK-009, TASK-016 e TASK-010 estão concluídas e integradas, com [revisão independente aprovada](../review.md) no escopo dessas entregas. O [BLOCK-001](../blocks/001-cobertura-apos-remocao-crud.md) está resolvido. A seleção das próximas tarefas deve respeitar suas dependências e bloqueios atuais. O MVP não depende de escolhas de autenticação, idiomas ou fuso. As demais etapas mantêm produtor único e serializam arquivos compartilhados.
 
@@ -51,6 +51,15 @@ Gate GitHub e base limpa têm aceite humano registrado. As TASK-036, TASK-002, T
 | SPEC-006 — Labels | 010 catálogo, 018 relação, 019 cadastro atômico, 026 formulário. |
 
 TASK-008 verifica CA01–CA13 e CA15, incluindo persistência após reinício e cobertura mínima de 70% exigida pelo CI.
+
+## Evolução autorizada após o MVP
+
+| Incremento |
+| --- |
+| [039 — Renovar a experiência do Planner](039-renovar-experiencia.md) |
+| [040 — Arrastar tarefas com mouse e touch](040-arrastar-tarefas.md) |
+
+O pacote de correção decorrente da revisão de 10/10/2026 está na [TASK-040](040-arrastar-tarefas.md#correção-pendente--r2-da-revisão-de-10102026); seus cabeçalhos definem a dependência da interface e a ordem de integração.
 
 ## Evolução futura — não bloqueia o MVP
 

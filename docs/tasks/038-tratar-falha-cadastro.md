@@ -13,6 +13,9 @@ blockers: []
 
 # 038 — Tratar falha de persistência no cadastro
 
+Nota de escopo — 09/10/2026: menções a avaliação humana pendente nas evidências datadas abaixo são históricas. A [decisão vigente](../prd.md#feedback-de-interface) retirou essa obrigação, sem alterar resultados ou presumir avaliação realizada.
+
+
 ## Objetivo e contexto
 
 Corrigir R1 da [revisão de prontidão](../review.md#revisão-de-prontidão-do-mvp--05102026): exceção de persistência em `Tasks.create_task/2` encerra a LiveView de cadastro. Cumprir PRD CA09 e [SPEC-004](../specs/004-experiencia-e-acesso.md) RN04/RN06 e CA-004-03, preservando a atomicidade de [SPEC-006](../specs/006-labels.md) RN02–RN04 e CA-006-04.
@@ -25,7 +28,7 @@ TASK-037 está integrada em `015eb6d`; sua dependência serializa o ajuste com t
 
 Adaptar o formulário existente, sem gerador. Tratar exceções pertinentes de persistência (`Ecto.ConstraintError`, `Postgrex.Error` e `DBConnection.ConnectionError`) na fronteira da chamada de cadastro, após rollback da transação. Manter a LiveView e as entradas, apresentando erro visível em pt-BR via Gettext, sem navegar ou anunciar sucesso. Não capturar indiscriminadamente erros de programação nem alterar o contrato transacional para ocultar falhas.
 
-Preservar tratamento de changesets, proprietário resolvido no servidor, seleção de labels e criação atômica. Sem alteração de schema, migration, contexto de domínio, bootstrap de usuário ou política de reconexão. Validação humana em navegador continua fora dos gates, conforme o PRD.
+Preservar tratamento de changesets, proprietário resolvido no servidor, seleção de labels e criação atômica. Sem alteração de schema, migration, contexto de domínio, bootstrap de usuário ou política de reconexão. Não há avaliação humana obrigatória da interface, conforme o [PRD](../prd.md#feedback-de-interface).
 
 ## Aceite e testes de intenção
 

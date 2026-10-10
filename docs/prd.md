@@ -1,6 +1,6 @@
 # PRD — MVP de prioridades diárias
 
-Escopo mínimo definido pelo responsável em 23/09/2026. MVP local concluído em 05/10/2026, com aceite aprovado na [revisão independente de prontidão](review.md#revalidação-de-prontidão-do-mvp--05102026), após a correção de CA09 na [TASK-038](tasks/038-tratar-falha-cadastro.md). A validação humana abaixo permanece pendente e fora do gate.
+Escopo mínimo definido pelo responsável em 23/09/2026. MVP local concluído em 05/10/2026, com aceite aprovado na [revisão independente de prontidão](review.md#revalidação-de-prontidão-do-mvp--05102026), após a correção de CA09 na [TASK-038](tasks/038-tratar-falha-cadastro.md).
 
 ## 1. Objetivo
 
@@ -31,7 +31,7 @@ Permitir cadastrar tarefas, escolher até três ações para o dia, ordenar, dev
 
 ## 4. Experiência
 
-Hoje tem destaque, prioridades numeradas e escolhas disponíveis. Backlog e retry são listas distintas com ação de selecionar. Cadastro aceita título e várias labels; histórico permanece acessível. Ações apresentam validação e erros sem falso sucesso. A avaliação em navegador de teclado, foco, responsividade e anúncios por tecnologias assistivas fica a cargo da validação humana abaixo.
+Hoje tem destaque, prioridades numeradas e escolhas disponíveis. Backlog e retry são listas distintas com ação de selecionar. Cadastro aceita título e várias labels; histórico permanece acessível. Ações apresentam validação e erros sem falso sucesso.
 
 ## 5. Arquitetura e qualidade
 
@@ -58,15 +58,15 @@ A entrega exige testes relevantes, verificações do repositório e **cobertura 
 | CA13 | Abrir painel usa usuário padrão sem login; repetir seeds não o duplica e parâmetros não trocam o proprietário. |
 | CA15 | Cadastro com várias labels existentes/novas persiste todos os vínculos; label incompatível rejeita a transação. |
 
-### Validação humana da interface — fora das tarefas
+<a id="validação-humana-da-interface--fora-das-tarefas"></a>
 
-Por decisão do responsável em 05/10/2026, a avaliação real em navegador fica reservada à pessoa responsável pelo produto, fora das tarefas e dos gates de execução dos agentes. Não exige nova ferramenta ou infraestrutura no pipeline.
+### Feedback de interface
 
-- Operar cadastro, seleção, reordenação, devolução e conclusão por teclado; observar foco visível e destino do foco após ações.
-- Conferir layout e acesso às ações em 360px e desktop, sem transbordamento que impeça o uso.
-- Conferir anúncios de erros e estados vazios por tecnologias assistivas.
+Por decisão do responsável em 09/10/2026, foco, operação por teclado, contraste, layout e questões estéticas não são requisitos nem critérios de aceite do projeto. Não há avaliação humana obrigatória da interface, checklist, evidência exigida ou pendência a registrar, inclusive para movimento reduzido e anúncios por tecnologias assistivas.
 
-Estado: pendente de validação humana; nenhum desses resultados é presumido pelos testes LiveView. Esta pendência não bloqueia a fila nem o aceite automatizado do MVP. Eventuais problemas encontrados poderão ser encaminhados posteriormente para planejamento.
+O responsável pode levantar observações durante seu uso e avaliação, a seu critério. Esse feedback poderá originar ajustes quando solicitado. Permanecem os requisitos funcionais e os gates automatizados já definidos.
+
+Esta decisão substitui a reserva de validação humana de 05/10/2026 e cancela CA-004-11 da renovação. Menções a avaliação humana pendente em relatórios e evidências anteriores são históricas; não representam obrigação vigente nem comprovação de avaliação realizada.
 
 ## 7. Solução final, fora do MVP
 

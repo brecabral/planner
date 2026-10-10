@@ -14,10 +14,12 @@ defmodule PlannerWeb.PageControllerTest do
         |> LazyHTML.from_document()
 
       assert html |> LazyHTML.query("html") |> LazyHTML.attribute("lang") == ["pt-BR"]
-      assert LazyHTML.text(html) =~ "Tranquilidade do protótipo à produção."
-      assert LazyHTML.text(html) =~ "Crie aplicações web ricas e interativas"
-      refute LazyHTML.text(html) =~ "Peace of mind"
-      refute LazyHTML.text(html) =~ "Build rich"
+      assert LazyHTML.text(html) =~ "Planner"
+      refute LazyHTML.text(html) =~ "Phoenix"
+      assert LazyHTML.text(html) =~ "Abrir Planner"
+      assert LazyHTML.text(html) =~ "Espaço para o que importa."
+      assert html |> LazyHTML.query("#open-planner") |> LazyHTML.attribute("href") == ["/tasks"]
+      assert html |> LazyHTML.query("html") |> LazyHTML.attribute("data-theme") == ["planner"]
       assert html |> LazyHTML.query("select") |> Enum.empty?()
     end
   end

@@ -372,7 +372,7 @@ defmodule Planner.TasksTest do
     assert returned.kind == :backlog
     assert returned.id == middle.id
     assert returned.title == middle.title
-    assert is_nil(returned.position)
+    assert returned.position == 1
     assert Repo.preload(returned, :labels).labels == [label]
     assert {:ok, ^returned} = Tasks.return_to_backlog(user, middle.id, day)
     assert {:ok, %{used_choices: 2, today: today}} = Tasks.snapshot(user, day)
@@ -706,6 +706,102 @@ defmodule Planner.TasksTest do
     end)
   end
 
+  test "registration, movement and ordering serialize on the same owner lock" do
+    for scenario <- [:reorder, :register_first, :register_last, :move] do
+      with_committed_user(fn user ->
+        day = ~D[2026-10-01]
+        [a, b] = for _ <- 1..2, do: task_fixture(user)
+        parent = self()
+
+        first_command = fn ->
+          if scenario == :register_first,
+            do: Tasks.create_task(user, %{title: "Concurrent registration"}),
+            else: Tasks.reorder_list(user, :backlog, [b.id, a.id], day)
+        end
+
+        second_command = fn ->
+          case scenario do
+            :register_last ->
+              Tasks.create_task(user, %{title: "Concurrent registration"})
+
+            :move ->
+              Tasks.move_task(
+                user,
+                %{
+                  "task_id" => a.id,
+                  "from" => "backlog",
+                  "to" => "today",
+                  "orders" => %{"backlog" => [b.id], "today" => [a.id]}
+                },
+                day
+              )
+
+            _ ->
+              Tasks.reorder_list(user, :backlog, [a.id, b.id], day)
+          end
+        end
+
+        holder =
+          selection_worker(fn ->
+            UserTransaction.run(
+              user,
+              fn _, _ ->
+                assert {:ok, _} = first_command.()
+                send(parent, {:holder, selection_backend()})
+                receive do: (:release -> {:ok, :released})
+              end,
+              day
+            )
+          end)
+
+        assert_receive {:holder, holder_backend}, 2_000
+
+        waiter =
+          selection_worker(fn ->
+            send(parent, {:waiter, selection_backend()})
+            second_command.()
+          end)
+
+        try do
+          assert_receive {:waiter, waiter_backend}, 2_000
+
+          wait_for_selection_lock(
+            waiter_backend,
+            [holder_backend],
+            System.monotonic_time(:millisecond) + 2_000
+          )
+        after
+          send(holder.pid, :release)
+        end
+
+        assert {:ok, :released} = Elixir.Task.await(holder)
+        result = Elixir.Task.await(waiter)
+        assert {:ok, snapshot} = Tasks.snapshot(user, day)
+
+        case scenario do
+          :register_first ->
+            assert result == {:error, :invalid_order}
+            assert Enum.map(snapshot.backlog, & &1.position) == [1, 2, 3]
+
+          :register_last ->
+            assert {:ok, created} = result
+            assert Enum.map(snapshot.backlog, & &1.id) == [b.id, a.id, created.id]
+            assert created.position == 3
+
+          :reorder ->
+            assert {:ok, _} = result
+            assert Enum.map(snapshot.backlog, & &1.id) == [a.id, b.id]
+
+          :move ->
+            assert {:ok, _} = result
+            assert Enum.map(snapshot.backlog, &{&1.id, &1.position}) == [{b.id, 1}]
+            assert Enum.map(snapshot.today, &{&1.id, &1.position}) == [{a.id, 1}]
+            assert snapshot.used_choices == 1
+        end
+      end)
+    end
+  end
+
   defp selection_worker(fun) do
     supervisor = start_supervised!({Elixir.Task.Supervisor, name: nil}, id: make_ref())
 
@@ -747,7 +843,7 @@ defmodule Planner.TasksTest do
     assert retry.title == expired.title
     assert retry.kind == :retry
     assert retry.scheduled_for == yesterday
-    assert is_nil(retry.position)
+    assert retry.position == 1
     assert is_nil(retry.completed_on)
     assert Repo.preload(retry, :labels).labels == [label]
     assert Repo.get!(Task, completed.id) == completed
@@ -773,8 +869,8 @@ defmodule Planner.TasksTest do
     Repo.insert!(%DailyPlan{user_id: user.id, day: day, used_choices: 3})
 
     assert {:ok, snapshot} = Tasks.snapshot(user, day)
-    assert Enum.map(snapshot.backlog, & &1.id) == [older.id, first.id, second.id]
-    assert Enum.map(snapshot.retry, & &1.id) == [retry_first.id, retry_second.id]
+    assert Enum.map(snapshot.backlog, & &1.id) == [first.id, second.id, older.id]
+    assert Enum.map(snapshot.retry, & &1.id) == [retry_second.id, retry_first.id]
     assert Enum.map(snapshot.today, & &1.id) == [today_first.id, today_second.id]
     assert snapshot.used_choices == 3
     assert snapshot.available_choices == 0
@@ -794,7 +890,7 @@ defmodule Planner.TasksTest do
                  assert plan.day == day
                  normalized = Repo.get!(Task, stale.id)
                  assert normalized.kind == :retry
-                 assert is_nil(normalized.position)
+                 assert normalized.position == 1
                  {:error, :stale_task}
                end,
                day
@@ -867,11 +963,12 @@ defmodule Planner.TasksTest do
     assert task.kind == :backlog
     assert is_nil(task.scheduled_for)
     assert is_nil(task.completed_on)
-    assert is_nil(task.position)
+    assert task.position == 1
     assert Repo.preload(task, :labels).labels == []
     assert Tasks.get_task!(user, task.id) == task
     assert {:ok, duplicate} = Tasks.create_task(user, %{title: task.title})
     refute duplicate.id == task.id
+    assert duplicate.position == 2
   end
 
   test "create_task/2 persists a title longer than 255 characters", %{user: user} do
@@ -903,16 +1000,20 @@ defmodule Planner.TasksTest do
       kind: :today,
       scheduled_for: ~D[2026-09-25],
       completed_on: ~D[2026-09-25],
-      position: 1
+      position: 999
     }
 
-    for forged <- [attrs, Map.new(attrs, fn {key, value} -> {Atom.to_string(key), value} end)] do
+    for {forged, position} <-
+          Enum.with_index(
+            [attrs, Map.new(attrs, fn {key, value} -> {Atom.to_string(key), value} end)],
+            1
+          ) do
       assert {:ok, task} = Tasks.create_task(user, forged)
       assert task.user_id == user.id
       assert task.kind == :backlog
       assert is_nil(task.scheduled_for)
       assert is_nil(task.completed_on)
-      assert is_nil(task.position)
+      assert task.position == position
     end
 
     assert Tasks.list_tasks(other) == []

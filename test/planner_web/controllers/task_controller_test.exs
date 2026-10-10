@@ -4,7 +4,7 @@ defmodule PlannerWeb.TaskRoutesTest do
   test "planner routes resolve to the authorized LiveViews" do
     for {path, module, action} <- [
           {"/tasks", PlannerWeb.TaskLive.Index, :index},
-          {"/tasks/new", PlannerWeb.TaskLive.Form, :new}
+          {"/tasks/new", PlannerWeb.TaskLive.Index, :new}
         ] do
       assert %{phoenix_live_view: {^module, ^action, _, _}} =
                Phoenix.Router.route_info(PlannerWeb.Router, "GET", path, "localhost")
@@ -26,6 +26,6 @@ defmodule PlannerWeb.TaskRoutesTest do
 
   test "home page remains available", %{conn: conn} do
     conn = get(conn, "/")
-    assert html_response(conn, 200) =~ "Tranquilidade do protótipo à produção"
+    assert html_response(conn, 200) =~ "Espaço para o que importa."
   end
 end

@@ -25,6 +25,150 @@ defmodule PlannerWeb.TaskLiveTest do
     if tags[:without_default], do: %{}, else: %{user: user_fixture(%{identifier: "default"})}
   end
 
+  test "drag persists, refreshes counters and reports stale orders in Portuguese", %{
+    conn: conn,
+    user: user
+  } do
+    [a, b] = for _ <- 1..2, do: task_fixture(user)
+    {:ok, view, _} = live(conn, "/tasks")
+    assert has_element?(view, "#planning-board[phx-hook='TaskDrag']")
+    assert has_element?(view, "#tasks-#{a.id} [data-drag-handle]")
+
+    params = %{
+      "task_id" => a.id,
+      "from" => "backlog",
+      "to" => "today",
+      "orders" => %{"backlog" => [b.id], "today" => [a.id]},
+      "user_id" => -1,
+      "day" => "1900-01-01"
+    }
+
+    render_hook(view, "move_task", params)
+    assert has_element?(view, "#today-#{a.id}")
+    assert has_element?(view, "#used-choices", "1 de 3")
+    assert has_element?(view, "#planning-status", "Movimento salvo.")
+    assert has_element?(view, "#task-menu-#{a.id} #return-#{a.id}")
+    refute has_element?(view, "#task-menu-#{a.id} #complete-#{a.id}")
+    render_hook(view, "move_task", params)
+    assert has_element?(view, "#planning-error", "não está mais disponível")
+    {:ok, reloaded, _} = live(conn, "/tasks")
+    assert has_element?(reloaded, "#today-#{a.id}")
+    assert {:ok, %{used_choices: 1, today: [task]}} = Tasks.snapshot(user)
+    assert task.scheduled_for == Date.utc_today()
+  end
+
+  test "menu reorders backlog and retry and drag handles exclude history", %{
+    conn: conn,
+    user: user
+  } do
+    [a, b, c, d] = for _ <- 1..4, do: task_fixture(user)
+    yesterday = Date.add(Date.utc_today(), -1)
+    for task <- [c, d], do: assert({:ok, _} = Tasks.select_today(user, task.id, yesterday))
+    {:ok, view, _} = live(conn, "/tasks")
+    view |> form("#move-up-#{b.id}") |> render_submit()
+    view |> form("#move-up-#{d.id}") |> render_submit()
+    assert {:ok, snapshot} = Tasks.snapshot(user)
+    assert Enum.map(snapshot.backlog, & &1.id) == [b.id, a.id]
+    assert Enum.map(snapshot.retry, & &1.id) == [d.id, c.id]
+    assert has_element?(view, "#move-up-button-#{b.id}[disabled]")
+    assert has_element?(view, "#move-down-button-#{c.id}[disabled]")
+    refute has_element?(view, "#history [data-drag-handle]")
+
+    render_hook(view, "move_task", %{
+      "task_id" => a.id,
+      "from" => "backlog",
+      "to" => "backlog",
+      "orders" => %{"backlog" => [a.id]}
+    })
+
+    assert has_element?(view, "#planning-error", "As prioridades mudaram")
+  end
+
+  test "drag reorders the same list and persistence failure returns an error with unchanged data",
+       %{conn: conn, user: user} do
+    [a, b] = for _ <- 1..2, do: task_fixture(user)
+    {:ok, view, _} = live(conn, "/tasks")
+
+    render_hook(view, "move_task", %{
+      "task_id" => b.id,
+      "from" => "backlog",
+      "to" => "backlog",
+      "orders" => %{"backlog" => [b.id, a.id]}
+    })
+
+    assert {:ok, before} = Tasks.snapshot(user)
+    assert Enum.map(before.backlog, & &1.id) == [b.id, a.id]
+
+    SQL.query!(
+      Repo,
+      "ALTER TABLE daily_plans ADD CONSTRAINT reject_drag_consumption CHECK (used_choices = 0) NOT VALID"
+    )
+
+    render_hook(view, "move_task", %{
+      "task_id" => a.id,
+      "from" => "backlog",
+      "to" => "today",
+      "orders" => %{"today" => [a.id], "backlog" => [b.id]}
+    })
+
+    assert has_element?(view, "#planning-error", "Não foi possível salvar")
+    assert has_element?(view, "#tasks-#{a.id}")
+    refute has_element?(view, "#today-#{a.id}")
+    assert {:ok, ^before} = Tasks.snapshot(user)
+    {:ok, reloaded, _} = live(conn, "/tasks")
+    assert has_element?(reloaded, "#move-up-button-#{b.id}[disabled]")
+  end
+
+  test "registration opens over the panel, cancels by patch and history stays collapsed", %{
+    conn: conn
+  } do
+    {:ok, view, _} = live(conn, "/tasks")
+    assert has_element?(view, "#history-toggle[aria-expanded='false']")
+    assert has_element?(view, "#history-content[hidden]")
+    view |> element("#history-toggle") |> render_click()
+    assert has_element?(view, "#history-toggle[aria-expanded='true']")
+    refute has_element?(view, "#history-content[hidden]")
+    view |> element("#new-task") |> render_click()
+    assert_patch(view, "/tasks/new")
+    assert has_element?(view, "#task-dialog[aria-modal='true']")
+    assert has_element?(view, "#today-heading")
+    assert has_element?(view, "#task_title[required]")
+    refute has_element?(view, "#task-labels[open]")
+    view |> element("#cancel-task") |> render_click()
+    assert_patch(view, "/tasks")
+    refute has_element?(view, "#task-dialog")
+    assert has_element?(view, "#history-toggle[aria-expanded='true']")
+  end
+
+  test "direct registration retains edited fields across parent updates and closes cleanly", %{
+    conn: conn,
+    user: user
+  } do
+    existing = label_fixture(user)
+    {:ok, view, _} = live(conn, "/tasks/new")
+    assert has_element?(view, "#task-dialog")
+    assert has_element?(view, "#today")
+
+    view
+    |> form("#task-form",
+      task: %{title: "Draft", label_ids: [to_string(existing.id)], new_label_names: "Notes"}
+    )
+    |> render_change()
+
+    render_click(view, "toggle_history")
+    assert has_element?(view, "#task_title[value='Draft']")
+    assert has_element?(view, "#task-label-#{existing.id}[checked]")
+    assert has_element?(view, "#task_new_label_names", "Notes")
+    view |> element("#close-task") |> render_click()
+    assert_patch(view, "/tasks")
+    refute has_element?(view, "#task-dialog")
+    assert Tasks.list_tasks(user) == []
+    view |> element("#new-task") |> render_click()
+    assert_patch(view, "/tasks/new")
+    refute has_element?(view, "#task_title[value='Draft']")
+    refute has_element?(view, "#task-label-#{existing.id}[checked]")
+  end
+
   for {path, selector} <- [{"/tasks", "#new-task"}, {"/tasks/new", "#task-form"}] do
     @tag bootstrap: true, without_default: true
     test "first access to #{path} creates one persistent default across mounts", %{conn: conn} do
@@ -102,7 +246,7 @@ defmodule PlannerWeb.TaskLiveTest do
     refute has_element?(view, "#task_title[aria-invalid='true']")
     refute has_element?(view, "#task_title-errors")
 
-    render_submit(view, "save", %{
+    render_submit(with_target(view, "#task-dialog"), "save", %{
       "task" => %{
         "title" => "My book",
         "label_ids" => ["-1"],
@@ -116,6 +260,7 @@ defmodule PlannerWeb.TaskLiveTest do
            )
 
     assert has_element?(view, "#task_label_ids-errors[role='alert']", "é inválido")
+    assert has_element?(view, "#task-labels[open][data-errors='true']")
     assert has_element?(view, "#task_new_label_names", "Original")
 
     view
@@ -128,6 +273,7 @@ defmodule PlannerWeb.TaskLiveTest do
            )
 
     assert has_element?(view, "#task_new_label_names-errors[role='alert']", "é inválido")
+    assert has_element?(view, "#task-labels[open][data-errors='true']")
     assert has_element?(view, "#task_title[value='My book']")
   end
 
@@ -300,6 +446,7 @@ defmodule PlannerWeb.TaskLiveTest do
 
     view |> form("#select-#{task.id}") |> render_submit()
     assert has_element?(view, "#planning-error[role=alert]", "Não foi possível")
+    refute has_element?(view, "#planning-status span")
     assert has_element?(view, "#tasks-#{task.id}")
     refute has_element?(view, "#today-#{task.id}")
     assert has_element?(view, "#used-choices", "0")
@@ -405,6 +552,11 @@ defmodule PlannerWeb.TaskLiveTest do
     assert Tasks.get_task!(foreign_user, foreign.id).position == 1
   end
 
+  defp finish_patch(_result, view, path) do
+    assert_patch(view, path)
+    {:ok, view, render(view)}
+  end
+
   defp assert_today_order(view, tasks) do
     for {task, index} <- Enum.with_index(tasks, 1) do
       assert has_element?(
@@ -432,6 +584,9 @@ defmodule PlannerWeb.TaskLiveTest do
            )
 
     view |> form("#complete-#{task.id}") |> render_submit()
+    assert has_element?(view, "#planning-status[role='status']", "Tarefa concluída.")
+    assert has_element?(view, "#history-toggle[aria-expanded='false']")
+    assert has_element?(view, "#history-content[hidden]")
     render_submit(view, "complete", %{"task_id" => to_string(task.id), "date" => "2099-01-01"})
     refute has_element?(view, "#today-#{task.id}")
     assert has_element?(view, "#history-#{task.id} [data-task-title]", "Original title")
@@ -533,9 +688,9 @@ defmodule PlannerWeb.TaskLiveTest do
     second = label_fixture(user, %{name: "Writing"})
     foreign = label_fixture(user_fixture(), %{name: "Private label"})
     {:ok, view, _} = live(conn, "/tasks/new")
-    assert has_element?(view, "#task_label_ids[multiple] option[value='#{first.id}']", "Reading")
-    assert has_element?(view, "#task_label_ids option[value='#{second.id}']", "Writing")
-    refute has_element?(view, "#task_label_ids option[value='#{foreign.id}']")
+    assert has_element?(view, "#task_label_ids input[type=checkbox][value='#{first.id}']")
+    assert has_element?(view, "#task_label_ids input[type=checkbox][value='#{second.id}']")
+    refute has_element?(view, "#task_label_ids input[type=checkbox][value='#{foreign.id}']")
 
     assert {:ok, _, _} =
              view
@@ -547,7 +702,7 @@ defmodule PlannerWeb.TaskLiveTest do
                }
              )
              |> render_submit()
-             |> follow_redirect(conn, "/tasks")
+             |> finish_patch(view, "/tasks")
 
     assert [task] = Tasks.list_tasks(user)
 
@@ -557,7 +712,8 @@ defmodule PlannerWeb.TaskLiveTest do
     {:ok, next, _} = live(conn, "/tasks/new")
 
     for label <- Labels.list_labels(user),
-        do: assert(has_element?(next, "#task_label_ids option[value='#{label.id}']", label.name))
+        do:
+          assert(has_element?(next, "#task_label_ids input[type=checkbox][value='#{label.id}']"))
   end
 
   for failure <- [:constraint, :postgres, :connection] do
@@ -592,7 +748,11 @@ defmodule PlannerWeb.TaskLiveTest do
 
       refute has_element?(view, "#flash-info")
       assert has_element?(view, "#task_title[value='Keep title']")
-      assert has_element?(view, "#task_label_ids option[value='#{existing.id}'][selected]")
+
+      assert has_element?(
+               view,
+               "#task_label_ids input[type=checkbox][value='#{existing.id}'][checked]"
+             )
 
       assert view
              |> element("#task_new_label_names")
@@ -609,7 +769,7 @@ defmodule PlannerWeb.TaskLiveTest do
                view
                |> form("#task-form")
                |> render_submit()
-               |> follow_redirect(conn, "/tasks")
+               |> finish_patch(view, "/tasks")
 
       assert has_element?(index, "#flash-info", "Tarefa cadastrada")
       refute has_element?(index, "#flash-error")
@@ -671,7 +831,12 @@ defmodule PlannerWeb.TaskLiveTest do
     |> render_submit()
 
     assert has_element?(view, "#task-form", "não pode ficar em branco")
-    assert has_element?(view, "#task_label_ids option[value='#{existing.id}'][selected]")
+
+    assert has_element?(
+             view,
+             "#task_label_ids input[type=checkbox][value='#{existing.id}'][checked]"
+           )
+
     assert has_element?(view, "#task_new_label_names", "New")
     assert Tasks.list_tasks(user) == []
     assert Labels.list_labels(user) == [existing]
@@ -692,6 +857,25 @@ defmodule PlannerWeb.TaskLiveTest do
     assert Labels.list_labels(user) == [existing]
   end
 
+  test "malformed checkbox values are rejected without losing the draft", %{
+    conn: conn,
+    user: user
+  } do
+    {:ok, view, _} = live(conn, "/tasks/new")
+
+    for ids <- ["invalid", %{"id" => "1"}, [%{"id" => "1"}]] do
+      render_submit(with_target(view, "#task-dialog"), "save", %{
+        "task" => %{"title" => "Keep draft", "label_ids" => ids, "new_label_names" => "Notes"}
+      })
+
+      assert has_element?(view, "#task_label_ids-errors[role='alert']", "é inválido")
+      assert has_element?(view, "#task_title[value='Keep draft']")
+      assert has_element?(view, "#task_new_label_names", "Notes")
+      assert Tasks.list_tasks(user) == []
+      assert Labels.list_labels(user) == []
+    end
+  end
+
   test "forged label IDs reject the whole registration without exposing other labels", %{
     conn: conn,
     user: user
@@ -701,7 +885,7 @@ defmodule PlannerWeb.TaskLiveTest do
     {:ok, view, _} = live(conn, "/tasks/new")
 
     for id <- [foreign.id, -1] do
-      render_submit(view, "save", %{
+      render_submit(with_target(view, "#task-dialog"), "save", %{
         "task" => %{
           "title" => "Must roll back",
           "label_ids" => [to_string(id)],
@@ -710,7 +894,7 @@ defmodule PlannerWeb.TaskLiveTest do
       })
 
       assert has_element?(view, "#task-existing-labels", "é inválido")
-      refute has_element?(view, "option", "Private label")
+      refute has_element?(view, "#task-existing-labels", "Private label")
       assert Tasks.list_tasks(user) == []
       assert Labels.list_labels(user) == [existing]
     end
@@ -724,7 +908,7 @@ defmodule PlannerWeb.TaskLiveTest do
              index
              |> element("#new-task")
              |> render_click()
-             |> follow_redirect(conn, "/tasks/new")
+             |> finish_patch(index, "/tasks/new")
 
     assert has_element?(form_view, "#task-form label", "Título")
     assert has_element?(form_view, "#save-task[phx-disable-with='Salvando...']")
@@ -733,7 +917,7 @@ defmodule PlannerWeb.TaskLiveTest do
              form_view
              |> form("#task-form", task: %{title: "Write my book"})
              |> render_submit()
-             |> follow_redirect(conn, "/tasks")
+             |> finish_patch(form_view, "/tasks")
 
     assert has_element?(index, "#flash-info", "Tarefa cadastrada")
     assert [task] = Tasks.list_tasks(user)
@@ -762,7 +946,7 @@ defmodule PlannerWeb.TaskLiveTest do
     assert Tasks.list_tasks(user) == []
 
     assert {:ok, _, _} =
-             view |> element("#cancel-task") |> render_click() |> follow_redirect(conn, "/tasks")
+             view |> element("#cancel-task") |> render_click() |> finish_patch(view, "/tasks")
   end
 
   test "browser params cannot switch owner or set task state", %{conn: conn, user: user} do
@@ -772,6 +956,7 @@ defmodule PlannerWeb.TaskLiveTest do
 
     assert {:ok, index, _} =
              view
+             |> with_target("#task-dialog")
              |> render_submit("save", %{
                "task" => %{
                  "title" => "Owned task",
@@ -779,17 +964,17 @@ defmodule PlannerWeb.TaskLiveTest do
                  "kind" => "today",
                  "completed_on" => "2026-01-01",
                  "scheduled_for" => "2026-01-01",
-                 "position" => 1
+                 "position" => 999
                }
              })
-             |> follow_redirect(conn, "/tasks")
+             |> finish_patch(view, "/tasks")
 
     assert [task] = Tasks.list_tasks(user)
     assert task.user_id == user.id
     assert task.kind == :backlog
     assert is_nil(task.completed_on)
     assert is_nil(task.scheduled_for)
-    assert is_nil(task.position)
+    assert task.position == 1
     assert Tasks.list_tasks(other) == [foreign]
     refute has_element?(index, "#tasks-#{foreign.id}")
     {:ok, index, _} = live(conn, "/tasks?user_id=#{other.id}")

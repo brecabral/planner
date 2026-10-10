@@ -6,7 +6,7 @@ A aplicação usa Phoenix, Elixir e PostgreSQL. O servidor roda na máquina; o b
 
 ## Como rodar
 
-Requer Elixir compatível com `mix.exs` (`~> 1.17`), Erlang/OTP compatível e Docker ativo com Compose que suporte `up --wait`.
+Requer Elixir compatível com `mix.exs` (`~> 1.17`), Erlang/OTP compatível, Node.js/npm para as dependências de frontend e Docker ativo com Compose que suporte `up --wait`.
 
 ```sh
 cp .env.example .env
@@ -31,10 +31,13 @@ Abra [localhost:4000](http://localhost:4000). Para usar o console interativo, ex
 | `mix ecto.setup` | Inicia o banco, cria a base, aplica migrations e seeds. |
 | `mix test` | Inicia o banco e executa os testes. |
 | `mix ci` | Verifica compilação, formatação, Credo estrito e testes com cobertura mínima de 70%. |
+| `mix assets.build` | Instala o frontend pelo lockfile (`npm ci`) e compila CSS/JS. |
 | `mix precommit` | Compila com warnings como erros, verifica dependências, formata e testa. |
 | `mix run priv/repo/seeds.exs` | Prepara o usuário padrão; repetir preserva sua identidade e dados. |
 | `mix ecto.reset` | Apaga e recria a base do ambiente atual. |
 | `docker compose stop postgres` | Para o banco sem apagar o volume. |
+
+Após atualizar o código de uma instalação existente, aplique as migrations com `mix ecto.migrate` antes de iniciar o servidor. A migration de ordenação preserva os dados e inicializa as posições de backlog/retry.
 
 ## Configuração e banco
 
@@ -54,12 +57,12 @@ A opção `:auto_create_default_user` da aplicação `:planner` fica desabilitad
 
 ## Sobre o projeto
 
-O fluxo implementado permite selecionar tarefas do backlog para hoje, ordenar prioridades e registrar conclusões. O escopo mínimo está no [PRD](docs/prd.md): usuário padrão sem login, interface pt-BR com Gettext, data corrente sem configuração de fuso e recarga manual. A correção de falhas no cadastro foi concluída na [TASK-038](docs/tasks/038-tratar-falha-cadastro.md). A validação humana da interface permanece pendente, fora do gate do MVP.
+O fluxo implementado permite selecionar tarefas do backlog para hoje, ordenar prioridades e registrar conclusões. O escopo mínimo está no [PRD](docs/prd.md): usuário padrão sem login, interface pt-BR com Gettext, data corrente sem configuração de fuso e recarga manual. A correção de falhas no cadastro foi concluída na [TASK-038](docs/tasks/038-tratar-falha-cadastro.md).
 
 Consulte as [decisões de arquitetura](docs/design.md), o [vocabulário do domínio](docs/ddd.md) e as [tarefas planejadas](docs/tasks/README.md) para acompanhar a evolução.
 
 ## CI
 
-O workflow `CI` executa o check **quality** em PRs para `main` e pushes na `main`, usando Elixir 1.20.3, OTP 29 e o Compose existente. Para reproduzir localmente, execute `mix ci` com Docker ativo e `.env` configurado. O comando verifica formatação sem corrigir arquivos; a cobertura deve atingir pelo menos 70%, conforme o limiar já configurado em `mix.exs`.
+O workflow `CI` executa o check **quality** em PRs para `main` e pushes na `main`, usando Elixir 1.20.3, OTP 29 e o Compose existente. Para reproduzir localmente, execute `mix ci` com Docker ativo e `.env` configurado. O comando também instala e compila os assets e verifica vulnerabilidades npm de severidade alta ou crítica. A versão resolvida do SortableJS está em `assets/package-lock.json`. O comando verifica formatação sem corrigir arquivos; a cobertura deve atingir pelo menos 70%, conforme o limiar já configurado em `mix.exs`.
 
 O responsável confirmou a configuração da proteção da `main` e do check obrigatório **quality**.

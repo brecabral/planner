@@ -13,6 +13,9 @@ blockers: []
 
 # 032 — Validar estrutura e mensagens do painel
 
+Nota de escopo — 09/10/2026: menções a avaliação humana pendente nas evidências datadas abaixo são históricas. A [decisão vigente](../prd.md#feedback-de-interface) retirou essa obrigação, sem alterar resultados ou presumir avaliação realizada.
+
+
 ## Entrada e limite
 
 [SPEC-004](../specs/004-experiencia-e-acesso.md) CA-004-01 a CA-004-06 e [SPEC-001](../specs/001-idiomas.md) CA-I01 a CA-I03; consumir history-ui. Referências interface, HEEx e Gettext.
@@ -23,7 +26,7 @@ Não executar gerador: adaptar o recurso produzido pelas dependências, sem recr
 
 ## Ajustes desta entrega
 
-Corrigir nomes acessíveis e mensagens/plurais ausentes do painel, verificando estrutura e eventos com os testes LiveView existentes. Preservar componentes gerados e dados digitados. Não mudar regras de domínio nem adicionar preferências de idioma. Validação real de teclado, foco, layout e anúncios por tecnologias assistivas fica fora desta tarefa e dos seus gates, reservada à validação humana do PRD. Não instalar ferramentas de navegador nem acrescentar infraestrutura de testes.
+Corrigir nomes acessíveis e mensagens/plurais ausentes do painel, verificando estrutura e eventos com os testes LiveView existentes. Preservar componentes gerados e dados digitados. Não mudar regras de domínio nem adicionar preferências de idioma. Foco, teclado, contraste, layout e avaliação estética não são requisitos; não há avaliação humana obrigatória da interface, conforme o [PRD](../prd.md#feedback-de-interface). Não instalar ferramentas de navegador nem acrescentar infraestrutura de testes.
 
 ## Aceite e teste de intenção
 
