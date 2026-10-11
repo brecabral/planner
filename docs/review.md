@@ -1,14 +1,28 @@
 ---
 review_base_commit: "2b8ba19ce2657126423256d3fd2596875c7ca661"
-reviewed_commit: "43ea80314c0a47a2a8357c17064cc01ac9ed5a40"
+reviewed_commit: "452083a6a4a117a39622c96bd1aec4bf9cd60f50"
 last_approved_commit: "2b8ba19ce2657126423256d3fd2596875c7ca661"
-reviewed_at: "2026-10-10"
-reviewer: "/root — revisão independente da árvore local TASK-039/TASK-040"
-status: changes_requested
+reviewed_at: "2026-10-11"
+reviewer: "/root — revisão independente de prontidão e da correção local R2"
+status: approved
 reviewed_tasks: ["TASK-039", "TASK-040"]
 ---
 
 # Revisão incremental das tarefas concluídas
+
+## Prontidão do MVP e revalidação de R2 — 11/10/2026
+
+Resultado: **approved no escopo local revisado**. O MVP local definido pelo PRD está pronto. TASK-039 está integrada; a correção de R2 na TASK-040 foi revalidada independentemente nesta sessão, sem novos achados bloqueantes identificados. A TASK-040 continua `in_review`: sua correção ainda está sem commit e requer integração e conferência operacional para encerramento. Aprovação técnica não equivale a conclusão operacional ou publicação.
+
+Base: `2b8ba19ce2657126423256d3fd2596875c7ca661`, confirmada como ancestral de HEAD `452083a6a4a117a39622c96bd1aec4bf9cd60f50`. Alvo efetivamente validado: árvore local sobre HEAD, incluindo alterações preexistentes em `assets/js/task_drag.js`, `assets/test/`, README, referência de LiveView/JavaScript e TASK-040. O SHA do cabeçalho identifica o commit de suporte, não certifica seu hook antigo. **Preservado `last_approved_commit`**, pois o código executável validado diverge de HEAD; esta aprovação depende da correção local.
+
+Conferidos PRD, mapa de entregas, contratos de interface/arraste, evidências humanas históricas, revisão anterior e código de domínio, transação, migration, painel, cadastro e hooks. Cadastro com labels, cota, devolução, conclusão, ordenação, virada, persistência e tratamento de falhas continuam cobertos pela suíte aprovada. O aceite de reinício entre processos da TASK-008 foi consultado como evidência histórica, sem repetição. Não foi refeita uma auditoria integral dos workflows/skills históricos; suas aprovações mantêm o escopo original.
+
+**R2 resolvido na árvore local:** captura de atributos anterior ao início, retenção e remoção explícita de ghost/clone, cancelamento de timers e restauração dos mesmos nós conferidos contra SortableJS instalado. Cinco testes técnicos executam a dependência real e verificam patch, desconexão, idempotência, pressão touch atrasada e resposta antiga após reconexão. O novo drop envia um único evento com DOM restaurado; cancelamento não envia movimento. A dependência explícita de TASK-039 também resolve a observação documental anterior.
+
+Validação reproduzida, após leitura da ajuda e política: `rtk mix ci`, saída 0, **157 testes aprovados**, seed 622287, cobertura Elixir **93,44%** (mínimo 70%); Credo, compilação, formato, build e npm audit aprovados. `rtk mix cmd node --test assets/test/task_drag.test.mjs`: **5 testes aprovados**. `rtk git diff --check`: aprovado. `precommit` não repetido por formatar e poder alterar dependências; sua execução aprovada na correção permanece evidência relatada. Não foi medida novamente a base; nenhuma alegação de aumento de cobertura.
+
+Limites: harness JavaScript usa DOM/timers controlados, sem gestos reais, layout ou patches em navegador; cobertura percentual não mede JavaScript. Conforme decisão vigente, avaliação humana da interface não é gate nem pendência obrigatória. Login, fuso configurável, sincronização e publicação são evolução futura e não impedem o MVP. CI remoto não consultado; nenhum reset humano, alteração de código de produto, commit ou deploy nesta revisão. Registros anteriores abaixo preservam o estado de cada rodada.
 
 
 ## Revisão das entregas locais — 10/10/2026

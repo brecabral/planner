@@ -16,6 +16,25 @@ export const TaskDrag = {
     this.offline = false
     this.generation = 0
     this.sortables = []
+    // Capture before Sortable sets will-change (which happens before onChoose).
+    this.onPress = event => {
+      if (this.pending || this.offline || this.gestureState ||
+          (event.button != null && event.button !== 0)) return
+      const item = event.target.closest("[data-drag-handle]")?.closest("[data-task-id]")
+      if (!item || !this.lists.includes(item.parentElement)) return
+      this.source = item.parentElement
+      this.gestureState = this.lists.flatMap(list => [...list.children]).map(node => ({
+        node,
+        attributes: ["class", "style", "draggable"].map(name => [name, node.getAttribute(name)]),
+        descendants: [...node.querySelectorAll("[draggable], a, img")].map(child => [child, child.getAttribute("draggable")]),
+      }))
+      this.bodyUserSelect = document.body.style.userSelect
+    }
+    this.onRelease = () => queueMicrotask(() => { if (!this.snapshot) this.restore() })
+    this.pressEvents = ["pointerdown", "mousedown", "touchstart"]
+    this.releaseEvents = ["pointerup", "pointercancel", "mouseup", "touchend", "touchcancel"]
+    this.pressEvents.forEach(name => this.el.addEventListener(name, this.onPress, true))
+    this.releaseEvents.forEach(name => document.addEventListener(name, this.onRelease, true))
     this.onPatchStart = () => this.cancelGesture()
     this.onPatchEnd = () => { this.install(); this.syncDisabled() }
     this.onSubmit = event => {
@@ -92,6 +111,27 @@ export const TaskDrag = {
     // Move the same nodes back, including empty-state nodes; never clone a stream.
     this.snapshot?.forEach(([list, nodes]) => nodes.forEach(node => list.appendChild(node)))
     this.snapshot = null
+    this.gestureState?.forEach(({node, attributes, descendants}) => {
+      // Sortable's animation timers survive destroy(); stop them before restoring styles.
+      clearTimeout(node.animated)
+      clearTimeout(node.animationResetTimer)
+      node.animated = node.animatingX = node.animatingY = false
+      node.animationResetTimer = null
+      node.prevFromRect = node.fromRect = node.prevToRect = node.toRect = null
+      node.thisAnimationDuration = null
+      attributes.forEach(([name, value]) => {
+        if (value === null) node.removeAttribute(name)
+        else node.setAttribute(name, value)
+      })
+      descendants.forEach(([child, value]) => {
+        if (value === null) child.removeAttribute("draggable")
+        else child.setAttribute("draggable", value)
+      })
+    })
+    if (this.gestureState) document.body.style.userSelect = this.bodyUserSelect
+    this.gestureState = null
+    this.bodyUserSelect = null
+    this.source = null
     delete this.el.dataset.dragging
     this.lists.forEach(list => delete list.dataset.dropAllowed)
   },
@@ -122,14 +162,24 @@ export const TaskDrag = {
     this.sortables.forEach(sortable => sortable.option("disabled", disabled))
   },
   cancelGesture() {
-    // Destroy the source first to cancel delayed starts, fallback ghosts and scrolling.
-    // Sortable.destroy() cancels without firing onEnd or submitting a command.
+    // destroy() calls _onDrop without an event: it clears static references but
+    // skips ghost/clone removal. Keep only artifacts belonging to our gesture.
+    const ownsDrag = this.gestureState?.some(({node}) => node === Sortable.dragged)
+    const artifacts = ownsDrag ? [Sortable.ghost, Sortable.clone] : []
+    // Destroy the source first to stop delayed starts, listeners and scrolling,
+    // without firing onEnd or submitting a command.
     if (this.sortables.length) {
+      this.sortables.forEach(sortable => {
+        // Flush the library's private animation callback timer through its API.
+        sortable.option("animation", 0)
+        sortable.animateAll()
+      })
       const source = this.sortables.find(sortable => sortable.el === this.source)
       source?.destroy()
       this.sortables.filter(sortable => sortable !== source).forEach(sortable => sortable.destroy())
       this.sortables = []
     }
+    artifacts.forEach(node => node?.remove())
     this.restore()
   },
   disconnected() {
@@ -153,5 +203,7 @@ export const TaskDrag = {
     this.el.removeEventListener("submit", this.onSubmit, true)
     window.removeEventListener("phx:page-loading-start", this.onLoadingStart)
     window.removeEventListener("phx:page-loading-stop", this.onLoadingStop)
+    this.pressEvents.forEach(name => this.el.removeEventListener(name, this.onPress, true))
+    this.releaseEvents.forEach(name => document.removeEventListener(name, this.onRelease, true))
   },
 }

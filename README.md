@@ -33,6 +33,7 @@ Abra [localhost:4000](http://localhost:4000). Para usar o console interativo, ex
 | `mix ci` | Verifica compilação, formatação, Credo estrito e testes com cobertura mínima de 70%. |
 | `mix assets.build` | Instala o frontend pelo lockfile (`npm ci`) e compila CSS/JS. |
 | `mix precommit` | Compila com warnings como erros, verifica dependências, formata e testa. |
+| `mix cmd node --test assets/test/task_drag.test.mjs` | Testa o ciclo técnico do hook de arraste com SortableJS instalado, sem navegador. Executar após instalar os assets. |
 | `mix run priv/repo/seeds.exs` | Prepara o usuário padrão; repetir preserva sua identidade e dados. |
 | `mix ecto.reset` | Apaga e recria a base do ambiente atual. |
 | `docker compose stop postgres` | Para o banco sem apagar o volume. |
@@ -66,3 +67,5 @@ Consulte as [decisões de arquitetura](docs/design.md), o [vocabulário do domí
 O workflow `CI` executa o check **quality** em PRs para `main` e pushes na `main`, usando Elixir 1.20.3, OTP 29 e o Compose existente. Para reproduzir localmente, execute `mix ci` com Docker ativo e `.env` configurado. O comando também instala e compila os assets e verifica vulnerabilidades npm de severidade alta ou crítica. A versão resolvida do SortableJS está em `assets/package-lock.json`. O comando verifica formatação sem corrigir arquivos; a cobertura deve atingir pelo menos 70%, conforme o limiar já configurado em `mix.exs`.
 
 O responsável confirmou a configuração da proteção da `main` e do check obrigatório **quality**.
+
+Para alterações no hook de arraste, execute também o teste JavaScript listado acima; ele é separado dos aliases `precommit` e `ci`. O harness usa o SortableJS do lockfile com DOM e timers mínimos controlados. Cobre cancelamento, restauração e retomada, mas não simula layout, propagação completa de eventos, mouse/touch reais ou patches do LiveView no navegador.
