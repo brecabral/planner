@@ -1,72 +1,54 @@
 ---
 id: "TASK-002"
-status: planned
-execution_level: advanced
-execution_rationale: "Remoção transversal com migration aplicada e possível descarte de dados; exige definir e verificar estratégia de persistência."
+status: "done"
+execution_level: "standard"
+execution_rationale: "Remoção delimitada de código gerado e migration; estratégia decidida, sem migração de dados."
 specs: []
-depends_on: ["TASK-003"]
+depends_on: ["TASK-003", "TASK-036"]
 provides: ["experimental-crud-removed"]
-consumes: ["github-quality-gate"]
-write_scope:
-  - "lib/planner/tasks*"
-  - "lib/planner_web/controllers/task*"
-  - "lib/planner_web/router.ex"
-  - "test/planner/tasks_test.exs"
-  - "test/planner_web/controllers/task_controller_test.exs"
-  - "test/support/fixtures/tasks_fixtures.ex"
-  - "priv/repo/"
-  - "README.md"
-  - "docs/prd.md"
-  - "docs/ddd.md"
-  - "docs/design.md"
-blockers:
-  - "Definir estratégia para migration aplicada e dados existentes antes de qualquer descarte."
+consumes: ["github-quality-gate", "baseline-test-coverage"]
+write_scope: ["lib/planner/tasks.ex", "lib/planner/tasks/", "lib/planner_web/controllers/task*", "lib/planner_web/router.ex", "test/planner/tasks_test.exs", "test/planner_web/controllers/task_controller_test.exs", "test/support/fixtures/tasks_fixtures.ex", "priv/repo/migrations/20260904140316_create_tasks.exs", "priv/repo/seeds.exs", "README.md"]
+blockers: []
 ---
 
-# 002 — Remover o CRUD experimental de tarefas
+# 002 — Remover a geração experimental de Task
 
-## Objetivo e referências
+## Objetivo e decisão
 
-Retirar o CRUD criado como teste de `phx.gen`, pois seu modelo não representa os requisitos do Planner. Não implementar um substituto nesta tarefa: primeiro definir as especificações do domínio.
+Remover integralmente a geração experimental de Task, inclusive a migration original do Ecto, conforme autorização do responsável em 23/09/2026. Não migrar dados experimentais nem criar migration compensatória. O responsável confirmou a base limpa na [TASK-012](012-reset-banco.md); não há novo reset pendente.
 
-Consultar [design D03/D06](../design.md#d03--remover-o-experimento-antes-de-modelar), [DDD](../ddd.md#convenções) e PRD §8/§13. Esta é uma limpeza preparatória para RF01–RF07; não entrega esses requisitos. Aplicam-se também as verificações locais de CA11.
+## Escopo e contrato
 
-## Inventário inicial a conferir antes de editar
+Remover contexto/schema, controller/templates, rota `/tasks`, testes e fixtures exclusivos do gerador, migration `20260904140316_create_tasks.exs` e referências em seeds/imports/links. Conferir referências antes de apagar; preservar Phoenix, Repo, Gettext, Compose e página inicial. Não executar reset, remover volume nem implementar substituto.
 
-- `lib/planner/tasks.ex` e `lib/planner/tasks/task.ex`: contexto e schema experimentais.
-- `lib/planner_web/controllers/task_controller.ex`, `task_html.ex` e `task_html/`: controller e templates do CRUD.
-- `resources "/tasks", TaskController` no router e eventuais links para essas rotas.
-- `test/planner/tasks_test.exs`, `test/planner_web/controllers/task_controller_test.exs` e `test/support/fixtures/tasks_fixtures.ex`: testes e fixtures exclusivos do experimento.
-- `priv/repo/migrations/20260904140316_create_tasks.exs`, seeds e referências a `Planner.Tasks`, `Planner.Tasks.Task`, `TaskController` e `TasksFixtures`.
+`experimental-crud-removed`: código e migration experimentais ausentes, base apta a inicialização nova. Atualizar no README apenas descrições/instruções afetadas. Referências técnicas: Phoenix, Ecto e testes.
 
-O inventário descreve a inspeção atual; pesquisar referências novamente para não apagar trabalho novo nem deixar dependências quebradas.
+## Aceite
 
-## Escopo e estratégia
+1. Teste de intenção comprova ausência das rotas experimentais e presença da página inicial.
+2. Não restam dependências dos módulos/fixtures removidos; a migration original não existe.
+3. Preparação de banco isolado vazio e precommit passam; não exigir upgrade do banco experimental antigo.
+4. Nenhum reset do banco do responsável foi executado e nenhum modelo substituto foi criado.
 
-1. Escrever primeiro um teste de intenção confirmando que a rota experimental deixou de ser exposta, usando a estrutura de rotas ou resposta HTTP sem depender de HTML bruto. Preservar a verificação de que a página inicial continua acessível.
-2. Remover contexto/schema, controller, templates, rotas e os testes/fixtures específicos do gerador. Não remover testes de infraestrutura ou testes de uma futura especificação apenas por compartilharem o nome “task”.
-3. Revisar seeds, links e imports; preservar Phoenix, `Planner.Repo`, configuração, Compose, Gettext e a página inicial.
-4. Verificar se a migration já foi aplicada em ambientes compartilhados e se há dados a preservar. Não apagar silenciosamente tabela ou volume. Se já aplicada, preservar o histórico e definir uma migration de remoção com `mix ecto.gen.migration remove_experimental_tasks`; qualquer descarte depende de confirmar que os dados são descartáveis ou estão preservados. Se comprovadamente nunca aplicada e sem dados, documentar a possibilidade de retirar apenas a migration experimental. Não executar `ecto.reset` para contornar essa decisão.
-5. Atualizar PRD/DDD/design para distinguir o que foi removido do que continua proposto; retirar links para arquivos excluídos e ajustar o estado atual no README.
-6. Não criar novos campos, schemas, contextos ou CRUD. A modelagem definitiva é um trabalho posterior, condicionado às especificações.
+## Impedimento de aceite resolvido
 
-## Critérios de aceite
+O [BLOCK-001](../blocks/001-cobertura-apos-remocao-crud.md) impediu a aprovação do gate. A [TASK-036](036-cobertura-base.md) corrigiu a cobertura e foi integrada antes do aceite desta entrega, conforme a revisão independente abaixo. A dependência registra essa condição de aceite, sem exigir refazer a remoção.
 
-1. `/tasks` e suas operações CRUD não constam das rotas disponíveis; não há links internos apontando para elas.
-2. Não restam módulos, imports, fixtures ou testes dependentes do CRUD removido; menções históricas pertinentes na documentação podem permanecer.
-3. A página inicial, configuração de banco, Gettext e comandos documentados continuam funcionando.
-4. A estratégia para a tabela/migration está registrada e é consistente tanto para uma base nova quanto para uma base existente; nenhuma perda de dados ocorre sem a decisão necessária.
-5. Nenhum modelo substituto foi implementado; documentos deixam explícita a sequência especificação → testes de intenção → implementação.
-6. `mix precommit` passa. Verificar rotas e preparação de uma base isolada por tarefas/aliases Mix apropriados, consultando `mix help` antes do uso.
+## Evidência e autoavaliação original — 23/09/2026
 
-## Evidência
+- Estado na autoavaliação original: bloqueado pelo gate de cobertura; revisão independente pendente. Autoavaliação do implementador `/root/implement_task_002` (gpt-6-sol, nível `standard`) concluída em 23/09/2026; não constitui aprovação independente.
+- Alvo/base: commit `refactor: remove experimental task CRUD` sobre `1ae3ac8` (`feat/mvp`), que contém este registro. Entrega registrada na branch de trabalho; integração aprovada e liberação das consumidoras pendentes da revisão independente.
+- Critério 1: teste de intenção escrito antes da remoção em `test/planner_web/controllers/task_controller_test.exs`. Execução inicial de `POSTGRES_TEST_DB=planner_task002_20260923 mix test test/planner_web/controllers/task_controller_test.exs`: 1/2 passou; falha esperada porque `GET /tasks` ainda resolvia para `PlannerWeb.TaskController`. Após a remoção, o mesmo comando passou 2/2: os oito métodos/caminhos do CRUD não resolvem e a página inicial responde HTTP 200.
+- Critério 2: inspeção de `rg -n 'Planner\.Tasks|PlannerWeb\.TaskController|TasksFixtures|TaskHTML|/tasks|create_tasks' lib test priv config README.md --glob '!*.po' --glob '!*.pot'` encontrou `/tasks` somente no teste de intenção (e um link documental para tarefas); `rg --files priv/repo/migrations lib/planner lib/planner_web/controllers test | rg '(tasks|task_|create_tasks)'` encontrou somente o teste de intenção. Contexto, schema, controller, templates, fixture, testes gerados e migration original foram removidos. `priv/repo/seeds.exs` não referenciava o CRUD.
+- Critério 3: `MIX_ENV=test POSTGRES_TEST_DB=planner_task002_fresh_20260923 mix ecto.setup` criou uma base nova e informou `Migrations already up`; `POSTGRES_TEST_DB=planner_task002_fresh_20260923 mix precommit` passou (7 testes, nenhuma falha). Não foi testado upgrade da base experimental antiga, fora do contrato.
+- Critério 4: não foram executados `mix ecto.reset`, `ecto.drop`, remoção de volume ou a TASK-012 humana; a única base criada foi `planner_task002_fresh_20260923` para validação, além da base isolada do teste inicial. O diff não adiciona modelo substituto.
+- Cobertura e gate adicional: `POSTGRES_TEST_DB=planner_task002_fresh_20260923 mix ci` passou compilação, formatação, Credo estrito (69 checks, nenhum problema) e 7 testes, mas retornou erro pelo limiar de cobertura: total 35,18% contra 70% em `mix.exs`. O mínimo obrigatório confirmado é 70%; a lacuna está nos testes, não na configuração do gate. `mix.exs` pertence à TASK-003 humana e está fora do escopo desta tarefa. Cobertura de linhas não demonstra os caminhos removidos; o teste de intenção e a inspeção do diff são a evidência principal.
+- Autoavaliação pelo [fluxo de review](../fluxos/review.md): critérios 1 a 4 atendidos, `git diff --check` sem problemas, nenhuma dependência residual ou alteração fora do escopo detectada. Achado para o revisor: lacuna de cobertura registrada no BLOCK-001; aprovação independente e integração permanecem pendentes. Não considerar `mix ci` aprovado.
 
-Preencher na execução: referências encontradas, decisão sobre dados/migrations, teste de intenção que falhou antes da mudança e resultado final dos aliases. Esta tarefa ainda não foi executada.
+### Revisão independente e integração — 23/09/2026
 
-## Contrato da entrega
+Revisor: coordenador `/root`, independente da implementação original. Resultado: `approved`. Alvo: remoção `f757265` contra `1ae3ac8`, conferida na base integrada `952d05a`, que incorpora os testes da TASK-036 (`8c6d655`). Nenhum achado bloqueante no diff; alterações de planejamento preexistentes foram preservadas fora deste commit de aceite.
 
-`experimental-crud-removed`: rotas, módulos e referências do experimento removidos, estratégia de persistência executada conforme decisão e verificações verdes. É manutenção preparatória, sem spec de novo comportamento do produto. A tarefa 001 consome essa base; não incluir tradução, seletor ou novo modelo de tarefas aqui.
+Critérios 1 e 2: teste de intenção cobre os oito métodos/caminhos removidos e GET `/`; inspeção confirmou ausência do contexto, schema, controller/templates, fixtures e migration experimental, sem referências residuais em produção ou seeds. Critério 3 reproduzido: `MIX_ENV=test POSTGRES_TEST_DB=planner_task002_accept_20260923 mix ecto.setup` criou base nova e executou seeds, saída 0; `POSTGRES_TEST_DB=planner_task002_accept_20260923 mix precommit` passou com 21 testes. Gate da mesma árvore executável: `POSTGRES_TEST_DB=planner_coord_20260923 mix ci`, saída 0 e 75,38% de cobertura. Critério 4: nenhum modelo substituto no diff; esta revisão não executou reset. A ausência de reset na implementação original é evidência relatada pelo implementador, não deduzida do diff.
 
-## Revisão independente
-
-Pendente. Na execução, registrar revisor de ponta, alvo/base, critérios verificados, evidências de testes/cobertura/evals aplicáveis, achados e decisão do gate conforme o [fluxo de review](../fluxos/review.md). A autoavaliação do implementador não substitui esta etapa. Integração ainda pendente.
+TASK-036 concluída e integrada; BLOCK-001 resolvido. Remoção original `f757265` confirmada na ancestralidade da base e aprovada sem reescrever seu commit. TASK-002 concluída; liberação da TASK-001 após o commit deste aceite.

@@ -1,24 +1,13 @@
 defmodule Planner.TasksFixtures do
   @moduledoc """
-  This module defines test helpers for creating
-  entities via the `Planner.Tasks` context.
+  Creates backlog tasks for an explicit test user.
   """
 
   @doc """
-  Generate a task.
+  Generates a task owned by the supplied user.
   """
-  def task_fixture(attrs \\ %{}) do
-    {:ok, task} =
-      attrs
-      |> Enum.into(%{
-        completed_on: ~D[2026-09-03],
-        kind: :action,
-        label: "some label",
-        name: "some name",
-        scheduled_for: ~D[2026-09-03]
-      })
-      |> Planner.Tasks.create_task()
-
+  def task_fixture(user, attrs \\ %{}) do
+    {:ok, task} = Planner.Tasks.create_task(user, Enum.into(attrs, %{title: "some title"}))
     task
   end
 end

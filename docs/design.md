@@ -1,83 +1,47 @@
 # Decisões de design e arquitetura
 
-Referências: [PRD](prd.md), [convenções](ddd.md) e [AGENTS.md](../AGENTS.md).
-
-“Confirmada” indica uma restrição do briefing ou convenção já existente. “Proposta” indica uma escolha ainda sujeita a revisão; não significa implementação concluída.
-
 ## D01 — Phoenix e PostgreSQL
 
-Status: confirmada pelo briefing e repositório.
+Manter stack existente, `Planner.Repo` e monólito Phoenix. Sem serviços separados ou filas no MVP.
 
-Manter a stack existente e `Planner.Repo`. Evitar dependências adicionais sem necessidade demonstrada. A [documentação oficial](https://phoenix.hexdocs.pm/overview.html) foi consultada como referência do framework, sem implicar atualização da versão instalada.
+## D02 — Documentação por responsabilidade
 
-## D02 — Documentação em docs/
-
-Status: adotada nesta documentação para resolver ambiguidade de caminho.
-
-O briefing menciona `doc/` e `docs/`, mas determina a entrega do PRD e das tarefas em `docs/`. O `.gitignore` reserva `/doc/` para documentação gerada. Centralizar especificações em `docs/` e tarefas em `docs/tasks/`. Operação e execução ficam somente no [README](../README.md); o índice de consulta seletiva fica no [AGENTS.md](../AGENTS.md).
+PRD define escopo; specs agregam arquitetura e comportamento de cada capacidade; tarefas descrevem incrementos e evidências; DDD nomeia conceitos. Referências ensinam uso do framework. Operação fica somente no README.
 
 ## D03 — Remover o experimento antes de modelar
 
-Status: confirmada pelo usuário; execução pendente na [tarefa 002](tasks/002-remover-crud-experimental.md).
+Remover geração experimental de Task, inclusive migration, e construir o modelo definido pelas specs. Não preservar compatibilidade com dados experimentais nem recriar o CRUD genérico.
 
-O CRUD de `phx.gen` não atende à modelagem pretendida e deve ser removido. A proposta anterior de evoluir diretamente `Planner.Tasks` foi substituída. Primeiro definir especificações de domínio, invariantes e critérios; só depois criar contexto, entidade e interface. Preservar a infraestrutura Phoenix, Repo, Gettext e banco local.
+## D04 — Painel LiveView
 
-## D04 — Painel com foco em Hoje
+Reaproveitar Index/Form gerados. Resolver usuário padrão no servidor e chamar contextos com esse proprietário. Atualizar o resultado das ações próprias; não adicionar polling, timer ou sincronização automática entre abas. Recarga consulta o estado corrente.
 
-Status: proposta.
+## D06 — Persistência e concorrência
 
-Usar LiveView para o painel, com prioridades numeradas em destaque, backlog secundário e histórico acessível. Seguir os componentes e regras do `AGENTS.md`, com Tailwind e CSS próprio, sem introduzir componentes daisyUI. O projeto atual usa controllers no CRUD; a migração do fluxo para LiveView ainda é trabalho futuro.
+Tarefas e labels têm user_id do usuário padrão. APIs recebem esse usuário explicitamente; não há Accounts.Scope autenticado no MVP. Associações não cruzam proprietários.
 
-## D05 — Três prioridades e virada do dia
+Persistir cota por usuário/data separada das pendências. Seleção, devolução, ordem e conclusão usam a mesma fronteira transacional, inclusive quando a cota ainda não existe. Cadastro engloba tarefa, novas labels e vínculos muitos-para-muitos em uma transação.
 
-Status: proposta pendente de confirmação.
+## D08 — Usuário padrão e data
 
-Limitar a três pendências simultâneas e devolver pendências anteriores ao backlog na apresentação do novo dia. As duas escolhas concretizam a simplicidade desejada, mas o briefing não define completamente essas regras. Ver H01–H04 e perguntas do PRD antes de implementar.
+Contexto Accounts contém somente identidade persistente e resolução/criação idempotente do usuário padrão. A resolução nas telas terá criação idempotente habilitada somente pela configuração de desenvolvimento, desabilitada por padrão. Reutilizar a operação existente de criação e o índice único; preservar a consulta estrita `get_default_user!/0` e os seeds explícitos. Não consultar `Mix.env()` no código de runtime nem criar outra variável `ENV`. Não adicionar criação na inicialização da aplicação, para preservar a execução de preparação/migrations sem acesso antecipado às tabelas. Incremento planejado na TASK-037. Não gerar autenticação agora. Data de negócio é Date.utc_today(), com valor controlável nos testes; não persistir fuso nem horário de seleção/conclusão. Normalizar virada na leitura/comando, sem depender de processo web.
 
-## D06 — Persistência a especificar
+## D09 — Gettext fixo em pt-BR
 
-Status: em aberto; proposta anterior de reutilizar os campos do gerador substituída.
+Manter PlannerWeb.Gettext, mensagens-base em inglês e tradução pt_BR. Configurar locale fixo e HTML pt-BR; sem sessão de preferência ou seletor. Conteúdo do usuário permanece inalterado.
 
-O histórico de conclusões continua sendo requisito, mas tabelas, campos, estados e operações serão definidos a partir das regras confirmadas do PRD. Não reutilizar o schema experimental por conveniência. A tarefa 002 deve avaliar migrations já aplicadas e dados existentes antes de qualquer descarte; registrar a estratégia de limpeza sem recriar o domínio antecipadamente.
+## D14 — Scaffolds e incrementos pequenos
 
-## D07 — Qualidade por Mix e GitHub
+Gerar contexto/schema e LiveViews, uma vez por recurso; usar --no-context na interface sobre domínio existente. Sem autenticação gerada, usar --no-scope e declarar user_id explicitamente nos recursos dependentes. Ajustar APIs para receber o usuário padrão do servidor e restringir campos permitidos. Comandos concretos ficam nas tarefas.
 
-Status: exigência confirmada; configuração parcialmente existente.
+## D15 — Tema semântico e cadastro sobre o planejamento
 
-Aplicar TDD enxuto e finalizar com `mix precommit`. O alias atual existe, mas formata arquivos e não contém linter dedicado. Definir verificações de CI que falhem quando houver divergência, configurar workflow e exigir PR com CI verde na `main`. Proteção remota ainda não verificada.
+Evolução autorizada em 09/10/2026: usar daisyUI já integrado ao Phoenix/Tailwind, com tema claro único `planner`. Cores ficam nos tokens semânticos do tema; componentes usam `base`, `primary`, `error` etc., preparando futuras paletas sem implementá-las. Remover controles e scripts de seleção de tema, inclusive leitura de preferências antigas. Nenhuma nova dependência.
 
-## D08 — Configuração externa e acesso
+`/tasks` e `/tasks/new` pertencem a TaskLive.Index; patch controla presença do Form convertido em LiveComponent. O componente conserva validação e captura restrita das falhas do cadastro existente, recebe proprietário do pai e comunica sucesso para atualização do snapshot e flash. Diálogo HTML nativo e hook no bundle cuidam de modalidade, Escape e foco; regras de negócio continuam no servidor. O atributo `open` do diálogo/seção de labels é preservado durante patches via API LiveView; erros de labels forçam expansão. Histórico mantém streams montados em contêiner oculto, evitando perder itens ao expandir/recolher.
 
-Status: configuração externa exigida; mecanismo de acesso em aberto.
+A [SPEC-004](specs/004-experiencia-e-acesso.md#evolução-da-experiência--09102026) define o comportamento. Foco, atalhos e apresentação descritos aqui registram escolhas presentes na implementação, não requisitos ou critérios de aceite. Não há avaliação humana obrigatória, conforme o [PRD](prd.md#feedback-de-interface); ajustes estéticos dependem de feedback do responsável.
 
-Usar `.env` local ignorado e variáveis injetadas nos ambientes de execução, sem segredos em código ou comentários. Desenvolvimento e teste já leem as variáveis de conexão de `.env` ou do ambiente via `config/database.exs`; uso e limites estão no [README](../README.md). Uso pessoal não resolve autenticação: definir a exposição e o acesso antes de disponibilizar remotamente.
+## D16 — Movimentação persistida de pendências
 
-## D09 — Idiomas com Gettext
-
-Status: suporte a pt-BR e inglês e política de idiomas confirmados; seletor ainda pendente.
-
-Manter `PlannerWeb.Gettext`, já integrado aos helpers web. Código e comentários em inglês; documentação `.md` em português; mensagens-base da interface em inglês e traduções em catálogos `pt_BR` e `en`. A proposta operacional é pt-BR como padrão e preferência persistida na sessão, sem adicionar contas de usuário.
-
-O Gettext mantém o locale por processo: a integração deve cobrir a requisição HTTP e a montagem de LiveViews. Comportamento e dúvidas estão na [SPEC-001](specs/001-idiomas.md); integração técnica em [Gettext](referencias/gettext.md); execução na [tarefa 001](tasks/001-troca-de-idiomas.md). Não é necessário adicionar uma biblioteca de internacionalização.
-
-## D10 — Documentação por responsabilidade e tarefas em grafo
-
-Status: adotada para a organização do repositório.
-
-Referências técnicas por conceito ficam em `docs/referencias`; comportamento em `docs/specs`; procedimentos reutilizáveis em `docs/skills`; execução em `docs/tasks`. O `AGENTS.md` contém regras essenciais e roteamento. Prosa em português, exemplos de código em inglês.
-
-Tarefas usam Markdown com frontmatter YAML como fonte única de dependências e entregas. `depends_on` forma um grafo acíclico; `provides` e `consumes` explicitam recursos compartilhados. Essa escolha mantém leitura humana e permite processamento sem duplicação de JSON. Formato e limites da coordenação: [grafo de tarefas](tasks/formato.md).
-
-## D11 — Perfis e capacidade de execução
-
-Status: definida pelo usuário e formalizada no fluxo do repositório.
-
-Planejadores de ponta definem specs, arquitetura e tarefas; revisores de ponta avaliam diffs, aderência e gates; implementadores seguem um fluxo único com nível mínimo `basic`, `standard` ou `advanced` atribuído por tarefa. Os perfis descrevem conduta e não alteram permissões técnicas ou modelos automaticamente.
-
-Toda validação de código segue review; autoavaliação não equivale a aprovação independente. Tarefas passam por `in_review` e só chegam a `done` após aprovação e integração. Critérios de nível e metadados têm fonte única no [formato das tarefas](tasks/formato.md); contexto inicial de cada perfil fica no [AGENTS.md](../AGENTS.md#perfis-de-atuação).
-
-## D12 — Reserva humana e infraestrutura GitHub
-
-Status: reserva `human` definida pelo usuário; execução da infraestrutura pendente.
-
-Tarefas `human` não podem ser executadas por agentes de nenhum perfil. Conclusão depende de confirmação humana e evidências; trabalho dependente deve aguardar. A TASK-003 fornece o gate GitHub para TASK-002 e, transitivamente, TASK-001. A recomendação inicial é compilação, formato, testes e Credo; cobertura inicialmente informativa. Ferramentas e proteção ainda não foram configuradas.
+Plano autorizado em 09/10/2026: SortableJS via npm (licença MIT), instalado pelo responsável na retomada em 10/10/2026, com versão resolvida 1.15.7 no lockfile e importação pelo bundle existente. Hook mantém somente o DOM temporário do gesto, restaura os mesmos nós antes de enviar o evento e deixa streams aplicarem o estado confirmado. Não usar ignore nas listas de streams. Uma operação de domínio valida os conjuntos completos e aplica transferência/posições/cota sob o lock do usuário. Cadastro compartilha esse lock; posições de backlog/retry têm restrições próprias, preservando o índice de hoje por data. A virada acrescenta ao final de retry. Menu usa a mesma ordenação persistida e transferências ao final.

@@ -11,6 +11,6 @@ Origem: integração inspecionada no projeto e documentação oficial consultada
 - A extração cria/atualiza `.pot`; a mesclagem atualiza `.po`. Revisar traduções vazias e fuzzy. Consultar a ajuda Mix antes de executar esses comandos.
 - O locale `pt_BR` corresponde ao catálogo; o atributo HTML usa `pt-BR`.
 
-Comportamento do produto e dúvidas pendentes: [spec de idiomas](../specs/001-idiomas.md). A sessão e o seletor são decisões da aplicação; Gettext não os cria automaticamente.
+Contrato do MVP: [spec de idiomas](../specs/001-idiomas.md). A sessão e o seletor são decisões da aplicação; Gettext não os cria automaticamente.
 
 Fontes: [API e locale](https://gettext.hexdocs.pm/Gettext.html#module-locale), [extração e catálogos](https://gettext.hexdocs.pm/Gettext.html#module-basic-overview), [montagem LiveView](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html#on_mount/1).

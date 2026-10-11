@@ -3,11 +3,14 @@ defmodule Planner.Tasks.Task do
   import Ecto.Changeset
 
   schema "tasks" do
-    field :name, :string
+    field :title, :string
+    field :kind, Ecto.Enum, values: [:backlog, :today, :retry]
     field :scheduled_for, :date
+    field :position, :integer
     field :completed_on, :date
-    field :kind, Ecto.Enum, values: [:action, :commitment]
-    field :label, :string
+    field :user_id, :id
+
+    many_to_many :labels, Planner.Labels.Label, join_through: Planner.Tasks.TaskLabel
 
     timestamps(type: :utc_datetime)
   end
@@ -15,7 +18,9 @@ defmodule Planner.Tasks.Task do
   @doc false
   def changeset(task, attrs) do
     task
-    |> cast(attrs, [:name, :scheduled_for, :completed_on, :kind, :label])
-    |> validate_required([:name, :scheduled_for, :completed_on, :kind, :label])
+    |> cast(attrs, [:title])
+    |> update_change(:title, &String.trim/1)
+    |> validate_required([:title, :user_id])
+    |> foreign_key_constraint(:user_id)
   end
 end

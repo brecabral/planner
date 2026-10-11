@@ -1,29 +1,21 @@
-# Linguagem de domínio e namespace
+# Linguagem de domínio e fronteiras
 
-Referência: [PRD](prd.md). As convenções abaixo orientam a especificação com DDD. O CRUD atual é experimental e será removido; seus campos e módulos não constituem um modelo aprovado.
+| Termo | Significado no MVP |
+| --- | --- |
+| Usuário padrão | Identidade persistente usada por todas as visitas de teste, sem login. |
+| Tarefa | Ação com título obrigatório e zero ou várias labels do proprietário. |
+| Backlog | Tarefas disponíveis, cadastradas ou retiradas manualmente de hoje. |
+| Hoje (`today`) | Pendências selecionadas para a data corrente, em ordem de prioridade. |
+| Retry | Tarefas que ficaram em hoje sem conclusão na mudança de data; selecionáveis novamente. |
+| Escolha | Consumo de uma das três vagas da data. Retirada manual restitui; conclusão mantém consumo. |
+| Prioridade | Posição entre as pendências de hoje. |
+| Conclusão | Registro persistente da execução com data, sem horário. |
+| Histórico | Tarefas concluídas ordenadas por data e desempate estável. |
+| Label | Classificação reutilizável, sem criar uma entidade de projeto. |
+| Dia corrente | Date.utc_today() no servidor; sem preferência de fuso. |
 
-## Linguagem comum
+## Fronteiras e nomes
 
-| Termo | Significado | Representação |
-| --- | --- | --- |
-| Tarefa | Ação concreta que o usuário pretende executar | `Planner.Tasks.Task` |
-| Backlog | Tarefas disponíveis para seleção, ainda não concluídas | Consulta no contexto `Planner.Tasks` |
-| Hoje | Seleção pendente para a data corrente da instalação | Data `scheduled_for`, sujeita à decisão de virada do dia |
-| Prioridade | Posição de execução entre as tarefas de hoje | Posição proposta, ainda não implementada |
-| Concluir | Registrar que uma tarefa foi executada | Operação de domínio; data `completed_on` |
-| Histórico | Consulta das tarefas concluídas | Consulta ordenada por `completed_on` |
+`Planner.Accounts` fornece o usuário padrão. `Planner.Tasks` possui tarefas, cotas, transições, histórico e vínculos com labels. `Planner.Labels` fornece o catálogo; o cadastro composto é coordenado por Tasks. `PlannerWeb` apresenta dados e eventos, sem decidir proprietário ou cota. Persistência em `Planner.Repo`.
 
-A coluna de representação acima descreve o experimento atual ou propostas anteriores, não contratos do domínio futuro. Backlog, hoje e histórico são conceitos do produto; entidades, campos e transições serão definidos nas especificações antes de novo código. Não reaproveitar `kind`, `label` ou datas apenas porque o gerador os criou.
-
-## Convenções
-
-- Documentação `.md` em português; código, identificadores, comentários, docstrings e mensagens técnicas em inglês. Textos de interface via Gettext, com `msgid` em inglês e catálogos para `pt_BR` e `en`; comportamento na [SPEC-001](specs/001-idiomas.md) e uso técnico na [referência Gettext](referencias/gettext.md).
-- Aplicação OTP: `:planner`. Domínio: `Planner`. Camada web: `PlannerWeb`.
-- Preservar os namespaces raiz e `Planner.Repo`. `Planner.Tasks` e `Planner.Tasks.Task` pertencem ao experimento a remover; qualquer reintrodução desses nomes depende da especificação, sem criar sinônimos concorrentes para o mesmo conceito.
-- Módulos em PascalCase, arquivos/funções/campos em snake_case e tabelas no plural.
-- Uma definição de módulo por arquivo. LiveViews terminam em `Live`, como o proposto `PlannerWeb.PlannerLive` em `lib/planner_web/live/planner_live.ex`.
-- Operações públicas devem expressar intenção. Exemplos propostos: `schedule_for_today`, `return_to_backlog`, `complete_task` e `reorder_today_tasks`; nomes e assinaturas finais serão definidos durante implementação.
-- Regras e persistência ficam no contexto; a camada web traduz eventos em operações do domínio.
-- DDD deve esclarecer linguagem, fronteiras e invariantes. Não exige novas camadas, microsserviços ou event sourcing.
-- Gerar migrations usando `mix ecto.gen.migration nome_em_snake_case`.
-- Specs em `docs/specs/` convertem requisitos em regras; tarefas usam `docs/tasks/NNN-descricao.md` com metadados YAML e referências às specs. Seguir o [formato do grafo](tasks/formato.md).
+`kind` classifica pendências como backlog/today/retry; a data de conclusão distingue concluídas das pendências. Módulos em PascalCase; campos, arquivos e funções em snake_case. Operações públicas expressam intenção e recebem o usuário definido no servidor. IDs de sessão ou formulário não são autoridade para trocar esse usuário.

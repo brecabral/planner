@@ -8,8 +8,11 @@
 import Config
 
 config :planner,
+  auto_create_default_user: false,
   ecto_repos: [Planner.Repo],
   generators: [timestamp_type: :utc_datetime]
+
+config :planner, PlannerWeb.Gettext, default_locale: "pt_BR"
 
 # Configure the endpoint
 config :planner, PlannerWeb.Endpoint,

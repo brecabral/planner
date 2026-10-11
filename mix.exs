@@ -109,8 +109,9 @@ defmodule Planner.MixProject do
       "ecto.reset": ["db.up", "ecto.drop", "ecto.setup"],
       test: ["db.up", "ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["compile", "tailwind planner", "esbuild planner"],
+      "assets.build": ["cmd --cd assets npm ci", "compile", "tailwind planner", "esbuild planner"],
       "assets.deploy": [
+        "cmd --cd assets npm ci",
         "tailwind planner --minify",
         "esbuild planner --minify",
         "phx.digest"
@@ -119,7 +120,10 @@ defmodule Planner.MixProject do
         "compile --warnings-as-errors",
         "format --check-formatted",
         "credo --strict",
-        "test --warnings-as-errors --cover"
+        "test --warnings-as-errors --cover",
+        "assets.setup",
+        "assets.build",
+        "cmd --cd assets npm audit --audit-level=high"
       ],
       precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"]
     ]

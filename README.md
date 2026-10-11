@@ -1,12 +1,12 @@
 # Planner
 
-Planner pessoal para escolher prioridades do dia, manter um backlog e consultar tarefas concluídas. O produto está em especificação; o CRUD de tarefas atual é um experimento do gerador Phoenix e será removido antes da implementação do domínio.
+Planner pessoal para escolher prioridades do dia, manter um backlog e consultar tarefas concluídas. O MVP local está concluído e aprovado em [revisão independente](docs/review.md).
 
 A aplicação usa Phoenix, Elixir e PostgreSQL. O servidor roda na máquina; o banco local roda em Docker, com dados persistidos em volume.
 
 ## Como rodar
 
-Requer Elixir compatível com `mix.exs` (`~> 1.17`), Erlang/OTP compatível e Docker ativo com Compose que suporte `up --wait`.
+Requer Elixir compatível com `mix.exs` (`~> 1.17`), Erlang/OTP compatível, Node.js/npm para as dependências de frontend e Docker ativo com Compose que suporte `up --wait`.
 
 ```sh
 cp .env.example .env
@@ -30,10 +30,15 @@ Abra [localhost:4000](http://localhost:4000). Para usar o console interativo, ex
 | `mix db.up` | Inicia apenas o PostgreSQL e aguarda sua disponibilidade. |
 | `mix ecto.setup` | Inicia o banco, cria a base, aplica migrations e seeds. |
 | `mix test` | Inicia o banco e executa os testes. |
-| `mix ci` | Verifica compilação, formatação, Credo estrito e testes com cobertura informativa. |
+| `mix ci` | Verifica compilação, formatação, Credo estrito e testes com cobertura mínima de 70%. |
+| `mix assets.build` | Instala o frontend pelo lockfile (`npm ci`) e compila CSS/JS. |
 | `mix precommit` | Compila com warnings como erros, verifica dependências, formata e testa. |
+| `mix cmd node --test assets/test/task_drag.test.mjs` | Testa o ciclo técnico do hook de arraste com SortableJS instalado, sem navegador. Executar após instalar os assets. |
+| `mix run priv/repo/seeds.exs` | Prepara o usuário padrão; repetir preserva sua identidade e dados. |
 | `mix ecto.reset` | Apaga e recria a base do ambiente atual. |
 | `docker compose stop postgres` | Para o banco sem apagar o volume. |
+
+Após atualizar o código de uma instalação existente, aplique as migrations com `mix ecto.migrate` antes de iniciar o servidor. A migration de ordenação preserva os dados e inicializa as posições de backlog/retry.
 
 ## Configuração e banco
 
@@ -43,14 +48,24 @@ O Compose usa PostgreSQL 17, publica a porta apenas em `127.0.0.1` e preserva da
 
 Alterar credenciais no `.env` não altera um volume já inicializado: ajuste também o usuário no banco existente. Para CI ou banco externo, exporte `PLANNER_SKIP_COMPOSE=true` e as variáveis de conexão de `.env.example`. Produção usa `config/runtime.exs` e não inicia Compose automaticamente.
 
+## Usuário padrão do MVP
+
+Em desenvolvimento, com banco criado e migrations aplicadas, abrir `/tasks` ou diretamente `/tasks/new` cria o usuário de identificador `default` se ele ainda não existir. Novos acessos e conexões reutilizam a mesma identidade, preservando timestamps, tarefas e labels. Não é necessário executar seeds antes desse primeiro acesso; o boot do servidor não cria usuários.
+
+A opção `:auto_create_default_user` da aplicação `:planner` fica desabilitada em `config/config.exs` e habilitada somente em `config/dev.exs`. `Planner.Accounts.resolve_default_user!/0` aplica essa configuração nas duas telas. Em `test` e `prod`, a ausência da identidade continua gerando erro e exige preparação explícita; banco e migrations permanecem pré-requisitos em todos os ambientes.
+
+`mix ecto.setup` (também chamado por `mix setup`) continua executando os seeds. Para repetir somente essa preparação em um banco já migrado, execute `mix run priv/repo/seeds.exs`: `Planner.Accounts.ensure_default_user!/0` garante a identidade sem duplicar ou substituir dados. A consulta `Planner.Accounts.get_default_user!/0` permanece estrita. Não há autenticação ou escolha de conta; testes usam fixtures isoladas, sem seeds globais.
+
 ## Sobre o projeto
 
-O fluxo planejado é selecionar tarefas do backlog para hoje, ordenar prioridades e registrar conclusões. As regras ainda estão em definição no [PRD](docs/prd.md). A troca entre português do Brasil e inglês será implementada com Gettext; ainda não está disponível.
+O fluxo implementado permite selecionar tarefas do backlog para hoje, ordenar prioridades e registrar conclusões. O escopo mínimo está no [PRD](docs/prd.md): usuário padrão sem login, interface pt-BR com Gettext, data corrente sem configuração de fuso e recarga manual. A correção de falhas no cadastro foi concluída na [TASK-038](docs/tasks/038-tratar-falha-cadastro.md).
 
 Consulte as [decisões de arquitetura](docs/design.md), o [vocabulário do domínio](docs/ddd.md) e as [tarefas planejadas](docs/tasks/README.md) para acompanhar a evolução.
 
 ## CI
 
-O workflow `CI` executa o check **quality** em PRs para `main` e pushes na `main`, usando Elixir 1.20.3, OTP 29 e o Compose existente. Para reproduzir localmente, execute `mix ci` com Docker ativo e `.env` configurado. O comando verifica formatação sem corrigir arquivos; cobertura é informativa, sem percentual mínimo bloqueante.
+O workflow `CI` executa o check **quality** em PRs para `main` e pushes na `main`, usando Elixir 1.20.3, OTP 29 e o Compose existente. Para reproduzir localmente, execute `mix ci` com Docker ativo e `.env` configurado. O comando também instala e compila os assets e verifica vulnerabilidades npm de severidade alta ou crítica. A versão resolvida do SortableJS está em `assets/package-lock.json`. O comando verifica formatação sem corrigir arquivos; a cobertura deve atingir pelo menos 70%, conforme o limiar já configurado em `mix.exs`.
 
-Após a primeira execução no GitHub, selecione **quality** como check obrigatório na proteção da `main` e exija PR. A proteção é configurada separadamente pelo responsável pelo repositório.
+O responsável confirmou a configuração da proteção da `main` e do check obrigatório **quality**.
+
+Para alterações no hook de arraste, execute também o teste JavaScript listado acima; ele é separado dos aliases `precommit` e `ci`. O harness usa o SortableJS do lockfile com DOM e timers mínimos controlados. Cobre cancelamento, restauração e retomada, mas não simula layout, propagação completa de eventos, mouse/touch reais ou patches do LiveView no navegador.

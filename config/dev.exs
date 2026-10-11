@@ -1,5 +1,7 @@
 import Config
 
+config :planner, auto_create_default_user: true
+
 import_config "database.exs"
 
 # Configure your database

@@ -1,12 +1,17 @@
-# Especificações da solução
+# Especificações do MVP
 
-Specs transformam requisitos do PRD em comportamento verificável. São contratos duráveis do produto; tarefas descrevem as mudanças necessárias para entregá-los. Referências ensinam a usar tecnologias e não substituem regras de negócio.
+Specs agregam arquitetura, invariantes e casos de uso; tarefas entregam passos pequenos. As seis specs abaixo descrevem o MVP definido, sem decisões de login, idioma alternativo, fuso ou atualização automática. Evoluções estão separadas no índice de tarefas e exigem revisão de contrato antes da execução.
 
-| Spec | Assunto |
+| Spec | Capacidade |
 | --- | --- |
-| [001 — Idiomas](001-idiomas.md) | Comportamento de seleção e persistência; ainda há decisões propostas. |
+| [001 — Interface pt-BR com Gettext](001-idiomas.md) | Contrato do MVP; implementação em várias tarefas. |
+| [002 — Backlog, retry e três escolhas diárias](002-planejamento-diario.md) | Contrato do MVP; implementação em várias tarefas. |
+| [003 — Data corrente, retry e histórico](003-dia-e-historico.md) | Contrato do MVP; implementação em várias tarefas. |
+| [004 — Experiência do painel](004-experiencia-e-acesso.md) | Contrato do MVP; implementação em várias tarefas. |
+| [005 — Usuário padrão do MVP](005-contas-e-acesso.md) | Contrato do MVP; implementação em várias tarefas. |
+| [006 — Labels reutilizáveis por usuário](006-labels.md) | Contrato do MVP; implementação em várias tarefas. |
 
-O planejamento diário ainda depende das respostas do PRD §12. Não criar sua modelagem definitiva antes dessas respostas.
+As seis specs estão implementadas no código integrado e com aceite verificado pela [revalidação independente do MVP](../review.md#revalidação-de-prontidão-do-mvp--05102026), alvo `2b8ba19`, em 05/10/2026. Não há avaliação humana obrigatória da interface, conforme o [PRD](../prd.md#feedback-de-interface).
 
 ## Como escrever
 
@@ -21,3 +26,5 @@ Uma spec está pronta quando outro agente consegue decidir o resultado dos cená
 Propostas pequenas começam como specs `draft`; não criar RFC, proposta e spec duplicadas. Atualizar a spec quando o comportamento mudar; manter justificativas relevantes em design. Ao decompor, atribuir cada entrega a uma tarefa e apontar as regras que ela cobre. Correções pequenas podem usar diretamente uma tarefa se o comportamento já estiver especificado.
 
 Consulta assistida: [skill de especificação](../skills/specify-feature/SKILL.md).
+
+Incremento autorizado de arraste: SPEC-002/003/004 em `ready` para a [TASK-040](../tasks/040-arrastar-tarefas.md); o aceite histórico do MVP não atesta essa implementação.

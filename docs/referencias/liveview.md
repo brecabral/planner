@@ -4,7 +4,7 @@ Origem: regras do gerador Phoenix anteriormente em `AGENTS.md`, traduzidas e org
 
 ## Organização e navegação
 
-- Módulos LiveView terminam em `Live`, como `PlannerWeb.PlannerLive`.
+- Preservar a organização de LiveViews geradas, como `TaskLive.Index` e `TaskLive.Form`. Para uma LiveView escrita separadamente, usar nome terminado em `Live`, como `PlannerWeb.PlannerLive`.
 - Evitar LiveComponents sem uma necessidade específica.
 - Usar `<.link navigate={...}>`, `<.link patch={...}>`, `push_navigate/2` e `push_patch/2`. Não usar `live_redirect` ou `live_patch` antigos.
 - Layouts, scope e componentes seguem [HEEx](heex.md).

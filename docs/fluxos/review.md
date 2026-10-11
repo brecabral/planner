@@ -8,6 +8,18 @@ Identificar alvo exato e base de comparação: PR, intervalo de commits, branch 
 
 Expandir para funções chamadoras, contratos, configurações e testes quando necessário para verificar efeitos. Consultar DDD/design e referências somente dos conceitos atingidos. Uma revisão estreita não autoriza reescrever a arquitetura inteira.
 
+## Marco persistente de revisão
+
+Em revisões incrementais das entregas, consultar o front matter YAML de [docs/review.md](../review.md). Manter `review_base_commit`, `reviewed_commit`, `last_approved_commit`, `reviewed_at`, `reviewer`, `status` e `reviewed_tasks`, com SHAs completos e escopo explícito no relatório.
+
+- Sem base expressamente solicitada, usar `last_approved_commit` como base, após conferir que existe e é ancestral do alvo. Avaliar o diff base → alvo e os contratos afetados; separar alterações locais. Uma base explícita do usuário prevalece.
+- Se o marco estiver ausente, inválido ou fora da ancestralidade, reconstruir uma base justificada pelo histórico e registrar a limitação. Um commit que apenas limpou o relatório não representa aprovação anterior.
+- Atualizar `reviewed_commit` e `status` em toda revisão. Avançar `last_approved_commit` somente com `approved` independente e gates aplicáveis satisfeitos para todo o escopo declarado. Em `changes_requested` ou `blocked`, preservar o último aprovado; usar `null` se ainda não existir aprovação comprovada. Autoavaliação não avança o marco independente.
+- O SHA aponta para o código commitado efetivamente avaliado, nunca para um futuro commit do relatório. Alterações locais não recebem aprovação implícita por esse SHA; se afetarem o código, validar o alvo isoladamente ou registrar a impossibilidade de avançar o marco.
+- O marco vale apenas para o escopo documentado. Tarefas ou áreas não revisadas não podem ser ignoradas em revisões futuras por terem commits anteriores ao marco. Preservar pendências e evidências ao atualizar ou limpar o relatório.
+
+Conferir a regra com estes casos: entrega aprovada avança o marco; falha de gate mantém o anterior; código local divergente não é atribuído a HEAD; histórico reescrito exige reconstrução da base; tarefa fora do escopo exige revisão própria mesmo antes do marco.
+
 ## Procedimento
 
 1. Relacionar cada critério de aceite a implementação e evidência. Procurar comportamento faltante, inventado ou incompatível com a spec; hipótese de produto não é fato para reprovar código.
@@ -21,7 +33,7 @@ Expandir para funções chamadoras, contratos, configurações e testes quando n
 
 ## Gate e relatório
 
-O gate considera aderência aos critérios, testes relevantes, verificações obrigatórias, política de cobertura existente e ausência de achados bloqueantes. Não há percentual de cobertura aprovado no projeto até que uma decisão o estabeleça. Usar métricas como evidência e investigar caminhos críticos descobertos.
+O gate considera aderência aos critérios, testes relevantes, verificações obrigatórias, política de cobertura existente e ausência de achados bloqueantes. O mínimo aprovado é 70% de cobertura, já bloqueante no CI. Não reduzir o limiar nem excluir código apenas para passar no gate. Usar métricas como evidência e investigar caminhos críticos descobertos.
 
 Entregar: alvo/base; critérios atendidos ou não verificados; comandos e resultados; cobertura/evals com limites; achados por gravidade; conclusão `approved`, `changes_requested` ou `blocked`. Para cada achado, informar arquivo/linha, condição que dispara o erro, impacto e correção esperada. Separar sugestões não bloqueantes de defeitos reproduzíveis. Ausência de achados não equivale a teste executado.
 
@@ -29,7 +41,7 @@ Registrar o resumo no campo de revisão da tarefa, com identidade do revisor, al
 
 ## Autoavaliação
 
-Implementadores aplicam os mesmos critérios, registram resultados e encaminham para revisão independente. Não podem preencher sua própria aprovação como revisão independente. Falhas de infraestrutura tornam a verificação correspondente bloqueada, não aprovada; não ampliar escopo só para mascarar a falha.
+Implementadores aplicam os mesmos critérios, registram resultados e encaminham ao coordenador para conferência operacional. Revisão independente ocorre quando explicitamente solicitada. Não podem preencher sua própria aprovação como revisão independente. Falhas de infraestrutura tornam a verificação correspondente bloqueada, não aprovada; não ampliar escopo só para mascarar a falha.
 
 ## Tarefas humanas
 

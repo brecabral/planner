@@ -24,16 +24,45 @@ import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import {hooks as colocatedHooks} from "phoenix-colocated/planner"
 import topbar from "../vendor/topbar"
+import {TaskDrag, taskDragDOM} from "./task_drag"
+
+const TaskDrawer = {
+  mounted() {
+    this.js().ignoreAttributes(this.el, ["open"])
+    this.js().ignoreAttributes(this.el.querySelector("#task-labels"), ["open"])
+    this.el.showModal()
+    this.el.querySelector("#task_title").focus()
+    this.onCancel = event => {
+      event.preventDefault()
+      this.el.querySelector("#cancel-task").click()
+    }
+    this.el.addEventListener("cancel", this.onCancel)
+    this.previousOverflow = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+  },
+  updated() {
+    const labels = this.el.querySelector("#task-labels")
+    if (labels.dataset.errors === "true") labels.open = true
+  },
+  destroyed() {
+    this.el.removeEventListener("cancel", this.onCancel)
+    this.el.close()
+    document.body.style.overflow = this.previousOverflow
+    document.querySelector("#new-task")?.focus()
+  },
+}
 
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {...colocatedHooks},
+  hooks: {...colocatedHooks, TaskDrawer, TaskDrag},
+  dom: taskDragDOM,
 })
 
 // Show progress bar on live navigation and form submits
-topbar.config({barColors: {0: "#29d"}, shadowColor: "rgba(0, 0, 0, .3)"})
+const primaryColor = getComputedStyle(document.documentElement).getPropertyValue("--color-primary").trim()
+topbar.config({barColors: {0: primaryColor}})
 window.addEventListener("phx:page-loading-start", _info => topbar.show(300))
 window.addEventListener("phx:page-loading-stop", _info => topbar.hide())
 
