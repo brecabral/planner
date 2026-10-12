@@ -21,8 +21,16 @@ defmodule PlannerWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
-    live "/tasks", TaskLive.Index, :index
-    live "/tasks/new", TaskLive.Index, :new
+  end
+
+  scope "/", PlannerWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :authenticated_user,
+      on_mount: [{PlannerWeb.UserAuth, :require_authenticated}] do
+      live "/tasks", TaskLive.Index, :index
+      live "/tasks/new", TaskLive.Index, :new
+    end
   end
 
   # Other scopes may use custom stacks.

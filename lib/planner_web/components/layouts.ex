@@ -46,6 +46,13 @@ defmodule PlannerWeb.Layouts do
           </span>
           {gettext("Planner")}
         </.link>
+        <.link
+          :if={@current_scope}
+          id="log-out"
+          href={~p"/users/log-out"}
+          method="delete"
+          class="btn btn-ghost ml-auto"
+        >{gettext("Log out")}</.link>
       </nav>
     </header>
     <main class="mx-auto max-w-6xl px-4 py-8 sm:px-8 sm:py-12">

@@ -28,7 +28,7 @@ defmodule PlannerWeb.UserAuthTest do
       conn = UserAuth.log_in_user(conn, user)
       assert token = get_session(conn, :user_token)
       assert get_session(conn, :live_socket_id) == "users_sessions:#{Base.url_encode64(token)}"
-      assert redirected_to(conn) == ~p"/"
+      assert redirected_to(conn) == ~p"/tasks"
       assert Accounts.get_user_by_session_token(token)
     end
 
@@ -70,18 +70,31 @@ defmodule PlannerWeb.UserAuthTest do
     end
 
     test "redirects to the configured path", %{conn: conn, user: user} do
-      conn = conn |> put_session(:user_return_to, "/hello") |> UserAuth.log_in_user(user)
-      assert redirected_to(conn) == "/hello"
+      conn = conn |> put_session(:user_return_to, "/tasks/new") |> UserAuth.log_in_user(user)
+      assert redirected_to(conn) == "/tasks/new"
+    end
+
+    test "rejects external and unauthorized return paths", %{conn: conn, user: user} do
+      for path <- [
+            "https://evil.test",
+            "//evil.test",
+            "/\\evil.test",
+            "/users/log-out",
+            "/tasks?return_to=https://evil.test"
+          ] do
+        response = conn |> put_session(:user_return_to, path) |> UserAuth.log_in_user(user)
+        assert redirected_to(response) == ~p"/tasks"
+      end
     end
 
     test "clears the return-to path from the session after logging in", %{conn: conn, user: user} do
       conn =
         conn
         |> assign(:current_scope, Scope.for_user(user))
-        |> put_session(:user_return_to, "/hello")
+        |> put_session(:user_return_to, "/tasks/new")
         |> UserAuth.log_in_user(user)
 
-      assert redirected_to(conn) == "/hello"
+      assert redirected_to(conn) == "/tasks/new"
       refute get_session(conn, :user_return_to)
     end
 
@@ -101,7 +114,7 @@ defmodule PlannerWeb.UserAuthTest do
         |> assign(:current_scope, Scope.for_user(user))
         |> UserAuth.log_in_user(user)
 
-      assert redirected_to(conn) == ~p"/"
+      assert redirected_to(conn) == ~p"/tasks"
     end
 
     test "writes a cookie if remember_me was set in previous session", %{conn: conn, user: user} do
@@ -141,7 +154,7 @@ defmodule PlannerWeb.UserAuthTest do
       refute get_session(conn, :user_token)
       refute conn.cookies[@remember_me_cookie]
       assert %{max_age: 0} = conn.resp_cookies[@remember_me_cookie]
-      assert redirected_to(conn) == ~p"/"
+      assert redirected_to(conn) == ~p"/users/log-in"
       refute Accounts.get_user_by_session_token(user_token)
     end
 
@@ -160,7 +173,7 @@ defmodule PlannerWeb.UserAuthTest do
       conn = conn |> fetch_cookies() |> UserAuth.log_out_user()
       refute get_session(conn, :user_token)
       assert %{max_age: 0} = conn.resp_cookies[@remember_me_cookie]
-      assert redirected_to(conn) == ~p"/"
+      assert redirected_to(conn) == ~p"/users/log-in"
     end
   end
 

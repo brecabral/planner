@@ -1,1 +1,1 @@
-Planner.Accounts.ensure_default_user!()
+# Accounts are created through email registration. Preserve existing legacy data.

@@ -11,19 +11,7 @@ defmodule PlannerWeb.TaskLiveTest do
   alias Planner.Repo
   alias Planner.Tasks
 
-  setup tags do
-    previous = Application.fetch_env(:planner, :auto_create_default_user)
-
-    on_exit(fn ->
-      case previous do
-        {:ok, value} -> Application.put_env(:planner, :auto_create_default_user, value)
-        :error -> Application.delete_env(:planner, :auto_create_default_user)
-      end
-    end)
-
-    Application.put_env(:planner, :auto_create_default_user, tags[:bootstrap] || false)
-    if tags[:without_default], do: %{}, else: %{user: user_fixture(%{identifier: "default"})}
-  end
+  setup :register_and_log_in_user
 
   for kind <- [:backlog, :retry, :today] do
     @tag kind: kind
@@ -360,65 +348,6 @@ defmodule PlannerWeb.TaskLiveTest do
     refute has_element?(view, "#task-label-#{existing.id}[checked]")
   end
 
-  for {path, selector} <- [{"/tasks", "#new-task"}, {"/tasks/new", "#task-form"}] do
-    @tag bootstrap: true, without_default: true
-    test "first access to #{path} creates one persistent default across mounts", %{conn: conn} do
-      assert Repo.aggregate(Planner.Accounts.User, :count) == 0
-      disconnected = get(conn, unquote(path))
-      user = Planner.Accounts.get_default_user!()
-      assert {:ok, view, _} = live(disconnected)
-      assert has_element?(view, unquote(selector))
-      assert {:ok, reloaded, _} = live(recycle(conn), unquote(path))
-      assert has_element?(reloaded, unquote(selector))
-      assert Planner.Accounts.get_default_user!() == user
-      assert Repo.aggregate(Planner.Accounts.User, :count) == 1
-      assert Tasks.list_tasks(user) == []
-      assert Labels.list_labels(user) == []
-    end
-
-    @tag without_default: true
-    test "disabled bootstrap rejects unprepared #{path} even with browser flags", %{conn: conn} do
-      assert_raise Ecto.NoResultsError, fn ->
-        live(conn, unquote(path) <> "?auto_create_default_user=true")
-      end
-
-      assert Repo.aggregate(Planner.Accounts.User, :count) == 0
-    end
-  end
-
-  @tag bootstrap: true
-  test "bootstrap preserves the default identity, timestamps and planning", %{
-    conn: conn,
-    user: user
-  } do
-    user = user |> Ecto.Changeset.change(updated_at: ~U[2020-01-01 00:00:00Z]) |> Repo.update!()
-    label = label_fixture(user)
-    task = task_fixture(user, %{label_ids: [label.id]})
-
-    for path <- ["/tasks", "/tasks/new", "/tasks"] do
-      assert {:ok, _, _} = live(recycle(conn), path)
-      assert Planner.Accounts.get_default_user!() == user
-      assert Tasks.list_tasks(user) == [task]
-      assert Labels.list_labels(user) == [label]
-      assert Repo.preload(task, :labels).labels == [label]
-    end
-  end
-
-  @tag bootstrap: true, without_default: true
-  test "bootstrap creates default without assuming or modifying another identity", %{conn: conn} do
-    other = user_fixture()
-    label = label_fixture(other)
-    task = task_fixture(other, %{label_ids: [label.id]})
-    assert {:ok, view, _} = live(conn, "/tasks?user_id=#{other.id}")
-    default = Planner.Accounts.get_default_user!()
-    assert default.id != other.id
-    refute has_element?(view, "#tasks-#{task.id}")
-    assert Repo.get!(Planner.Accounts.User, other.id) == other
-    assert Tasks.list_tasks(other) == [task]
-    assert Labels.list_labels(other) == [label]
-    assert Repo.aggregate(Planner.Accounts.User, :count) == 2
-  end
-
   test "field errors are associated with inputs and clear after correction", %{conn: conn} do
     {:ok, view, _} = live(conn, "/tasks/new")
     refute has_element?(view, "[aria-invalid='true']")
@@ -495,7 +424,7 @@ defmodule PlannerWeb.TaskLiveTest do
     foreign = task_fixture(user_fixture())
 
     for _ <- 1..2 do
-      {:ok, view, _} = live(recycle(conn), "/tasks")
+      {:ok, view, _} = live(conn, "/tasks")
       assert has_element?(view, "#tasks #tasks-#{backlog.id}", backlog.title)
       assert has_element?(view, "#retry #retry-#{retry.id}", retry.title)
       assert has_element?(view, "#today #today-#{first.id} [data-priority]", "1")
@@ -524,7 +453,7 @@ defmodule PlannerWeb.TaskLiveTest do
     end
 
     for _ <- 1..2 do
-      {:ok, view, _} = live(recycle(conn), "/tasks")
+      {:ok, view, _} = live(conn, "/tasks")
       assert has_element?(view, "#today-empty", "Nenhuma tarefa")
       assert has_element?(view, "#retry-empty", "Nenhuma tarefa")
       assert has_element?(view, "#tasks-empty", "Cadastre uma tarefa")
@@ -587,7 +516,7 @@ defmodule PlannerWeb.TaskLiveTest do
     assert has_element?(view, "#used-choices", "1")
     refute has_element?(view, "#retry-#{task.id}")
     assert has_element?(view, "#today-#{retry.id} [data-priority]", "1")
-    {:ok, reload, _} = live(recycle(conn), "/tasks")
+    {:ok, reload, _} = live(conn, "/tasks")
     assert has_element?(reload, "#tasks-#{task.id}")
     assert has_element?(reload, "#used-choices", "1")
   end
@@ -689,7 +618,7 @@ defmodule PlannerWeb.TaskLiveTest do
     assert has_element?(view, "#used-choices", "3")
     assert has_element?(view, "#move-up-#{third.id} button[disabled]")
     assert has_element?(view, "#move-down-#{second.id} button[disabled]")
-    {:ok, reload, _} = live(recycle(conn), "/tasks")
+    {:ok, reload, _} = live(conn, "/tasks")
     assert_today_order(reload, [third, first, second])
   end
 
@@ -792,7 +721,7 @@ defmodule PlannerWeb.TaskLiveTest do
     assert has_element?(view, "#history-count", "1")
     assert has_element?(view, "#used-choices", "1")
     refute has_element?(view, "#history-#{task.id} button")
-    {:ok, reload, _} = live(recycle(conn), "/tasks")
+    {:ok, reload, _} = live(conn, "/tasks")
     assert has_element?(reload, "#history-#{task.id}")
     assert has_element?(reload, "#history-count", "1")
     assert has_element?(reload, "#used-choices", "1")
@@ -814,7 +743,7 @@ defmodule PlannerWeb.TaskLiveTest do
     for task <- tasks, do: view |> form("#complete-#{task.id}") |> render_submit()
     render_submit(view, "complete", %{"task_id" => to_string(old.id)})
 
-    for panel <- [view, elem(live(recycle(conn), "/tasks"), 1)] do
+    for panel <- [view, elem(live(conn, "/tasks"), 1)] do
       assert has_element?(panel, "#today-count", "0")
       assert has_element?(panel, "#used-choices", "3")
       assert has_element?(panel, "#quota-exhausted", "esgotadas")
@@ -1091,7 +1020,7 @@ defmodule PlannerWeb.TaskLiveTest do
     end
   end
 
-  test "opens without login and creates a persisted backlog task", %{conn: conn, user: user} do
+  test "authenticated user creates a persisted backlog task", %{conn: conn, user: user} do
     {:ok, index, _} = live(conn, "/tasks")
     assert has_element?(index, "#tasks-empty", "Cadastre uma tarefa")
 
@@ -1115,7 +1044,7 @@ defmodule PlannerWeb.TaskLiveTest do
     assert task.kind == :backlog
     assert task.title == "Write my book"
     assert has_element?(index, "#tasks-#{task.id}", task.title)
-    {:ok, reloaded, html} = live(recycle(conn), "/tasks")
+    {:ok, reloaded, html} = live(conn, "/tasks")
     assert has_element?(reloaded, "#tasks-#{task.id}", task.title)
 
     assert html
