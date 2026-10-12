@@ -82,6 +82,24 @@
   background: var(--color-base-100);
 }
 
+/* Controls occupy their own row, independent of user text length. */
+.task-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.task-content { min-width: 0; }
+.task-content [data-label] {
+  max-width: 100%;
+  height: auto;
+  min-height: 1.5rem;
+  white-space: normal;
+}
+
+.task-content + form { margin-top: 0.75rem; }
+
 .btn, a, input, textarea, summary {
   transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
 }

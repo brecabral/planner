@@ -71,17 +71,19 @@ defmodule PlannerWeb.TaskLive.Index do
               data-task-id={task.id}
               class="task-card"
             >
-              <.drag_handle task={task} />
-              <span
-                data-priority
-                class="mr-2 inline-grid size-8 place-items-center rounded-lg bg-primary/10 font-semibold text-primary"
-              >{task.position}.</span>
-              <span id={"task-title-#{task.id}"} data-task-title>{task.title}</span>
-              <.task_labels task={task} />
-              <div class="mt-3 flex flex-wrap gap-2">
-                <.planning_action task={task} action="complete" />
+              <div class="task-controls">
                 <.task_menu task={task} count={@today_count} />
+                <.drag_handle task={task} />
               </div>
+              <div class="task-content">
+                <span
+                  data-priority
+                  class="mr-2 inline-grid size-8 place-items-center rounded-lg bg-primary/10 font-semibold text-primary"
+                >{task.position}.</span>
+                <span id={"task-title-#{task.id}"} data-task-title>{task.title}</span>
+                <.task_labels task={task} />
+              </div>
+              <.planning_action task={task} action="complete" />
             </div>
           </div>
         </section>
@@ -108,10 +110,14 @@ defmodule PlannerWeb.TaskLive.Index do
                 data-task-id={task.id}
                 class="task-card"
               >
-                <.drag_handle task={task} />
-                <span id={"task-title-#{task.id}"} data-task-title>{task.title}</span>
-                <.task_labels task={task} />
-                <.task_menu task={task} count={@backlog_count} />
+                <div class="task-controls">
+                  <.task_menu task={task} count={@backlog_count} />
+                  <.drag_handle task={task} />
+                </div>
+                <div class="task-content">
+                  <span id={"task-title-#{task.id}"} data-task-title>{task.title}</span>
+                  <.task_labels task={task} />
+                </div>
               </div>
             </div>
           </section>
@@ -135,10 +141,14 @@ defmodule PlannerWeb.TaskLive.Index do
                 data-task-id={task.id}
                 class="task-card"
               >
-                <.drag_handle task={task} />
-                <span id={"task-title-#{task.id}"} data-task-title>{task.title}</span>
-                <.task_labels task={task} />
-                <.task_menu task={task} count={@retry_count} />
+                <div class="task-controls">
+                  <.task_menu task={task} count={@retry_count} />
+                  <.drag_handle task={task} />
+                </div>
+                <div class="task-content">
+                  <span id={"task-title-#{task.id}"} data-task-title>{task.title}</span>
+                  <.task_labels task={task} />
+                </div>
               </div>
             </div>
           </section>
@@ -374,7 +384,7 @@ defmodule PlannerWeb.TaskLive.Index do
     <button
       type="button"
       data-drag-handle
-      class="task-drag-handle btn btn-ghost btn-square"
+      class="task-drag-handle btn btn-ghost btn-square shrink-0"
       aria-label={gettext("Drag %{title}", title: @task.title)}
     >
       <.icon name="hero-bars-3" class="size-4" />
@@ -387,13 +397,16 @@ defmodule PlannerWeb.TaskLive.Index do
 
   defp task_menu(assigns) do
     ~H"""
-    <details id={"task-menu-#{@task.id}"} class="dropdown dropdown-end">
-      <summary class="btn btn-ghost" aria-label={gettext("Actions for %{title}", title: @task.title)}>
+    <details id={"task-menu-#{@task.id}"} class="dropdown dropdown-start shrink-0">
+      <summary
+        class="btn btn-ghost btn-square"
+        aria-label={gettext("Actions for %{title}", title: @task.title)}
+      >
         <.icon name="hero-ellipsis-horizontal" class="size-5" />
       </summary>
-      <div class="dropdown-content z-10 rounded-box bg-base-100 p-2 shadow-lg">
+      <div class="dropdown-content z-10 w-56 rounded-box bg-base-100 p-2 shadow-lg">
         <.planning_action task={@task} action={if @task.kind == :today, do: "return", else: "select"} />
-        <div class="flex">
+        <div class="flex gap-2">
           <.order_action task={@task} direction="up" disabled={@task.position == 1} />
           <.order_action task={@task} direction="down" disabled={@task.position == @count} />
         </div>
@@ -410,6 +423,7 @@ defmodule PlannerWeb.TaskLive.Index do
     ~H"""
     <form
       id={"move-#{@direction}-#{@task.id}"}
+      class="shrink-0"
       phx-submit={JS.push("reorder", page_loading: true) |> JS.focus(to: "##{@task.kind}-heading")}
     >
       <input type="hidden" name="task_id" value={@task.id} />
@@ -459,7 +473,7 @@ defmodule PlannerWeb.TaskLive.Index do
         JS.push(@action, page_loading: true)
         |> JS.focus(to: @focus)
       }
-      class="inline-flex"
+      class="inline-flex shrink-0"
     >
       <input type="hidden" name="task_id" value={@task.id} />
       <button
