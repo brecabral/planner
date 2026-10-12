@@ -1,13 +1,12 @@
 defmodule PlannerWeb.TaskLive.Index do
   use PlannerWeb, :live_view
 
-  alias Planner.Accounts
   alias Planner.Tasks
 
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash}>
+    <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
         {gettext("Planner")}
         <:actions>
@@ -238,7 +237,7 @@ defmodule PlannerWeb.TaskLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    user = Accounts.resolve_default_user!()
+    user = socket.assigns.current_scope.user
     {:ok, snapshot} = Tasks.snapshot(user)
 
     {:ok,

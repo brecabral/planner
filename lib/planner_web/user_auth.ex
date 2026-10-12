@@ -36,13 +36,18 @@ defmodule PlannerWeb.UserAuth do
   or falls back to the `signed_in_path/1`.
   """
   def log_in_user(conn, user, params \\ %{}) do
-    user_return_to = get_session(conn, :user_return_to)
+    user_return_to = safe_return_to(get_session(conn, :user_return_to))
 
     conn
     |> create_or_extend_session(user, params)
     |> delete_session(:user_return_to)
     |> redirect(to: user_return_to || signed_in_path(conn))
   end
+
+  # Only planning entry points are valid post-login destinations. Ignore query
+  # strings and any client-supplied external, protocol-relative or unknown URL.
+  defp safe_return_to(path) when path in ["/tasks", "/tasks/new"], do: path
+  defp safe_return_to(_path), do: nil
 
   @doc """
   Logs the user out.
@@ -60,7 +65,7 @@ defmodule PlannerWeb.UserAuth do
     conn
     |> renew_session(nil)
     |> delete_resp_cookie(@remember_me_cookie, @remember_me_options)
-    |> redirect(to: ~p"/")
+    |> redirect(to: ~p"/users/log-in")
   end
 
   @doc """
@@ -264,7 +269,7 @@ defmodule PlannerWeb.UserAuth do
   end
 
   @doc "Returns the path to redirect to after log in."
-  def signed_in_path(_), do: ~p"/"
+  def signed_in_path(_), do: ~p"/tasks"
 
   @doc """
   Plug for routes that require the user to be authenticated.

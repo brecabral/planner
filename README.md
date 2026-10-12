@@ -48,17 +48,17 @@ O Compose usa PostgreSQL 17, publica a porta apenas em `127.0.0.1` e preserva da
 
 Alterar credenciais no `.env` não altera um volume já inicializado: ajuste também o usuário no banco existente. Para CI ou banco externo, exporte `PLANNER_SKIP_COMPOSE=true` e as variáveis de conexão de `.env.example`. Produção usa `config/runtime.exs` e não inicia Compose automaticamente.
 
-## Usuário padrão do MVP local — comportamento atual
+## Autenticação e dados por conta
 
-Em desenvolvimento, com banco criado e migrations aplicadas, abrir `/tasks` ou diretamente `/tasks/new` cria o usuário de identificador `default` se ele ainda não existir. Novos acessos e conexões reutilizam a mesma identidade, preservando timestamps, tarefas e labels. Não é necessário executar seeds antes desse primeiro acesso; o boot do servidor não cria usuários.
+O cadastro é aberto por e-mail e o acesso usa exclusivamente magic link, sem senha. `/` leva visitantes a `/users/log-in`; contas autenticadas seguem para `/tasks`. O cadastro de tarefas em `/tasks/new` também exige sessão. Após confirmar o link, o usuário acessa seu planejamento; “Sair” encerra a sessão e retorna ao login. Links expiram em 15 minutos e só podem ser consumidos uma vez.
 
-A opção `:auto_create_default_user` da aplicação `:planner` fica desabilitada em `config/config.exs` e habilitada somente em `config/dev.exs`. `Planner.Accounts.resolve_default_user!/0` aplica essa configuração nas duas telas. Em `test` e `prod`, a ausência da identidade continua gerando erro e exige preparação explícita; banco e migrations permanecem pré-requisitos em todos os ambientes.
+Tarefas, labels, histórico e as três escolhas diárias pertencem à conta autenticada. Novas contas começam sem os dados das demais. A identidade antiga `default` e seus registros são preservados sem e-mail de acesso, não são transferidos para o primeiro cadastro e não ficam disponíveis a visitantes. Nenhum ambiente cria ou resolve automaticamente um usuário compartilhado. Seeds não criam contas nem alteram o legado; testes preparam fixtures isoladas.
 
-`mix ecto.setup` (também chamado por `mix setup`) continua executando os seeds. Para repetir somente essa preparação em um banco já migrado, execute `mix run priv/repo/seeds.exs`: `Planner.Accounts.ensure_default_user!/0` garante a identidade sem duplicar ou substituir dados. A consulta `Planner.Accounts.get_default_user!/0` permanece estrita. Não há autenticação ou escolha de conta; testes usam fixtures isoladas, sem seeds globais.
+O fluxo de autenticação está implementado. A TASK-046 documentará o procedimento completo de teste de e-mail local após validá-lo; esta etapa ainda não autoriza publicação em produção.
 
 ## Sobre o projeto
 
-O fluxo implementado permite selecionar tarefas do backlog para hoje, ordenar prioridades e registrar conclusões. O escopo mínimo está no [PRD](docs/prd.md): usuário padrão sem login, interface pt-BR com Gettext, data corrente sem configuração de fuso e recarga manual. A correção de falhas no cadastro foi concluída na [TASK-038](docs/tasks/038-tratar-falha-cadastro.md).
+O fluxo implementado permite selecionar tarefas do backlog para hoje, ordenar prioridades e registrar conclusões. O escopo está no [PRD](docs/prd.md): contas por magic link, interface pt-BR com Gettext, data corrente sem configuração de fuso e recarga manual. A correção de falhas no cadastro foi concluída na [TASK-038](docs/tasks/038-tratar-falha-cadastro.md).
 
 Consulte as [decisões de arquitetura](docs/design.md), o [vocabulário do domínio](docs/ddd.md) e as [tarefas planejadas](docs/tasks/README.md) para acompanhar a evolução.
 
@@ -72,4 +72,4 @@ Para alterações no hook de arraste, execute também o teste JavaScript listado
 
 ## Evolução planejada para produção
 
-O [plano de tarefas](docs/tasks/README.md) prevê auth padrão Phoenix com magic link, home direcionada ao login/dashboard, teste local de e-mail com Swoosh, temas claro/escuro por conta e preparação de release. Os procedimentos acima continuam descrevendo o código atual sem autenticação. A TASK-046 atualizará aqui os passos executáveis para testar magic link; as tarefas de produção documentarão aqui configuração e recuperação depois de definidos e validados. Hospedagem, domínio e provedor de e-mail estão pendentes. Créditos e loja ficam para evolução futura.
+O [plano de tarefas](docs/tasks/README.md) prevê auth padrão Phoenix com magic link, home direcionada ao login/dashboard, teste local de e-mail com Swoosh, temas claro/escuro por conta e preparação de release. Autenticação e isolamento por conta já estão implementados. A TASK-046 atualizará aqui os passos executáveis para testar magic link; as tarefas de produção documentarão aqui configuração e recuperação depois de definidos e validados. Hospedagem, domínio e provedor de e-mail estão pendentes. Créditos e loja ficam para evolução futura.

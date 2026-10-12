@@ -24,8 +24,8 @@ defmodule PlannerWeb.TaskRoutesTest do
     end
   end
 
-  test "home page remains available", %{conn: conn} do
+  test "home redirects visitors to authentication", %{conn: conn} do
     conn = get(conn, "/")
-    assert html_response(conn, 200) =~ "Espaço para o que importa."
+    assert redirected_to(conn) == "/users/log-in"
   end
 end

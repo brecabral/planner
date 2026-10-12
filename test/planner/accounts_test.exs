@@ -7,39 +7,14 @@ defmodule Planner.AccountsTest do
 
   import Planner.AccountsFixtures
 
-  setup do
-    previous = Application.fetch_env(:planner, :auto_create_default_user)
-
-    on_exit(fn ->
-      case previous do
-        {:ok, value} -> Application.put_env(:planner, :auto_create_default_user, value)
-        :error -> Application.delete_env(:planner, :auto_create_default_user)
-      end
-    end)
-
-    :ok
-  end
-
-  test "automatic preparation is enabled only in development configuration" do
-    for {env, expected} <- [dev: true, test: false, prod: false] do
+  test "automatic legacy preparation is absent in every environment" do
+    for env <- [:dev, :test, :prod] do
       config = Config.Reader.read!("config/config.exs", env: env, target: :host)
-      assert config[:planner][:auto_create_default_user] == expected
+      refute config[:planner][:auto_create_default_user]
     end
   end
 
-  test "resolution remains strict with the setting disabled or absent" do
-    for setting <- [false, nil] do
-      if is_nil(setting),
-        do: Application.delete_env(:planner, :auto_create_default_user),
-        else: Application.put_env(:planner, :auto_create_default_user, setting)
-
-      assert_raise Ecto.NoResultsError, fn -> Accounts.resolve_default_user!() end
-      assert Repo.aggregate(User, :count) == 0
-    end
-  end
-
-  test "simultaneous resolutions on separate connections converge through the unique index" do
-    Application.put_env(:planner, :auto_create_default_user, true)
+  test "explicit legacy preparation remains idempotent across connections" do
     supervisor = start_supervised!(Task.Supervisor)
     parent = self()
 
@@ -51,7 +26,7 @@ defmodule Planner.AccountsTest do
           Task.Supervisor.async_nolink(supervisor, fn ->
             Sandbox.unboxed_run(Repo, fn ->
               Repo.transact(fn ->
-                user = Accounts.resolve_default_user!()
+                user = Accounts.ensure_default_user!()
                 send(parent, {:inserted, user, backend_pid()})
                 receive do: (:release -> {:ok, user})
               end)
@@ -64,7 +39,7 @@ defmodule Planner.AccountsTest do
           Task.Supervisor.async_nolink(supervisor, fn ->
             Sandbox.unboxed_run(Repo, fn ->
               send(parent, {:contender, backend_pid()})
-              Accounts.resolve_default_user!()
+              Accounts.ensure_default_user!()
             end)
           end)
 
@@ -83,7 +58,7 @@ defmodule Planner.AccountsTest do
 
         assert Task.await(holder) == {:ok, user}
         assert Task.await(contender) == user
-        assert Accounts.resolve_default_user!() == user
+        assert Accounts.ensure_default_user!() == user
         assert Repo.aggregate(User, :count) == 1
       after
         for pid <- Task.Supervisor.children(supervisor),
@@ -121,12 +96,10 @@ defmodule Planner.AccountsTest do
     assert Repo.aggregate(User, :count) == 0
   end
 
-  test "seeds create a missing default user exactly once" do
+  test "seeds never create a shared identity" do
     Code.eval_file("priv/repo/seeds.exs")
-    default = Accounts.get_default_user!()
     Code.eval_file("priv/repo/seeds.exs")
-    assert Accounts.get_default_user!() == default
-    assert Repo.aggregate(User, :count) == 1
+    assert Repo.aggregate(User, :count) == 0
   end
 
   test "running seeds twice preserves the existing default user and other identities" do

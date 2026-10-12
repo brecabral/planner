@@ -49,6 +49,7 @@ defmodule PlannerWeb.AuthenticationFlowTest do
     view |> form("#confirmation_form", user: %{token: token}) |> render_submit()
     assert has_element?(view, "#confirmation_form[phx-trigger-action]")
     logged_in = post(conn, ~p"/users/log-in", user: %{token: token}, _action: "confirmed")
+    assert redirected_to(logged_in) == ~p"/tasks"
     assert session = get_session(logged_in, :user_token)
     assert {authenticated, _} = Accounts.get_user_by_session_token(session)
     assert authenticated.id == user.id
@@ -57,6 +58,7 @@ defmodule PlannerWeb.AuthenticationFlowTest do
     refute get_session(reused, :user_token)
     assert redirected_to(reused) == ~p"/users/log-in"
     logged_out = logged_in |> recycle() |> delete(~p"/users/log-out")
+    assert redirected_to(logged_out) == ~p"/users/log-in"
     refute get_session(logged_out, :user_token)
     refute Accounts.get_user_by_session_token(session)
   end
