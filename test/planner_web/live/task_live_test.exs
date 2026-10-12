@@ -25,6 +25,41 @@ defmodule PlannerWeb.TaskLiveTest do
     if tags[:without_default], do: %{}, else: %{user: user_fixture(%{identifier: "default"})}
   end
 
+  test "pending cards reserve left controls and a full menu with long text", %{
+    conn: conn,
+    user: user
+  } do
+    label = label_fixture(user, %{name: String.duplicate("Label", 20)})
+
+    [backlog, today, retry] =
+      for _ <- 1..3,
+          do:
+            task_fixture(user, %{
+              title: String.duplicate("Long title ", 20),
+              label_ids: [label.id]
+            })
+
+    assert {:ok, _} = Tasks.select_today(user, retry.id, Date.add(Date.utc_today(), -1))
+    assert {:ok, _} = Tasks.select_today(user, today.id)
+    {:ok, view, _} = live(conn, "/tasks")
+
+    for {list, task} <- [{"tasks", backlog}, {"today", today}, {"retry", retry}] do
+      card = "##{list}-#{task.id}"
+      menu = "#task-menu-#{task.id}"
+      assert has_element?(view, "#{card} > .task-controls:first-child > #{menu}:first-child")
+      assert has_element?(view, "#{menu}.dropdown-start > summary.btn-square")
+      assert has_element?(view, "#{menu} > .dropdown-content.w-56")
+      assert has_element?(view, "#{menu} #move-up-#{task.id}.shrink-0")
+      assert has_element?(view, "#{menu} #move-down-#{task.id}.shrink-0")
+      assert has_element?(view, "#{card} > .task-controls > [data-drag-handle].shrink-0")
+      assert has_element?(view, "#{card} > .task-content [data-task-title]", task.title)
+      assert has_element?(view, "#{card} > .task-content [data-label]", label.name)
+    end
+
+    assert has_element?(view, "#today-#{today.id} > #complete-#{today.id}")
+    refute has_element?(view, "#task-menu-#{today.id} #complete-#{today.id}")
+  end
+
   test "drag persists, refreshes counters and reports stale orders in Portuguese", %{
     conn: conn,
     user: user
