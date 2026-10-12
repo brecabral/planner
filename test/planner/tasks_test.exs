@@ -382,7 +382,7 @@ defmodule Planner.TasksTest do
     assert {:ok, %{used_choices: 3}} = Tasks.snapshot(user, day)
   end
 
-  test "return_to_backlog rejects invalid owners, completion and expired selections", %{
+  test "return_to_backlog rejects invalid owners and completion", %{
     user: user
   } do
     day = ~D[2026-10-01]
@@ -397,9 +397,7 @@ defmodule Planner.TasksTest do
       assert {:error, :not_found} = Tasks.return_to_backlog(user, id, day)
     end
 
-    for id <- [expired.id, completed.id] do
-      assert {:error, :invalid_state} = Tasks.return_to_backlog(user, id, day)
-    end
+    assert {:error, :invalid_state} = Tasks.return_to_backlog(user, completed.id, day)
 
     assert Repo.get!(Task, completed.id) == completed
     assert Repo.get!(Task, foreign.id) == foreign
@@ -437,13 +435,53 @@ defmodule Planner.TasksTest do
     yesterday = ~D[2026-09-30]
     day = Date.add(yesterday, 1)
     task = task_fixture(user)
-    assert {:ok, selected} = Tasks.select_today(user, task.id, yesterday)
-    assert {:error, :invalid_state} = Tasks.return_to_backlog(user, task.id, day)
-    assert Repo.get_by(DailyPlan, user_id: user.id, day: day) == nil
-    assert Repo.get!(Task, task.id) == selected
-    assert {:ok, %{used_choices: 0, today: [], retry: [retry]}} = Tasks.snapshot(user, day)
-    assert retry.id == task.id
+    assert {:ok, _} = Tasks.select_today(user, task.id, yesterday)
+    assert {:ok, returned} = Tasks.return_to_backlog(user, task.id, day)
+    assert returned.kind == :backlog
+
+    assert {:ok, %{used_choices: 0, today: [], retry: [], backlog: [backlog]}} =
+             Tasks.snapshot(user, day)
+
+    assert backlog.id == task.id
     assert Repo.get_by!(DailyPlan, user_id: user.id, day: yesterday).used_choices == 1
+  end
+
+  test "concurrent retry drag and menu return serialize and preserve exhausted quota" do
+    with_committed_user(fn user ->
+      day = ~D[2026-10-02]
+      moving = task_fixture(user)
+      assert {:ok, _} = Tasks.select_today(user, moving.id, Date.add(day, -1))
+
+      for _ <- 1..3 do
+        task = task_fixture(user)
+        assert {:ok, _} = Tasks.select_today(user, task.id, day)
+      end
+
+      [drag, menu] =
+        race_planning_commands(user, day, [
+          fn ->
+            Tasks.move_task(
+              user,
+              %{
+                "task_id" => moving.id,
+                "from" => "retry",
+                "to" => "backlog",
+                "orders" => %{"retry" => [], "backlog" => [moving.id]}
+              },
+              day
+            )
+          end,
+          fn -> Tasks.return_to_backlog(user, moving.id, day) end
+        ])
+
+      assert match?({:ok, _}, drag) or drag == {:error, :invalid_state}
+      assert {:ok, _} = menu
+
+      assert {:ok, %{used_choices: 3, retry: [], backlog: [%{id: id, position: 1}]}} =
+               Tasks.snapshot(user, day)
+
+      assert id == moving.id
+    end)
   end
 
   test "concurrent returns refund the same task only once" do

@@ -215,6 +215,135 @@ defmodule Planner.TaskMovementTest do
     assert Repo.get_by(Planner.Tasks.DailyPlan, user_id: user.id, day: Date.add(day, 1)) == nil
   end
 
+  for index <- 0..2 do
+    test "retry to backlog inserts at index #{index} with exhausted quota" do
+      user = user_fixture()
+      day = ~D[2026-10-02]
+      label = Planner.LabelsFixtures.label_fixture(user)
+      [moving, remaining] = for _ <- 1..2, do: task_fixture(user, %{label_ids: [label.id]})
+
+      for task <- [moving, remaining],
+          do: assert({:ok, _} = Tasks.select_today(user, task.id, Date.add(day, -1)))
+
+      [a, b | selected] = for _ <- 1..5, do: task_fixture(user)
+      for task <- selected, do: assert({:ok, _} = Tasks.select_today(user, task.id, day))
+      ids = List.insert_at([a.id, b.id], unquote(index), moving.id)
+
+      assert {:ok, _} =
+               Tasks.move_task(
+                 user,
+                 payload(moving, "retry", "backlog", %{
+                   "retry" => [remaining.id],
+                   "backlog" => ids
+                 }),
+                 day
+               )
+
+      assert {:ok, snapshot} = Tasks.snapshot(user, day)
+      assert snapshot.used_choices == 3
+      assert Enum.map(snapshot.backlog, & &1.id) == ids
+      assert Enum.map(snapshot.backlog, & &1.position) == [1, 2, 3]
+      moved = Enum.find(snapshot.backlog, &(&1.id == moving.id))
+      assert moved.title == moving.title
+      assert moved.labels == [label]
+      assert [%{id: remaining_id, position: 1}] = snapshot.retry
+      assert remaining_id == remaining.id
+      assert {:ok, returned} = Tasks.return_to_backlog(user, remaining.id, day)
+      assert returned.position == 4
+      assert {:ok, %{used_choices: 3, retry: []}} = Tasks.snapshot(user, day)
+    end
+  end
+
+  test "retry transfer to empty backlog rejects stale, foreign and incomplete orders atomically" do
+    user = user_fixture()
+    day = ~D[2026-10-02]
+    moving = task_fixture(user)
+    foreign = task_fixture(user_fixture())
+    assert {:ok, _} = Tasks.select_today(user, moving.id, Date.add(day, -1))
+    assert {:ok, before} = Tasks.snapshot(user, day)
+
+    for params <- [
+          payload(moving, "today", "backlog", %{"today" => [], "backlog" => [moving.id]}),
+          payload(moving, "retry", "backlog", %{"retry" => []}),
+          payload(moving, "retry", "backlog", %{
+            "retry" => [],
+            "backlog" => [moving.id, foreign.id]
+          }),
+          payload(foreign, "retry", "backlog", %{"retry" => [], "backlog" => [foreign.id]}),
+          payload(moving, "retry", "backlog", %{"retry" => [moving.id], "backlog" => [moving.id]})
+        ] do
+      assert {:error, _} = Tasks.move_task(user, params, day)
+      assert {:ok, ^before} = Tasks.snapshot(user, day)
+    end
+
+    params = payload(moving, "retry", "backlog", %{"retry" => [], "backlog" => [moving.id]})
+    assert {:ok, _} = Tasks.move_task(user, params, day)
+    assert {:ok, after_move} = Tasks.snapshot(user, day)
+    assert after_move.used_choices == 0
+    assert [%{id: id, position: 1}] = after_move.backlog
+    assert id == moving.id
+    assert {:error, :invalid_state} = Tasks.move_task(user, params, day)
+    assert {:ok, ^after_move} = Tasks.snapshot(user, day)
+  end
+
+  test "today to retry is forbidden and a drag across rollover keeps its original source" do
+    user = user_fixture()
+    day = ~D[2026-10-02]
+    moving = task_fixture(user)
+    assert {:ok, _} = Tasks.select_today(user, moving.id, day)
+    before = Tasks.list_tasks(user)
+
+    assert {:error, :invalid_state} =
+             Tasks.move_task(
+               user,
+               payload(moving, "today", "retry", %{"today" => [], "retry" => [moving.id]}),
+               day
+             )
+
+    assert Tasks.list_tasks(user) == before
+    next_day = Date.add(day, 1)
+
+    assert {:error, :invalid_state} =
+             Tasks.move_task(
+               user,
+               payload(moving, "today", "backlog", %{"today" => [], "backlog" => [moving.id]}),
+               next_day
+             )
+
+    assert Tasks.list_tasks(user) == before
+
+    assert {:ok, %{used_choices: 0, backlog: [], today: [], retry: [retry]}} =
+             Tasks.snapshot(user, next_day)
+
+    assert retry.id == moving.id
+  end
+
+  test "retry final order failure rolls back the transfer and rollover" do
+    user = user_fixture()
+    day = ~D[2026-10-02]
+    [moving, expired] = for _ <- 1..2, do: task_fixture(user)
+
+    for task <- [moving, expired],
+        do: assert({:ok, _} = Tasks.select_today(user, task.id, Date.add(day, -1)))
+
+    before = Tasks.list_tasks(user)
+
+    Repo.query!(
+      "ALTER TABLE tasks ADD CONSTRAINT reject_retry_order CHECK (id != #{moving.id} OR kind != 'backlog' OR position = 1) NOT VALID"
+    )
+
+    assert_raise Ecto.ConstraintError, fn ->
+      Tasks.move_task(
+        user,
+        payload(moving, "retry", "backlog", %{"retry" => [expired.id], "backlog" => [moving.id]}),
+        day
+      )
+    end
+
+    assert Tasks.list_tasks(user) == before
+    assert Repo.get_by(Planner.Tasks.DailyPlan, user_id: user.id, day: day) == nil
+  end
+
   defp payload(task, source, target, orders),
     do: %{
       "task_id" => task.id,

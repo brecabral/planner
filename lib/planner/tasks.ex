@@ -166,7 +166,9 @@ defmodule Planner.Tasks do
 
   defp transfer_for_move(_task, kind, kind, _day, _plan), do: :ok
   defp transfer_for_move(task, _source, :today, day, plan), do: select_task(task, day, plan)
-  defp transfer_for_move(task, :today, :backlog, day, plan), do: return_task(task, day, plan)
+
+  defp transfer_for_move(task, source, :backlog, day, plan) when source in [:today, :retry],
+    do: return_task(task, day, plan)
 
   defp list_kind(kind) when kind in [:today, :backlog, :retry], do: {:ok, kind}
   defp list_kind("today"), do: {:ok, :today}
@@ -176,7 +178,7 @@ defmodule Planner.Tasks do
 
   defp allowed_move?(kind, kind), do: true
   defp allowed_move?(source, :today) when source in [:backlog, :retry], do: true
-  defp allowed_move?(:today, :backlog), do: true
+  defp allowed_move?(source, :backlog) when source in [:today, :retry], do: true
   defp allowed_move?(_, _), do: false
 
   defp valid_order?(ids, expected) do
@@ -234,11 +236,12 @@ defmodule Planner.Tasks do
   end
 
   @doc """
-  Returns a current pending task to backlog and refunds one choice atomically.
+  Returns a pending today/retry task to backlog atomically.
+  Only a current today task refunds a choice; retry preserves the quota.
 
   Returns `{:ok, task}`; an already pending backlog task is an unchanged success.
   Missing/foreign/malformed IDs return `{:error, :not_found}` and completed,
-  retry or noncurrent tasks return `{:error, :invalid_state}`. Persistence
+  noncurrent tasks return `{:error, :invalid_state}`. Persistence
   errors roll back the task, remaining positions and quota together.
   The optional date is server/test controlled, never browser input.
   """
@@ -252,6 +255,7 @@ defmodule Planner.Tasks do
           is_nil(task) -> {:error, :not_found}
           not is_nil(task.completed_on) -> {:error, :invalid_state}
           task.kind == :backlog -> {:ok, task}
+          task.kind == :retry -> return_task(task, day, plan)
           task.kind == :today and task.scheduled_for == day -> return_task(task, day, plan)
           true -> {:error, :invalid_state}
         end
@@ -268,12 +272,18 @@ defmodule Planner.Tasks do
              position: next_position(task.user_id, :backlog, day)
            )
            |> Repo.update() do
-      compact_positions(task.user_id, day)
+      compact_positions(task.user_id, day, task.kind)
 
-      case plan |> DailyPlan.changeset(%{used_choices: plan.used_choices - 1}) |> Repo.update() do
-        {:ok, _plan} -> {:ok, returned}
-        {:error, changeset} -> {:error, changeset}
-      end
+      refund_return(task, returned, plan)
+    end
+  end
+
+  defp refund_return(%Task{kind: :retry}, returned, _plan), do: {:ok, returned}
+
+  defp refund_return(_task, returned, plan) do
+    case plan |> DailyPlan.changeset(%{used_choices: plan.used_choices - 1}) |> Repo.update() do
+      {:ok, _plan} -> {:ok, returned}
+      {:error, changeset} -> {:error, changeset}
     end
   end
 
