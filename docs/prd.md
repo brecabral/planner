@@ -1,12 +1,12 @@
-# PRD — MVP de prioridades diárias
+# PRD — Planner: MVP local e MVP de produção
 
 Escopo mínimo definido pelo responsável em 23/09/2026. MVP local concluído em 05/10/2026, com aceite aprovado na [revisão independente de prontidão](review.md#revalidação-de-prontidão-do-mvp--05102026), após a correção de CA09 na [TASK-038](tasks/038-tratar-falha-cadastro.md).
 
-## 1. Objetivo
+## 1. Objetivo do MVP local entregue
 
 Permitir cadastrar tarefas, escolher até três ações para o dia, ordenar, devolver ou concluir e consultar histórico. O MVP é usado com um usuário padrão de teste; não exige contas, login ou configuração pessoal.
 
-## 2. Escopo funcional do MVP
+## 2. Escopo funcional do MVP local entregue
 
 | ID | Requisito |
 | --- | --- |
@@ -19,7 +19,7 @@ Permitir cadastrar tarefas, escolher até três ações para o dia, ordenar, dev
 | RF07 | Reordenar prioridades e devolver manualmente uma tarefa de hoje ao backlog. |
 | RF10 | Associar várias labels opcionais, reutilizando existentes ou criando novas no cadastro. |
 
-## 3. Regras
+## 3. Regras do MVP local entregue
 
 - Selecionar consome uma escolha; concluir mantém o consumo; devolver manualmente ao backlog restitui uma escolha uma única vez.
 - Backlog contém tarefas disponíveis, inclusive as retiradas manualmente de hoje. Retry recebe apenas tarefas que permaneceram em hoje sem conclusão quando o servidor observar um novo dia.
@@ -39,7 +39,7 @@ Manter Phoenix, PostgreSQL e Gettext. Reaproveitar geradores, adaptando o CRUD a
 
 A entrega exige testes relevantes, verificações do repositório e **cobertura mínima de 70%**, já exigida pelo CI. O percentual não substitui testes dos limites, devolução, conclusão, falhas e concorrência.
 
-## 6. Critérios de aceite do MVP
+## 6. Critérios de aceite do MVP local
 
 | ID | Cenário e resultado |
 | --- | --- |
@@ -68,16 +68,39 @@ O responsável pode levantar observações durante seu uso e avaliação, a seu 
 
 Esta decisão substitui a reserva de validação humana de 05/10/2026 e cancela CA-004-11 da renovação. Menções a avaliação humana pendente em relatórios e evidências anteriores são históricas; não representam obrigação vigente nem comprovação de avaliação realizada.
 
-## 7. Solução final, fora do MVP
+## 7. MVP de produção — plano autorizado em 11/10/2026
 
-| ID preservado | Evolução |
+O responsável confirmou o funcionamento do MVP local. A integração está no snapshot `367bf35` (`MVP Local (#7)`); a TASK-040 foi reconciliada com esse aceite. As seções anteriores preservam o contrato entregue, sem impor usuário padrão, ausência de login ou tema único ao novo incremento. Planejamento pronto não significa funcionalidades implementadas ou aplicação publicada.
+
+| Requisito | Entrega do MVP de produção |
 | --- | --- |
-| RF08 | Contas e autenticação com dados privados por usuário. |
-| RF09 / CA14 | Fuso escolhido no gerenciamento da conta. |
-| RF11 / CA16 | Publicação remota com contas reais e configuração de produção. |
+| RF12 | Menu de ações no canto esquerdo dos cartões, com controles de mover sem compressão. |
+| RF07 ampliado | Enviar retry ao backlog por menu/arraste, preservando dados e sem alterar cota. |
+| RF16 | Excluir definitivamente pendências com confirmação; excluir de hoje restitui uma escolha, concluídas permanecem preservadas. |
+| RF08 | Cadastro aberto por e-mail, magic link com auth padrão Phoenix e dados privados por conta. |
+| RF13 | Home direciona ao login; autenticados seguem para `/tasks`; desenvolvimento permite testar links na mailbox local. |
+| RF14 | Temas claro existente e escuro gratuitos para todos, concessões e preferência persistidas por usuário. |
+| RF11 | Release, runtime, envio real de e-mail, backup/restauração, aceite integrado e publicação após definição do destino. |
 
-Troca de idioma e atualização automática da tela também ficam para evolução. Essas decisões não bloqueiam o MVP. Equipes, integrações, recorrência, IA e gestão completa de projetos continuam fora do produto definido.
+Dados do usuário padrão ficam preservados e isolados; não migrar automaticamente para nenhuma conta. Dashboard mantém `/tasks` e cadastro `/tasks/new`. Usar pt-BR, data UTC, limite de três escolhas e recarga manual. O feedback de layout RF12 é uma correção específica solicitada, sem reinstalar checklist visual ou aceite humano obrigatório.
 
-## 8. Planejamento
+### Aceites do incremento
 
-O [índice de tarefas](tasks/README.md) separa os incrementos do MVP e as entregas futuras. Specs agregam arquitetura e casos de uso; status e evidências ficam nas tarefas.
+- CA17: cadastro/login/logout por magic link funcionam; visitantes não acessam planejamento, duas contas não leem nem alteram dados alheios, e dados legados permanecem isolados (SPEC-005).
+- CA18: claro e escuro estão disponíveis gratuitamente, seleção persiste por conta e não vaza entre sessões (SPEC-007).
+- CA19: menu corrigido, retry → backlog e exclusão respeitam cota, transações e histórico; release mantém esses contratos com contas reais (SPEC-002/004/008).
+- CA16: artefato validado é publicado com HTTPS, entrega real de links e recuperação comprovada, após fechar configuração e destino (SPEC-008).
+
+### Pendências restritas à produção remota
+
+Hospedagem, domínio e serviço de e-mail ainda não escolhidos, conforme resposta do responsável. Definir remetente e recuperação no destino antes das tarefas correspondentes; essas decisões não impedem correções locais, auth, mailbox ou temas. O plano não autoriza publicação imediata.
+
+## 8. Evolução após o MVP de produção
+
+- RF15: adição de créditos a usuários na TASK-049; loja, preços e compra de temas vêm depois. Propriedade futura aproveita as concessões da SPEC-007. Não há saldo, cobrança, pagamento ou loja no MVP de produção.
+- RF09 / CA14: fuso por conta (TASK-004/017), seletor de idioma (TASK-013/014) e atualização automática (TASK-031) continuam adiados.
+- Equipes, integrações, recorrência, IA, reabertura, edição/exclusão de labels e gestão completa de projetos continuam fora deste plano.
+
+## 9. Planejamento
+
+O [índice de tarefas](tasks/README.md) organiza entregas do MVP de produção; cabeçalhos são a fonte de dependências e prontidão. Comportamentos estão nas [specs](specs/README.md), arquitetura em [design](design.md). Créditos têm contrato futuro separado e não bloqueiam os dois temas gratuitos.

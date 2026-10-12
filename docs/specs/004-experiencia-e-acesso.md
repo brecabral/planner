@@ -71,3 +71,17 @@ Evolução autorizada pelo plano do responsável; amplia a entrega anterior sem 
 - RN16: um drop envia um único evento com tarefa, origem, destino e ordens finais afetadas. Restaurar DOM antes da resposta de streams. Impedir novos movimentos durante operação pendente ou desconexão; sucesso só após persistência. Rejeição recompõe painel e mostra erro pt-BR; reconexão relê estado.
 - CA-004-12: eventos de arraste e menu atualizam listas/contadores, persistem após recarga e mostram erro traduzido para estado desatualizado ou comando inválido.
 - CA-004-13: cenário de validação pelo responsável: gesto real de mouse/touch, pressão, rolagem externa/automática, destino vazio, bloqueio durante espera/desconexão, reconexão e rejeição pelo servidor. Por decisão posterior do usuário em 09/10/2026, o agente não precisa testar UI/UX ou executar navegador; valida a implementação com testes de domínio/LiveView e compilação. LiveViewTest não executa o hook. Não presumir que o responsável já realizou esses testes nem torná-los pré-requisito humano para implementar.
+
+## MVP de produção — 11/10/2026
+
+Este incremento substitui a home e o tema único de RN07/CA-004-07 após integração da autenticação e dos temas. As exclusões de RN13 eram limites da TASK-039, não do novo MVP. O proprietário passa a ser autenticado pela SPEC-005. O feedback específico de layout abaixo é requisito solicitado; não cria checklist geral de UI/UX nem avaliação humana obrigatória.
+
+- RN17: colocar o acionador e o menu de ações no canto esquerdo de cada cartão de pendência; ancorar a abertura à esquerda. Os controles de mover/subir/descer conservam espaço próprio, sem compressão ou sobreposição, inclusive com títulos/labels longos e viewport estreita. Concluir permanece visível; a alça continua independente do menu.
+- RN18: oferecer “Enviar ao backlog” em retry e aceitar esse destino no arraste conforme SPEC-002 RN11. Não oferecer backlog → retry. Ações mantêm processamento, erro pt-BR e estado confirmado pelo servidor.
+- RN19: oferecer “Excluir tarefa” no menu de pendências, nunca no histórico. Antes de enviar o comando, pedir confirmação explícita de exclusão definitiva identificando a tarefa; cancelar não grava. Confirmar usa SPEC-002 RN12–RN13. Falha preserva o estado e informa erro; sucesso remove item e atualiza contadores/cota somente após persistência. Não implementar desfazer, edição ou exclusão de labels.
+- RN20: entrada, sessão e dashboard seguem SPEC-005; seleção de tema e renderização inicial seguem SPEC-007. Manter `/tasks` como dashboard principal e `/tasks/new` como cadastro autenticado por patch.
+- CA-004-14: cada menu está na região esquerda do cartão e abre à esquerda; controles de movimento não encolhem, inclusive em cenário com texto longo. Testes estruturais verificam composição/classes; inspeção no navegador, se feita, é evidência separada e não atribuída a LiveViewTest.
+- CA-004-15: enviar retry ao backlog por evento do menu ou arraste recompõe ambas as listas e preserva cota; erro não mostra sucesso. Drop continua único, com restauração dos mesmos nós e cancelamento funcional.
+- CA-004-16: cancelar exclusão mantém tarefa; confirmar remove pendência e atualiza cota conforme a lista; concluídas não oferecem ação e evento forjado é rejeitado. Falha e ID antigo mostram erro sem falsa confirmação.
+
+Entregas: TASK-041, TASK-042, TASK-044, TASK-045 e TASK-048. Contratos antigos não comprovam implementação destes aceites.

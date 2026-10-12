@@ -45,3 +45,19 @@ A [SPEC-004](specs/004-experiencia-e-acesso.md#evolução-da-experiência--09102
 ## D16 — Movimentação persistida de pendências
 
 Plano autorizado em 09/10/2026: SortableJS via npm (licença MIT), instalado pelo responsável na retomada em 10/10/2026, com versão resolvida 1.15.7 no lockfile e importação pelo bundle existente. Hook mantém somente o DOM temporário do gesto, restaura os mesmos nós antes de enviar o evento e deixa streams aplicarem o estado confirmado. Não usar ignore nas listas de streams. Uma operação de domínio valida os conjuntos completos e aplica transferência/posições/cota sob o lock do usuário. Cadastro compartilha esse lock; posições de backlog/retry têm restrições próprias, preservando o índice de hoje por data. A virada acrescenta ao final de retry. Menu usa a mesma ordenação persistida e transferências ao final.
+
+## D17 — Evolução para produção com auth padrão Phoenix
+
+Decisão de 11/10/2026 substitui, para o novo incremento, a resolução pública do usuário padrão em D04/D06/D08/D14. Reutilizar Accounts/User/users com migration aditiva e scaffold de `phx.gen.auth` instalado, sem regenerar tarefas/labels. A TASK-015 é produtora única de auth, tokens, notifier e scope; TASK-045 integra o proprietário autenticado às entradas HTTP/LiveView e mantém APIs de domínio com usuário explícito derivado do scope. Preservar default sem e-mail autenticável, não transferir seus dados e não resetar banco. A restrição de `identifier` legado precisa acomodar contas por e-mail.
+
+Cadastro aberto, magic link sem senha, `/` redireciona ao login ou `/tasks` conforme sessão. Usar os mecanismos de sessão/token/revogação do gerador, sem criar protocolo próprio. Ajuda local e templates de Phoenix 1.8.13 consultados; o template de token usa validade de 15 minutos para login. Configuração local usa Swoosh existente; operação vai ao README na TASK-046. Fornecedor de e-mail/hosting de produção ainda pendentes.
+
+## D18 — Ajustes de tarefas e preservação da cota
+
+Retry → backlog e exclusão reutilizam o lock/transação por usuário. Transferência não altera cota; exclusão de pendência de hoje restitui uma escolha, das demais não; concluídas são preservadas. Normalizar dia antes de decidir o efeito. Remover vínculos ao excluir sem apagar catálogo de labels. Interfaces consomem essas operações e restauram estado confirmado; menus ficam à esquerda com controles sem compressão por pedido explícito do responsável.
+
+## D19 — Catálogo, concessão e seleção de tema
+
+Substitui o limite de tema único de D15 para o MVP de produção. Preservar tokens do claro `planner`, adicionar `planner_dark`, manter CSS semântico no bundle existente. `Planner.Themes` possui catálogo e concessão única usuário/tema; preferência é referência persistida por conta. Contas existentes e futuras recebem ambos gratuitamente. Renderização inicial usa seleção autorizada no servidor; páginas públicas voltam ao claro. Não aplicar preferência global de navegador entre contas.
+
+A relação de concessão é a base para futura propriedade por compra. Créditos, débitos, preços, checkout e saldo não são implementados agora; SPEC-009/TASK-049 ficam bloqueadas por decisões próprias. Não criar abstrações de pagamento nem carteira vazia para preparar uma funcionalidade ainda indefinida.

@@ -3,7 +3,7 @@
 Origem: regras do gerador Phoenix anteriormente em `AGENTS.md`, traduzidas em 22/09/2026. Aplicação: estilos, assets e experiência de uso.
 
 - Usar daisyUI integrado ao Phoenix/Tailwind para a interface, conforme D15 de [design](../design.md). A diretriz anterior que proibia novas interfaces daisyUI foi substituída pela renovação autorizada em 09/10/2026.
-- Tema claro único `planner`: definir cores somente nos tokens semânticos daisyUI em `assets/css/app.css`. Componentes usam `base-100/200/300`, `base-content`, `primary`, `error` etc.; não fixar cores de paleta. Não aplicar preferências antigas ou tema do sistema.
+- Definir cores somente nos tokens semânticos daisyUI em `assets/css/app.css`. Componentes usam `base-100/200/300`, `base-content`, `primary`, `error` etc.; não fixar cores de paleta. O claro `planner` está implementado; o plano de produção adiciona `planner_dark` e seleção por conta conforme SPEC-007/design D19. Não aplicar preferências antigas ou tema do sistema.
 - Transições dos controles e painel entre 150–200 ms, com tratamento de `prefers-reduced-motion`; não animar entrada dos itens de streams.
 - Tailwind v4 não precisa de `tailwind.config.js`; manter em `assets/css/app.css` a sintaxe de importação e fontes do projeto:
 

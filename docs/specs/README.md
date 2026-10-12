@@ -1,6 +1,6 @@
-# Especificações do MVP
+# Especificações do Planner
 
-Specs agregam arquitetura, invariantes e casos de uso; tarefas entregam passos pequenos. As seis specs abaixo descrevem o MVP definido, sem decisões de login, idioma alternativo, fuso ou atualização automática. Evoluções estão separadas no índice de tarefas e exigem revisão de contrato antes da execução.
+Specs agregam arquitetura, invariantes e casos de uso; tarefas entregam passos pequenos. O MVP local foi entregue; o plano de produção amplia planejamento/interface e substitui o acesso compartilhado por contas. Os cabeçalhos indicam prontidão do contrato, não conclusão da implementação.
 
 | Spec | Capacidade |
 | --- | --- |
@@ -8,10 +8,10 @@ Specs agregam arquitetura, invariantes e casos de uso; tarefas entregam passos p
 | [002 — Backlog, retry e três escolhas diárias](002-planejamento-diario.md) | Contrato do MVP; implementação em várias tarefas. |
 | [003 — Data corrente, retry e histórico](003-dia-e-historico.md) | Contrato do MVP; implementação em várias tarefas. |
 | [004 — Experiência do painel](004-experiencia-e-acesso.md) | Contrato do MVP; implementação em várias tarefas. |
-| [005 — Usuário padrão do MVP](005-contas-e-acesso.md) | Contrato do MVP; implementação em várias tarefas. |
+| [005 — Contas, magic link e isolamento](005-contas-e-acesso.md) | Contrato do MVP; implementação em várias tarefas. |
 | [006 — Labels reutilizáveis por usuário](006-labels.md) | Contrato do MVP; implementação em várias tarefas. |
 
-As seis specs estão implementadas no código integrado e com aceite verificado pela [revalidação independente do MVP](../review.md#revalidação-de-prontidão-do-mvp--05102026), alvo `2b8ba19`, em 05/10/2026. Não há avaliação humana obrigatória da interface, conforme o [PRD](../prd.md#feedback-de-interface).
+As versões do MVP local dessas seis specs foram implementadas no código integrado e tiveram aceite verificado pela [revalidação independente do MVP](../review.md#revalidação-de-prontidão-do-mvp--05102026), alvo `2b8ba19`, em 05/10/2026. Não há avaliação humana obrigatória da interface, conforme o [PRD](../prd.md#feedback-de-interface).
 
 ## Como escrever
 
@@ -27,4 +27,17 @@ Propostas pequenas começam como specs `draft`; não criar RFC, proposta e spec 
 
 Consulta assistida: [skill de especificação](../skills/specify-feature/SKILL.md).
 
-Incremento autorizado de arraste: SPEC-002/003/004 em `ready` para a [TASK-040](../tasks/040-arrastar-tarefas.md); o aceite histórico do MVP não atesta essa implementação.
+Arraste integrado na [TASK-040](../tasks/040-arrastar-tarefas.md), com aceite local confirmado em 11/10/2026. Os incrementos de produção nas SPEC-002/004/005/007 ainda exigem suas próprias entregas e evidências.
+
+## Contratos do MVP de produção
+
+| Spec | Escopo e prontidão |
+| --- | --- |
+| [002 — Planejamento](002-planejamento-diario.md) | Ready: retry → backlog e exclusão de pendências; TASK-042/043. |
+| [004 — Painel](004-experiencia-e-acesso.md) | Ready: menu à esquerda e novas ações; TASK-041/042/044. |
+| [005 — Contas](005-contas-e-acesso.md) | Ready: cadastro aberto, magic link, isolamento e dev; TASK-015/045/046. |
+| [007 — Temas](007-temas-e-creditos.md) | Ready: dois temas gratuitos, concessão e preferência por usuário; TASK-047/048. |
+| [008 — Produção](008-producao.md) | Draft: contratos locais definidos, destino e serviços remotos pendentes. |
+| [009 — Créditos e compras](009-creditos-e-compras.md) | Draft: evolução futura; não bloqueia o MVP de produção. |
+
+As versões históricas citadas nos aceites de 05/10 não atestam login, temas ou operações novas. SPEC-003 preserva data UTC/histórico; SPEC-006 preserva classificação, com novo proprietário autenticado integrado pela TASK-045.

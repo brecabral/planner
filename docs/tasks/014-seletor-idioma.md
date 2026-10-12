@@ -8,7 +8,7 @@ depends_on: ["TASK-008"]
 provides: ["interface-locale-switching"]
 consumes: ["verified-mvp"]
 write_scope: ["lib/planner_web/controllers/locale_controller.ex", "lib/planner_web/router.ex", "lib/planner_web/components/layouts*", "priv/gettext/", "test/planner_web/"]
-blockers: ["Fora do MVP; revisar escopo e contratos antes de iniciar a evolução."]
+blockers: ["Fora do MVP de produção; revisar escopo e contratos antes de iniciar a evolução."]
 ---
 
 # 014 — Seletor de idioma
@@ -18,3 +18,5 @@ blockers: ["Fora do MVP; revisar escopo e contratos antes de iniciar a evoluçã
 Definir idiomas adicionais e persistência da preferência antes de criar seletor.
 
 Fora do MVP. Não executável nem gate da entrega mínima. O contrato de produto e o aceite serão definidos ao retomar esta etapa; não aplicar o comportamento futuro às specs atuais do MVP.
+
+O plano de produção de 11/10/2026 mantém esta capacidade adiada. Reavaliar dependências diante da autenticação/temas quando o contrato for retomado; os cabeçalhos atuais não autorizam execução.
