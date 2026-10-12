@@ -1,6 +1,6 @@
 ---
 id: "TASK-045"
-status: "in_review"
+status: "done"
 execution_level: "advanced"
 execution_rationale: "Integra identidade em HTTP, LiveView e comandos, com risco transversal de acesso entre usuários."
 specs: ["SPEC-005", "SPEC-002", "SPEC-004", "SPEC-006"]
@@ -51,3 +51,7 @@ TDD: quatro testes novos de entrada, autenticação, revogação e isolamento fa
 Validação via RTK, ajudas Mix previamente consultadas na sessão: testes direcionados, `mix gettext.extract --merge --no-fuzzy --locale pt_BR` (uma mensagem nova, “Sair”), `mix precommit` e `mix ci` finais com **223 testes aprovados**, sem warnings, Credo estrito sem achados, assets compilados e npm audit sem vulnerabilidades. Cobertura total **93,75%** (anterior TASK-015 **92,81%**, mínimo **70%** preservado); UserAuth **98,18%**, TaskLive.Index **98,59%**, Form **97,26%**, Tasks **97,94%**, Login/PageController **100%**. `git diff --check` aprovado.
 
 Autoavaliação pelo fluxo de review: **approved no escopo técnico validado**, sobre alterações locais contra a base acima; sem achados bloqueantes. Não é revisão independente nem avança seu marco. Nenhum hook/JavaScript alterado; testes não validam layout, interação real com navegador ou fechamento do transporte WebSocket. Sem publicação. Estado `in_review`, aguardando conferência operacional e commit de integração pelo coordenador; implementador não realizou staging/commit nem iniciou consumidoras.
+
+### Conferência operacional — 12/10/2026
+
+Coordenador `/root`: entrega integrada em `800b2d3` na branch `feat/ux`. Conferidos escopo, autoavaliação, gates relatados aprovados (223 testes, cobertura 93,75%) e ausência de impedimentos. Sem reprodução de testes ou revisão independente. Estado anterior histórico; conclusão operacional libera TASK-046. Limites de validação em navegador preservados.
