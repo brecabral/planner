@@ -1,6 +1,6 @@
 ---
 id: "TASK-015"
-status: "in_review"
+status: "done"
 execution_level: "advanced"
 execution_rationale: "Concilia scaffold com identidade e dados existentes, tokens e sessão sem sobrescrever a base."
 specs: ["SPEC-005"]
@@ -55,3 +55,7 @@ Validações via RTK com ajuda Mix consultada: `mix test` direcionado (38 testes
 Autoavaliação pelo fluxo de review sobre alterações locais contra a base acima: contratos e diff inspecionados, sem achados bloqueantes no escopo TASK-015; **approved no escopo técnico validado**, com gates finais aprovados. Não é revisão independente e não avança o marco de review independente. Não houve validação em navegador real; LiveViewTest comprova HTML/eventos/submissão, não comportamento do navegador. Nenhum hook alterado. A entrega prepara auth nas rotas próprias: proteção do painel, destino `/tasks`, redirecionamentos globais e isolamento nas entradas de planejamento pertencem à TASK-045; operação de mailbox/README à TASK-046. Esta etapa intermediária não deve ser publicada.
 
 Estado `in_review`: aguarda conferência operacional e commit de integração pelo coordenador. Sem staging, commit ou publicação pelo implementador.
+
+### Conferência operacional — 12/10/2026
+
+Coordenador `/root`: entrega integrada em `d36fed4` na branch `feat/ux`. Conferidos escopo, registro de autoavaliação, gates relatados aprovados (222 testes, cobertura 92,81%) e ausência de impedimentos. Sem reprodução de testes ou revisão independente. Estado anterior histórico; conclusão operacional libera TASK-045. Limites de validação em navegador e de publicação da etapa intermediária preservados.
