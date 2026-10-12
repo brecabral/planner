@@ -1,6 +1,6 @@
 ---
 id: "TASK-043"
-status: "in_review"
+status: "done"
 execution_level: "advanced"
 execution_rationale: "Remoção definitiva exige atomicidade, compactação e disputa com conclusão e virada."
 specs: ["SPEC-002", "SPEC-003", "SPEC-006"]
@@ -51,3 +51,7 @@ Validações via RTK, usando ajudas Mix já consultadas nesta sessão: `mix test
 Autoavaliação pelo fluxo de review: **approved no escopo técnico validado**, sem achados bloqueantes, avaliando os três arquivos de código/testes locais contra a base acima. Cobertura total anterior: 93,37%; atual: 93,50%. A métrica é de linhas Elixir, não comprova todos os interleavings; a corrida real valida resultados serializáveis e testes determinísticos cobrem rejeição de histórico. Não é revisão independente e não avança o marco independente. Teste JS adicional não se aplica, pois hook não mudou. Sem validação de interface nesta entrega de domínio.
 
 Estado `in_review`: aguarda conferência operacional e commit de integração pelo coordenador. Sem staging, commit, publicação ou início de consumidoras pelo implementador.
+
+### Conferência operacional — 12/10/2026
+
+Coordenador `/root`: entrega integrada em `4250a07` na branch `feat/ux`. Conferidos escopo, contrato de consumo, autoavaliação, gates relatados aprovados (174 testes, cobertura 93,50%) e ausência de impedimentos. Sem reprodução de testes ou revisão independente. Estado anterior histórico; conclusão operacional libera TASK-044.
