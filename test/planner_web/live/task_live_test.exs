@@ -25,6 +25,122 @@ defmodule PlannerWeb.TaskLiveTest do
     if tags[:without_default], do: %{}, else: %{user: user_fixture(%{identifier: "default"})}
   end
 
+  for kind <- [:backlog, :retry, :today] do
+    @tag kind: kind
+    test "confirms or cancels permanent deletion from #{kind}", %{
+      conn: conn,
+      user: user,
+      kind: kind
+    } do
+      task = task_fixture(user, %{title: "Identified task"})
+
+      if kind != :backlog do
+        day = if kind == :retry, do: Date.add(Date.utc_today(), -1), else: Date.utc_today()
+        assert {:ok, _} = Tasks.select_today(user, task.id, day)
+      end
+
+      {:ok, view, _} = live(conn, "/tasks")
+
+      assert has_element?(
+               view,
+               "#task-menu-#{task.id}.dropdown-start #delete-#{task.id}",
+               "Excluir tarefa"
+             )
+
+      view |> element("#delete-#{task.id}") |> render_click()
+      assert has_element?(view, "#delete-confirmation", "Identified task")
+      assert has_element?(view, "#delete-confirmation", "definitivamente")
+      assert {:ok, before} = Tasks.snapshot(user)
+      view |> element("#cancel-delete") |> render_click()
+      refute has_element?(view, "#delete-confirmation")
+      assert {:ok, ^before} = Tasks.snapshot(user)
+      view |> element("#delete-#{task.id}") |> render_click()
+      view |> form("#confirm-delete") |> render_submit()
+      refute has_element?(view, "#delete-#{task.id}")
+      refute has_element?(view, "#delete-confirmation")
+      assert has_element?(view, "#planning-status", "Tarefa excluída.")
+      assert has_element?(view, "#used-choices", "0 de 3")
+      assert {:ok, %{backlog: [], retry: [], today: [], used_choices: 0}} = Tasks.snapshot(user)
+      {:ok, reloaded, _} = live(conn, "/tasks")
+      refute has_element?(reloaded, "#delete-#{task.id}")
+    end
+  end
+
+  test "forged deletion requests and stale confirmations preserve history and foreign tasks", %{
+    conn: conn,
+    user: user
+  } do
+    completed = task_fixture(user)
+    assert {:ok, _} = Tasks.select_today(user, completed.id)
+    assert {:ok, _} = Tasks.complete_task(user, completed.id)
+    foreign_user = user_fixture()
+    foreign = task_fixture(foreign_user)
+    pending = task_fixture(user)
+    {:ok, view, _} = live(conn, "/tasks")
+    refute has_element?(view, "#history [id^='delete-']")
+
+    for id <- [completed.id, foreign.id, -1, nil, "invalid"] do
+      render_click(view, "request_delete", %{"task_id" => id, "user_id" => foreign_user.id})
+      assert has_element?(view, "#planning-error", "não está mais disponível")
+      refute has_element?(view, "#delete-confirmation")
+      render_submit(view, "delete", %{"task_id" => id, "user_id" => foreign_user.id})
+      assert has_element?(view, "#planning-error", "não está mais disponível")
+    end
+
+    assert Tasks.get_task!(foreign_user, foreign.id) == foreign
+    assert [%{id: id}] = Tasks.list_history(user)
+    assert id == completed.id
+    view |> element("#delete-#{pending.id}") |> render_click()
+    assert {:ok, _} = Tasks.delete_pending_task(user, pending.id)
+    view |> form("#confirm-delete") |> render_submit()
+    assert has_element?(view, "#planning-error", "não está mais disponível")
+    refute has_element?(view, "#delete-#{pending.id}")
+    refute has_element?(view, "#planning-status", "Tarefa excluída.")
+    assert has_element?(view, "#used-choices", "1 de 3")
+  end
+
+  test "confirmation uses the selected server task and ignores forged target and owner", %{
+    conn: conn,
+    user: user
+  } do
+    selected = task_fixture(user)
+    other = task_fixture(user)
+    foreign_user = user_fixture()
+    foreign = task_fixture(foreign_user)
+    {:ok, view, _} = live(conn, "/tasks")
+    view |> element("#delete-#{selected.id}") |> render_click()
+    render_submit(view, "delete", %{"task_id" => foreign.id, "user_id" => foreign_user.id})
+    assert has_element?(view, "#planning-status", "Tarefa excluída.")
+    refute has_element?(view, "#tasks-#{selected.id}")
+    assert has_element?(view, "#tasks-#{other.id}")
+    assert Tasks.get_task!(foreign_user, foreign.id) == foreign
+    assert has_element?(view, "#backlog-count", "1")
+  end
+
+  test "deletion persistence error keeps confirmed data and registration draft", %{
+    conn: conn,
+    user: user
+  } do
+    task = task_fixture(user)
+    assert {:ok, _} = Tasks.select_today(user, task.id)
+    {:ok, view, _} = live(conn, "/tasks/new")
+    view |> form("#task-form", task: %{title: "Keep draft"}) |> render_change()
+    assert {:ok, before} = Tasks.snapshot(user)
+
+    SQL.query!(
+      Repo,
+      "ALTER TABLE daily_plans ADD CONSTRAINT reject_ui_delete CHECK (used_choices = 1) NOT VALID"
+    )
+
+    render_click(view, "request_delete", %{"task_id" => task.id})
+    view |> form("#confirm-delete") |> render_submit()
+    assert has_element?(view, "#planning-error", "Não foi possível salvar")
+    refute has_element?(view, "#planning-status", "Tarefa excluída.")
+    assert has_element?(view, "#today-#{task.id}")
+    assert has_element?(view, "#task-form input[name='task[title]'][value='Keep draft']")
+    assert {:ok, ^before} = Tasks.snapshot(user)
+  end
+
   test "pending cards reserve left controls and a full menu with long text", %{
     conn: conn,
     user: user

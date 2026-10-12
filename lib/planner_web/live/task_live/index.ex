@@ -193,6 +193,39 @@ defmodule PlannerWeb.TaskLive.Index do
           </div>
         </div>
       </section>
+      <section
+        :if={@deletion_task}
+        id="delete-confirmation"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="delete-heading"
+        aria-describedby="delete-description"
+        class="modal modal-open"
+      >
+        <.focus_wrap id="delete-focus" class="modal-box" phx-mounted={JS.focus(to: "#cancel-delete")}>
+          <h2 id="delete-heading" class="text-lg font-semibold">{gettext("Delete task")}</h2>
+          <p id="delete-description" class="mt-4 break-words">
+            {gettext("Permanently delete the task “%{title}”? This cannot be undone.",
+              title: @deletion_task.title
+            )}
+          </p>
+          <div class="modal-action">
+            <button id="cancel-delete" type="button" phx-click="cancel_delete" class="btn">
+              {gettext("Cancel")}
+            </button>
+            <form id="confirm-delete" phx-submit={JS.push("delete", page_loading: true)}>
+              <button
+                id="confirm-delete-button"
+                type="submit"
+                class="btn btn-error"
+                phx-disable-with={gettext("Saving...")}
+              >
+                {gettext("Delete permanently")}
+              </button>
+            </form>
+          </div>
+        </.focus_wrap>
+      </section>
       <.live_component
         :if={@live_action == :new}
         module={PlannerWeb.TaskLive.Form}
@@ -216,6 +249,7 @@ defmodule PlannerWeb.TaskLive.Index do
      |> assign(:planning_status, nil)
      |> assign(:status_version, 0)
      |> assign(:history_open, false)
+     |> assign(:deletion_task, nil)
      |> assign_snapshot(snapshot)}
   end
 
@@ -236,6 +270,30 @@ defmodule PlannerWeb.TaskLive.Index do
     {:noreply, assign(socket, :history_open, !socket.assigns.history_open)}
   end
 
+  def handle_event("request_delete", params, socket) do
+    task = pending_deletion_task(socket.assigns.user, Map.get(params, "task_id"))
+
+    if task do
+      {:noreply, assign(socket, deletion_task: task, planning_error: nil, planning_status: nil)}
+    else
+      finish_action(assign(socket, :deletion_task, nil), {:error, :not_found}, "delete")
+    end
+  end
+
+  def handle_event("cancel_delete", _params, socket) do
+    {:noreply, assign(socket, :deletion_task, nil)}
+  end
+
+  def handle_event("delete", _params, socket) do
+    result =
+      case socket.assigns.deletion_task do
+        nil -> {:error, :not_found}
+        task -> run_action("delete", socket.assigns.user, task.id)
+      end
+
+    finish_action(assign(socket, :deletion_task, nil), result, "delete")
+  end
+
   def handle_event(action, params, socket) when action in ["select", "return", "complete"] do
     result = run_action(action, socket.assigns.user, Map.get(params, "task_id"))
 
@@ -252,6 +310,18 @@ defmodule PlannerWeb.TaskLive.Index do
     result = run_action("move_task", socket.assigns.user, params)
     {:noreply, socket} = finish_action(socket, result, "move_task")
     {:reply, %{ok: match?({:ok, _}, result)}, socket}
+  end
+
+  defp pending_deletion_task(user, id) do
+    with {:ok, id} when is_integer(id) <- Ecto.Type.cast(:id, id),
+         task = Tasks.get_task!(user, id),
+         true <- is_nil(task.completed_on) do
+      task
+    else
+      _ -> nil
+    end
+  rescue
+    _error in [Ecto.NoResultsError, Ecto.Query.CastError] -> nil
   end
 
   defp move_priority(ids, %{"task_id" => id, "direction" => direction})
@@ -303,6 +373,7 @@ defmodule PlannerWeb.TaskLive.Index do
     {:noreply, refresh_snapshot(socket)}
   end
 
+  defp success_message("delete"), do: gettext("Task deleted.")
   defp success_message("move_task"), do: gettext("Movement saved.")
   defp success_message("complete"), do: gettext("Task completed.")
   defp success_message("return"), do: gettext("Task returned to backlog.")
@@ -311,6 +382,9 @@ defmodule PlannerWeb.TaskLive.Index do
 
   defp run_action(action, user, id) do
     case action do
+      "delete" ->
+        Tasks.delete_pending_task(user, id)
+
       "select" ->
         Tasks.select_today(user, id)
 
@@ -407,6 +481,16 @@ defmodule PlannerWeb.TaskLive.Index do
       <div class="dropdown-content z-10 w-56 rounded-box bg-base-100 p-2 shadow-lg">
         <.planning_action task={@task} action={if @task.kind == :today, do: "return", else: "select"} />
         <.planning_action :if={@task.kind == :retry} task={@task} action="return" />
+        <button
+          id={"delete-#{@task.id}"}
+          type="button"
+          phx-click="request_delete"
+          phx-disable-with={gettext("Saving...")}
+          phx-value-task_id={@task.id}
+          class="btn btn-ghost text-error"
+        >
+          {gettext("Delete task")}
+        </button>
         <div class="flex gap-2">
           <.order_action task={@task} direction="up" disabled={@task.position == 1} />
           <.order_action task={@task} direction="down" disabled={@task.position == @count} />
