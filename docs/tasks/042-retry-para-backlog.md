@@ -1,6 +1,6 @@
 ---
 id: "TASK-042"
-status: "in_review"
+status: "done"
 execution_level: "advanced"
 execution_rationale: "Amplia transição transacional e contrato de arraste, preservando concorrência e cota."
 specs: ["SPEC-002", "SPEC-004"]
@@ -49,3 +49,7 @@ Comandos via RTK, após consulta das respectivas ajudas Mix: `mix test test/plan
 Autoavaliação pelo fluxo de review: **approved no escopo técnico validado**, sem achados bloqueantes, sobre os nove arquivos de código/teste/catálogo locais contra a base acima. Autoavaliação não é revisão independente e não avança o marco de review. Cobertura total anterior informada pela TASK-041: 93,45%; atual 93,37%, preservando caminhos críticos testados e mínimo de 70%. Cobertura de linhas Elixir não mede ramos JavaScript ou layout. Harness usa DOM/timers mínimos e chamadas da dependência; não comprova gesto real mouse/touch, layout ou patches LiveView em navegador. Não houve validação visual em navegador nesta entrega.
 
 Estado `in_review`: aguarda conferência operacional e commit de integração pelo coordenador. Sem staging, commit, publicação ou início de consumidoras pelo implementador.
+
+### Conferência operacional — 12/10/2026
+
+Coordenador `/root`: entrega integrada em `7c8903f` na branch `feat/ux`. Conferidos escopo dos arquivos, autoavaliação, gates relatados aprovados (166 testes Elixir, 8 JavaScript, cobertura 93,37%) e ausência de impedimentos. Sem reprodução de testes ou revisão independente. Estado anterior histórico; conclusão operacional libera TASK-043. Limites de navegador preservados.
