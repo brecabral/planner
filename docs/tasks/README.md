@@ -1,6 +1,6 @@
 # Tarefas de implementação
 
-O MVP contém somente o fluxo de planejamento com usuário padrão, pt-BR via Gettext, data corrente e recarga manual. Cabeçalhos YAML são a fonte de status, dependências e bloqueios; convenções no [formato](formato.md). Cada tarefa informa scaffold e ajustes quando houver geração.
+O MVP local entregue contém o fluxo de planejamento com usuário padrão, pt-BR via Gettext, data corrente e recarga manual. O MVP de produção amplia esse contrato conforme o PRD e a seção própria abaixo. Cabeçalhos YAML são a fonte de status, dependências e bloqueios; convenções no [formato](formato.md). Cada tarefa informa scaffold e ajustes quando houver geração.
 
 ## MVP
 
@@ -59,21 +59,40 @@ TASK-008 verifica CA01–CA13 e CA15, incluindo persistência após reinício e 
 | [039 — Renovar a experiência do Planner](039-renovar-experiencia.md) |
 | [040 — Arrastar tarefas com mouse e touch](040-arrastar-tarefas.md) |
 
-O pacote de correção decorrente da revisão de 10/10/2026 está na [TASK-040](040-arrastar-tarefas.md#correção-pendente--r2-da-revisão-de-10102026); seus cabeçalhos definem a dependência da interface e a ordem de integração.
+O encerramento da TASK-040 foi reconciliado com a integração `367bf35` e o aceite local do responsável em 11/10/2026. Seus registros de correção/revisão anteriores são históricos.
 
-## Evolução futura — não bloqueia o MVP
+## MVP de produção — plano de 11/10/2026
 
-Estas tarefas só poderão iniciar após redefinir seus contratos e decisões de produto. Não representam trabalho necessário para a entrega mínima.
+O pedido autoriza o planejamento; execução e estados reais seguem os cabeçalhos. Sequência serializa painel, Accounts, migrations, catálogos, testes e README compartilhados. A próxima tarefa elegível é 041, após o encerramento reconciliado da 040. Não há dependência humana nova nesta sequência; escolhas externas estão explicitadas em blockers.
 
-| Evolução |
-| --- |
-| [013 — Locale variável em LiveView](013-locale-liveview.md) |
-| [014 — Seletor de idioma](014-seletor-idioma.md) |
-| [015 — Autenticação e contas reais](015-integrar-autenticacao.md) |
-| [004 — Fuso configurável na conta](004-configuracao-dia.md) |
-| [017 — Gerenciamento de fuso](017-formulario-fuso.md) |
-| [031 — Atualização automática do painel](031-atualizar-dia-liveview.md) |
-| [011 — Release de produção](011-entrega-remota.md) |
-| [033 — Runtime de produção](033-configurar-producao.md) |
-| [034 — Publicação remota](034-publicar-aplicacao.md) |
-| [035 — Backup e restauração](035-validar-restauracao.md) |
+| Entrega | Tarefa |
+| --- | --- |
+| Corrigir menu à esquerda e controles comprimidos | [041](041-ajustar-menu-tarefas.md) |
+| Enviar retry ao backlog | [042](042-retry-para-backlog.md) |
+| Exclusão definitiva de pendências no domínio | [043](043-excluir-pendencias-dominio.md) |
+| Confirmação e exclusão pelo painel | [044](044-excluir-pendencias-interface.md) |
+| Scaffold de auth Phoenix, cadastro aberto e magic link | [015](015-integrar-autenticacao.md) |
+| Home/login/dashboard e isolamento por conta | [045](045-isolar-planejamento-autenticado.md) |
+| Testar magic link em dev pela mailbox local | [046](046-magic-link-dev.md) |
+| Catálogo, concessões gratuitas e preferência de tema | [047](047-catalogo-concessoes-temas.md) |
+| Tema claro/escuro e seletor persistido | [048](048-temas-claro-escuro.md) |
+| Release local com assets e migrations | [011](011-entrega-remota.md) |
+| Runtime de produção e entrega real de e-mail | [033](033-configurar-producao.md) |
+| Backup/restauração isolada | [035](035-validar-restauracao.md) |
+| Aceite integrado do candidato de produção | [050](050-aceite-mvp-producao.md) |
+| Publicação do artefato validado | [034](034-publicar-aplicacao.md) |
+
+Cadastro aberto e dados antigos isolados foram confirmados. Exclusão preserva concluídas e restitui uma escolha somente ao excluir pendência de hoje. Os dois temas são gratuitos para todas as contas; catálogo/concessões preparam propriedade futura sem saldo ou loja. Hosting/domínio/e-mail e recuperação remota ainda precisam de definição na SPEC-008; tarefas locais não dependem dessas escolhas.
+
+## Evolução futura — não bloqueia o MVP de produção
+
+| Evolução | Tarefa |
+| --- | --- |
+| Locale variável em LiveView | [013](013-locale-liveview.md) |
+| Seletor de idioma | [014](014-seletor-idioma.md) |
+| Fuso configurável na conta | [004](004-configuracao-dia.md) |
+| Gerenciamento de fuso | [017](017-formulario-fuso.md) |
+| Atualização automática do painel | [031](031-atualizar-dia-liveview.md) |
+| Adição de créditos por usuário, com regras a definir | [049](049-creditos-usuarios.md) |
+
+Compra de temas, preços, loja e pagamentos serão decompostos depois de decisões próprias na SPEC-009. Não são dependências dos dois temas gratuitos nem da publicação do MVP de produção.

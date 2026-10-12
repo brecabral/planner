@@ -36,3 +36,7 @@ Um contrato pequeno fornece a data corrente no servidor e permite controlá-la n
 Contrato de data, normalização, conclusão, consulta e recarga são implementados em etapas no [mapa de tarefas](../tasks/README.md). Não há decisão de fuso bloqueando o MVP.
 
 - CA-003-07: com retry reordenado e pendências vencidas, normalizar conserva a ordem existente e acrescenta vencidas pela prioridade anterior; repetir não duplica nem altera posições. Histórico permanece somente consulta por conclusão.
+
+## Aplicação ao MVP de produção
+
+O proprietário deixa de ser o usuário padrão e passa a ser a conta autenticada da [SPEC-005](005-contas-e-acesso.md), sem mudar as regras de data UTC, consulta histórica ou nomes de labels. A integração de isolamento é entregue pela TASK-045 e não herda o aceite do MVP local. Exclusão de pendências segue SPEC-002 RN12–RN13: remove vínculos, preserva labels e não permite excluir concluídas.

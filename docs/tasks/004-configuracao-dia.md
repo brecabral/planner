@@ -8,7 +8,7 @@ depends_on: ["TASK-008"]
 provides: ["user-timezone-storage"]
 consumes: ["verified-mvp"]
 write_scope: ["lib/planner/accounts/user.ex", "priv/repo/migrations/", "test/planner/accounts/user_test.exs"]
-blockers: ["Fora do MVP; revisar escopo e contratos antes de iniciar a evolução."]
+blockers: ["Fora do MVP de produção; revisar escopo e contratos antes de iniciar a evolução."]
 ---
 
 # 004 — Fuso configurável na conta
@@ -18,3 +18,5 @@ blockers: ["Fora do MVP; revisar escopo e contratos antes de iniciar a evoluçã
 Definir política de escolha inicial e alteração de fuso; revisar migrations e conta após autenticação.
 
 Fora do MVP. Não executável nem gate da entrega mínima. O contrato de produto e o aceite serão definidos ao retomar esta etapa; não aplicar o comportamento futuro às specs atuais do MVP.
+
+O plano de produção de 11/10/2026 mantém esta capacidade adiada. Reavaliar dependências diante da autenticação/temas quando o contrato for retomado; os cabeçalhos atuais não autorizam execução.

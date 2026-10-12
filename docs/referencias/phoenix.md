@@ -26,3 +26,9 @@ Na versão instalada, a ajuda de `phx.gen.auth`, `phx.gen.context`, `phx.gen.sch
 - Schema aceita enum e referências; migration e changeset gerados exigem revisão de defaults, campos opcionais, unicidade e constraints do domínio.
 - A geração de CRUD não aprova edição/exclusão ou entrada livre de campos controlados pelo servidor. Remover essas superfícies quando não pertencem à spec.
 - Release gera scripts de servidor/migration; a opção Docker também cria arquivos de container. Nenhuma dessas gerações publica a aplicação.
+
+## Auth sobre identidade existente
+
+Em 11/10/2026, a ajuda local de `phx.gen.auth` e o template `schema_token.ex.eex` foram consultados na versão instalada (Phoenix 1.8.13). O gerador oferece LiveView, tokens, notifier e scope; o template de magic link usa 15 minutos. Preservar o protocolo gerado e revisar o código efetivamente instalado antes de adaptá-lo.
+
+Em base com Accounts/User existentes, geração não equivale a migration de dados pronta: conciliar schema/contexto, preservar IDs/FKs e converter criação da tabela existente em alteração aditiva. A geração é única na TASK-015; consumidoras não repetem o scaffold. A inclusão de senha pelo scaffold não autoriza expô-la quando o contrato é exclusivamente magic link.

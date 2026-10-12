@@ -1,6 +1,6 @@
 ---
 id: "TASK-040"
-status: in_review
+status: done
 execution_level: advanced
 execution_rationale: "Integra ordenação transacional, migration de dados e DOM temporário com streams e gestos touch."
 specs: ["SPEC-002", "SPEC-003", "SPEC-004"]
@@ -12,6 +12,10 @@ blockers: []
 ---
 
 # 040 — Arrastar tarefas com mouse e touch
+
+## Encerramento reconciliado — 11/10/2026
+
+O responsável confirmou: “eu ja vefiquei o mvp local, tudo certo”. A entrega e a correção R2 estão no snapshot integrado `367bf3555bc2b06e5ce90aedc2118e46e00986de` (`MVP Local (#7)`), que inclui o hook, o harness e os registros da revalidação independente abaixo; árvore limpa antes desta atualização documental. Aceite local confirmado, gates relatados aprovados e revisão independente de R2 aprovada. Estado reconciliado para `done`, sem repetir testes nem alterar o marco histórico do review. As menções seguintes a correção não commitada e `in_review` descrevem as rodadas anteriores. Os novos ajustes pedidos para o MVP de produção são novas tarefas, não reabertura de R2.
 
 Execução direta do plano aprovado pelo usuário em 09/10/2026. Preservar a renovação [TASK-039](039-renovar-experiencia.md), produtora da interface consumida por esta tarefa. Dependências do MVP integradas; TASK-039 integrada no snapshot `8f1402a`, com conferência operacional registrada em `452083a` antes da correção R2. Nenhum pré-requisito humano pendente.
 

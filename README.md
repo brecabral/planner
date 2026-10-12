@@ -1,6 +1,6 @@
 # Planner
 
-Planner pessoal para escolher prioridades do dia, manter um backlog e consultar tarefas concluídas. O MVP local está concluído e aprovado em [revisão independente](docs/review.md).
+Planner pessoal para escolher prioridades do dia, manter um backlog e consultar tarefas concluídas. O MVP local está concluído e aprovado em [revisão independente](docs/review.md), com aceite do responsável confirmado em 11/10/2026. O [plano do MVP de produção](docs/prd.md#7-mvp-de-produção--plano-autorizado-em-11102026) adiciona contas por magic link, isolamento, ajustes de tarefas e temas; essas funcionalidades ainda não estão implementadas.
 
 A aplicação usa Phoenix, Elixir e PostgreSQL. O servidor roda na máquina; o banco local roda em Docker, com dados persistidos em volume.
 
@@ -48,7 +48,7 @@ O Compose usa PostgreSQL 17, publica a porta apenas em `127.0.0.1` e preserva da
 
 Alterar credenciais no `.env` não altera um volume já inicializado: ajuste também o usuário no banco existente. Para CI ou banco externo, exporte `PLANNER_SKIP_COMPOSE=true` e as variáveis de conexão de `.env.example`. Produção usa `config/runtime.exs` e não inicia Compose automaticamente.
 
-## Usuário padrão do MVP
+## Usuário padrão do MVP local — comportamento atual
 
 Em desenvolvimento, com banco criado e migrations aplicadas, abrir `/tasks` ou diretamente `/tasks/new` cria o usuário de identificador `default` se ele ainda não existir. Novos acessos e conexões reutilizam a mesma identidade, preservando timestamps, tarefas e labels. Não é necessário executar seeds antes desse primeiro acesso; o boot do servidor não cria usuários.
 
@@ -69,3 +69,7 @@ O workflow `CI` executa o check **quality** em PRs para `main` e pushes na `main
 O responsável confirmou a configuração da proteção da `main` e do check obrigatório **quality**.
 
 Para alterações no hook de arraste, execute também o teste JavaScript listado acima; ele é separado dos aliases `precommit` e `ci`. O harness usa o SortableJS do lockfile com DOM e timers mínimos controlados. Cobre cancelamento, restauração e retomada, mas não simula layout, propagação completa de eventos, mouse/touch reais ou patches do LiveView no navegador.
+
+## Evolução planejada para produção
+
+O [plano de tarefas](docs/tasks/README.md) prevê auth padrão Phoenix com magic link, home direcionada ao login/dashboard, teste local de e-mail com Swoosh, temas claro/escuro por conta e preparação de release. Os procedimentos acima continuam descrevendo o código atual sem autenticação. A TASK-046 atualizará aqui os passos executáveis para testar magic link; as tarefas de produção documentarão aqui configuração e recuperação depois de definidos e validados. Hospedagem, domínio e provedor de e-mail estão pendentes. Créditos e loja ficam para evolução futura.
