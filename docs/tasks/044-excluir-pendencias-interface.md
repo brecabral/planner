@@ -1,6 +1,6 @@
 ---
 id: "TASK-044"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Integra operação pronta com confirmação e atualização de streams e contadores."
 specs: ["SPEC-004", "SPEC-002"]
@@ -49,3 +49,7 @@ Validações via RTK, usando ajudas Mix já consultadas nesta sessão: `mix test
 Autoavaliação pelo fluxo de review: **approved no escopo técnico validado**, sem achados bloqueantes, sobre os quatro arquivos locais de código/teste/catálogo contra a base acima. Cobertura total anterior: 93,50%; atual: 93,77%. Não é revisão independente e não avança o marco independente. LiveViewTest comprova HTML, eventos, mensagens e persistência; não executa layout, foco, teclado, modalidade ou diálogo no navegador. Nenhuma validação visual real foi realizada. Hook não alterado, portanto teste JavaScript adicional não se aplica.
 
 Estado `in_review`: aguarda conferência operacional e commit de integração pelo coordenador. Sem staging, commit, publicação ou início de consumidoras pelo implementador.
+
+### Conferência operacional — 12/10/2026
+
+Coordenador `/root`: entrega integrada em `5f8049d` na branch `feat/ux`. Conferidos escopo, autoavaliação, gates relatados aprovados (180 testes, cobertura 93,77%) e ausência de impedimentos. Sem reprodução de testes ou revisão independente. Estado anterior histórico; conclusão operacional libera TASK-015. Limites da validação em navegador preservados.
