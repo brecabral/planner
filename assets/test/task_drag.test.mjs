@@ -4,7 +4,7 @@ import vm from "node:vm"
 import test from "node:test"
 import {environment} from "./drag_dom.mjs"
 
-function setup() {
+function setup(sourceIndex = 0, targetIndex = 1) {
   const env = environment()
   const context = vm.createContext(env)
   // Execute the installed dependency, including real destroy/_onDrop/_nulling.
@@ -25,7 +25,7 @@ function setup() {
       item.setAttribute("style", "transform: scale(1);will-change: opacity")
     }
     const handle = document.createElement("button"); handle.dataset.dragHandle = ""; item.appendChild(handle)
-    lists[0].appendChild(item); return item
+    lists[sourceIndex].appendChild(item); return item
   })
   const empty = document.createElement("p"); lists[1].appendChild(empty)
   const unrelated = document.createElement("aside"); unrelated.setAttribute("class", "task-drag-preview"); document.body.appendChild(unrelated)
@@ -45,7 +45,7 @@ function setup() {
     lists.forEach(list => assert.equal(list.dataset.dropAllowed, undefined))
   }
   function start(attachClone = true) {
-    const item = items[0], source = hook.sortables[0]
+    const item = items[0], source = hook.sortables[sourceIndex]
     const event = {type: "mousedown", target: item.children[0], clientX: 10, clientY: 10, button: 0, cancelable: true, preventDefault() {}, stopPropagation() {}}
     // Capture precedes Sortable's list listener, as in DOM propagation.
     board.dispatchEvent(event)
@@ -55,8 +55,8 @@ function setup() {
     assert.ok(Sortable.ghost)
     assert.equal(Sortable.ghost.parentNode, document.body)
     // Also exercise an attached clone; default removeCloneOnHide usually detaches it.
-    if (attachClone) lists[0].appendChild(Sortable.clone)
-    lists[1].appendChild(item)
+    if (attachClone) lists[sourceIndex].appendChild(Sortable.clone)
+    lists[targetIndex].appendChild(item)
     return {source, event, item, ghost: Sortable.ghost, clone: Sortable.clone}
   }
   return {...env, hook, lists, items, events, start, assertRestored, Sortable, baselineListeners}
@@ -152,3 +152,24 @@ test("a stale reply after disconnect cannot unlock a new pending drop", () => {
   assert.equal(f.hook.pending, false)
   f.hook.destroyed()
 })
+
+for (const [source, target, permitted] of [[2, 0, true], [0, 2, false], [1, 2, false]]) {
+  test(`transition ${source} to ${target} validates target and restores nodes once`, () => {
+    const f = setup(source, target)
+    const from = f.lists[source], to = f.lists[target]
+    const sortable = f.hook.sortables[source]
+    assert.equal(sortable.option("onMove")({from, to}), permitted)
+    const drag = f.start(false)
+    assert.equal(to.dataset.dropAllowed, String(permitted))
+    drag.source._onDrop(drag.event)
+    f.hook.drop({})
+    f.assertRestored()
+    assert.equal(f.events.length, permitted ? 1 : 0)
+    if (permitted) {
+      assert.deepEqual(JSON.parse(JSON.stringify(f.events[0].payload)), {task_id: "1", from: "retry", to: "backlog", orders: {retry: ["2"], backlog: ["1"]}})
+      f.events[0].reply({error: "rejected"})
+      assert.equal(f.hook.pending, false)
+    }
+    f.hook.destroyed()
+  })
+}

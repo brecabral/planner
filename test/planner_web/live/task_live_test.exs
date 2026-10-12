@@ -92,6 +92,46 @@ defmodule PlannerWeb.TaskLiveTest do
     assert task.scheduled_for == Date.utc_today()
   end
 
+  test "retry menu and drag return to backlog with exhausted quota and confirmed Portuguese feedback",
+       %{conn: conn, user: user} do
+    label = label_fixture(user)
+    [a, b] = for _ <- 1..2, do: task_fixture(user, %{label_ids: [label.id]})
+
+    for task <- [a, b],
+        do: assert({:ok, _} = Tasks.select_today(user, task.id, Date.add(Date.utc_today(), -1)))
+
+    for _ <- 1..3 do
+      task = task_fixture(user)
+      assert {:ok, _} = Tasks.select_today(user, task.id)
+    end
+
+    {:ok, view, _} = live(conn, "/tasks")
+    assert has_element?(view, "#task-menu-#{a.id} #return-button-#{a.id}", "Enviar ao backlog")
+    view |> form("#return-#{a.id}") |> render_submit()
+    assert has_element?(view, "#tasks-#{a.id} [data-label]", label.name)
+    refute has_element?(view, "#retry-#{a.id}")
+
+    params = %{
+      "task_id" => b.id,
+      "from" => "retry",
+      "to" => "backlog",
+      "orders" => %{"retry" => [], "backlog" => [b.id, a.id]}
+    }
+
+    render_hook(view, "move_task", params)
+    assert has_element?(view, "#planning-status", "Movimento salvo.")
+    assert has_element?(view, "#tasks-#{b.id}")
+    assert has_element?(view, "#retry-empty")
+    assert has_element?(view, "#used-choices", "3 de 3")
+    render_hook(view, "move_task", params)
+    assert has_element?(view, "#planning-error", "não está mais disponível")
+    refute has_element?(view, "#planning-status", "Movimento salvo.")
+    {:ok, reloaded, _} = live(conn, "/tasks")
+    assert has_element?(reloaded, "#tasks-#{b.id}")
+    assert {:ok, %{used_choices: 3, backlog: backlog, retry: []}} = Tasks.snapshot(user)
+    assert Enum.map(backlog, & &1.id) == [b.id, a.id]
+  end
+
   test "menu reorders backlog and retry and drag handles exclude history", %{
     conn: conn,
     user: user

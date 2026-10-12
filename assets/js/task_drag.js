@@ -2,7 +2,7 @@ import Sortable from "sortablejs"
 
 const allowed = (from, to) => from === to ||
   ((from === "backlog" || from === "retry") && to === "today") ||
-  (from === "today" && to === "backlog")
+  ((from === "today" || from === "retry") && to === "backlog")
 
 // Patch notifications run before streams touch any of the temporarily moved nodes.
 export const taskDragDOM = {

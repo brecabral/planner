@@ -406,6 +406,7 @@ defmodule PlannerWeb.TaskLive.Index do
       </summary>
       <div class="dropdown-content z-10 w-56 rounded-box bg-base-100 p-2 shadow-lg">
         <.planning_action task={@task} action={if @task.kind == :today, do: "return", else: "select"} />
+        <.planning_action :if={@task.kind == :retry} task={@task} action="return" />
         <div class="flex gap-2">
           <.order_action task={@task} direction="up" disabled={@task.position == 1} />
           <.order_action task={@task} direction="down" disabled={@task.position == @count} />
@@ -459,9 +460,17 @@ defmodule PlannerWeb.TaskLive.Index do
   defp planning_action(assigns) do
     {label, focus} =
       case assigns.action do
-        "select" -> {gettext("Bring to today"), "#today-heading"}
-        "return" -> {gettext("Return to backlog"), "#backlog-heading"}
-        "complete" -> {gettext("Complete task"), "#today-heading"}
+        "select" ->
+          {gettext("Bring to today"), "#today-heading"}
+
+        "return" ->
+          {if(assigns.task.kind == :retry,
+             do: gettext("Send to backlog"),
+             else: gettext("Return to backlog")
+           ), "#backlog-heading"}
+
+        "complete" ->
+          {gettext("Complete task"), "#today-heading"}
       end
 
     assigns = assign(assigns, label: label, focus: focus)
