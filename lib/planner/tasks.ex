@@ -31,6 +31,49 @@ defmodule Planner.Tasks do
   end
 
   @doc """
+  Permanently deletes an owned pending task and its links, preserving labels.
+
+  Returns `{:ok, task}` with the deleted task. Missing, malformed, foreign,
+  completed and previously deleted IDs all return `{:error, :not_found}`.
+  The user's lock and day normalization precede validation. Only deletion from
+  current today refunds a choice; retry and backlog preserve consumption.
+  Deletion, links, compaction, quota and normalization roll back together on
+  persistence failure. The optional date is server/test controlled.
+  """
+  def delete_pending_task(%User{} = user, id, date \\ nil) do
+    UserTransaction.run(
+      user,
+      fn day, plan ->
+        case owned_task(user, id) do
+          %Task{completed_on: nil} = task ->
+            delete_pending(task, day, plan)
+
+          _ ->
+            {:error, :not_found}
+        end
+      end,
+      date
+    )
+  end
+
+  defp delete_pending(task, day, plan) do
+    Repo.delete_all(
+      from link in TaskLabel, where: link.task_id == ^task.id and link.user_id == ^task.user_id
+    )
+
+    deleted = Repo.delete!(task)
+    compact_positions(task.user_id, day, task.kind)
+
+    if task.kind == :today and task.scheduled_for == day do
+      plan
+      |> DailyPlan.changeset(%{used_choices: plan.used_choices - 1})
+      |> Repo.update!()
+    end
+
+    {:ok, deleted}
+  end
+
+  @doc """
   Completes a current pending task without refunding a daily choice.
 
   Returns `{:ok, task}` and preserves the original date on repeated completion.

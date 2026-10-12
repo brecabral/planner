@@ -532,6 +532,55 @@ defmodule Planner.TasksTest do
     end)
   end
 
+  test "concurrent deletion against deletion, return and completion preserves one refund or history" do
+    for operation <- [:delete, :return, :complete] do
+      with_committed_user(fn user ->
+        day = ~D[2026-10-02]
+        task = task_fixture(user)
+        assert {:ok, _} = Tasks.select_today(user, task.id, day)
+
+        competing =
+          case operation do
+            :delete -> fn -> Tasks.delete_pending_task(user, task.id, day) end
+            :return -> fn -> Tasks.return_to_backlog(user, task.id, day) end
+            :complete -> fn -> Tasks.complete_task(user, task.id, day) end
+          end
+
+        [deletion, other] =
+          race_planning_commands(user, day, [
+            fn -> Tasks.delete_pending_task(user, task.id, day) end,
+            competing
+          ])
+
+        if operation == :delete do
+          assert Enum.count([deletion, other], &match?({:ok, _}, &1)) == 1
+          assert {:error, :not_found} in [deletion, other]
+        end
+
+        assert {:ok, snapshot} = Tasks.snapshot(user, day)
+        assert snapshot.today == []
+        assert snapshot.backlog == []
+        assert snapshot.retry == []
+
+        if operation == :complete and match?({:ok, _}, other) do
+          assert deletion == {:error, :not_found}
+          assert [%{id: id}] = Tasks.list_history(user)
+          assert id == task.id
+          assert snapshot.used_choices == 1
+        else
+          assert match?({:ok, _}, deletion) or (operation == :delete and match?({:ok, _}, other))
+          assert other == {:error, :not_found} or match?({:ok, _}, other)
+          assert Repo.get(Task, task.id) == nil
+          assert snapshot.used_choices == 0
+          assert Tasks.list_history(user) == []
+        end
+
+        assert {:error, :not_found} = Tasks.delete_pending_task(user, task.id, day)
+        assert {:ok, ^snapshot} = Tasks.snapshot(user, day)
+      end)
+    end
+  end
+
   defp with_committed_user(operation) do
     Sandbox.unboxed_run(Repo, fn ->
       user = user_fixture()
