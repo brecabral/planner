@@ -1,6 +1,6 @@
 ---
 id: "TASK-041"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Ajusta composição de cartões, menu e controles sem alterar eventos ou domínio."
 specs: ["SPEC-004"]
@@ -47,3 +47,7 @@ Validação: `mix test test/planner_web/live/task_live_test.exs` — **37 aprova
 Autoavaliação pelo fluxo de review: **approved no escopo técnico validado**, sem achado bloqueante, comparando os três arquivos de código/teste locais contra a base acima; não é aprovação independente e não altera o marco de review. LiveViewTest verifica HTML/classes/eventos, não executa layout de navegador, mouse/touch ou viewport real. Não foi realizada inspeção visual no navegador; cobertura Elixir não mede CSS ou gestos. Hook não modificado, portanto teste JavaScript adicional não exigido.
 
 Estado `in_review`: aguarda conferência operacional e commit de integração pelo coordenador. Sem staging, commit, publicação ou início de consumidoras pelo implementador.
+
+### Conferência operacional — 12/10/2026
+
+Coordenador `/root`: entrega integrada na branch `feat/ux` pelo commit `de3bbd0`. Conferidos registro de autoavaliação, gates relatados aprovados (158 testes, cobertura 93,45%), ausência de impedimentos e arquivos restritos ao escopo. Sem reprodução de testes ou revisão independente. O estado anterior acima é histórico; tarefa concluída operacionalmente, liberando a TASK-042. Limite de validação visual preservado.
