@@ -3,10 +3,10 @@ id: "TASK-011"
 status: "planned"
 execution_level: "standard"
 execution_rationale: "Empacota aplicação pronta com assets e migrations, sem escolher infraestrutura remota."
-specs: ["SPEC-005", "SPEC-007"]
-depends_on: ["TASK-048"]
+specs: ["SPEC-005", "SPEC-007", "SPEC-008"]
+depends_on: ["TASK-048", "TASK-051"]
 provides: ["release-scaffold"]
-consumes: ["user-theme-switching"]
+consumes: ["user-theme-switching", "registration-delivery-recovery"]
 write_scope: ["lib/planner/release.ex", "rel/", "Dockerfile", ".dockerignore", "README.md", "docs/tasks/011-entrega-remota.md"]
 blockers: ["BLOCK-005: tentativas de delegação interrompidas sem retorno; retomar com implementador responsivo."]
 ---
@@ -17,9 +17,13 @@ blockers: ["BLOCK-005: tentativas de delegação interrompidas sem retorno; reto
 
 TASK-048 integrada em `1f388fe` e concluída em `79ac675`. Duas tentativas de delegação não retornaram progresso ou evidências e foram interrompidas; nenhuma alteração da TASK-011 foi observada após as interrupções. A tarefa permanece `planned`, pois o início efetivo da implementação não foi confirmado. Diagnóstico e condição de retomada em [BLOCK-005](../blocks/005-delegacao-release-sem-retorno.md). Nenhum build ou smoke test foi comprovado; não há conclusão operacional.
 
+## Pré-requisito da revisão — 13/10/2026
+
+Integrar TASK-051 antes de empacotar: R3 impede considerar o cadastro pronto quando o envio falha. BLOCK-005 continua independente e exige a evidência operacional de retomada já definida; esta reconciliação não o encerra.
+
 ## Objetivo e entradas
 
-Empacotar o incremento autenticado com temas, sem publicar. Ler SPEC-005/007 e somente contrato local confirmado RN01/CA-008-01 da SPEC-008 (a parte remota permanece draft), mix.exs/assets/README e referências Mix/Phoenix. A spec remota draft não é contrato executável desta tarefa local.
+Empacotar o incremento autenticado com temas, sem publicar. Ler SPEC-005/007 e RN01/RN03/CA-008-01 da SPEC-008, mix.exs/assets/README e referências Mix/Phoenix. O contrato vigente termina na entrega local e não depende de decisões de infraestrutura do usuário.
 
 ## Scaffold e aceite
 

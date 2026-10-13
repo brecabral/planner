@@ -80,7 +80,7 @@ O responsável confirmou o funcionamento do MVP local. A integração está no s
 | RF08 | Cadastro aberto por e-mail, magic link com auth padrão Phoenix e dados privados por conta. |
 | RF13 | Home direciona ao login; autenticados seguem para `/tasks`; desenvolvimento permite testar links na mailbox local. |
 | RF14 | Temas claro existente e escuro gratuitos para todos, concessões e preferência persistidas por usuário. |
-| RF11 | Release, runtime, envio real de e-mail, backup/restauração, aceite integrado e publicação após definição do destino. |
+| RF11 | Código Phoenix funcional, release local com assets e migrations e aceite integrado reproduzível sem serviços externos. |
 
 Dados do usuário padrão ficam preservados e isolados; não migrar automaticamente para nenhuma conta. Dashboard mantém `/tasks` e cadastro `/tasks/new`. Usar pt-BR, data UTC, limite de três escolhas e recarga manual. O feedback de layout RF12 é uma correção específica solicitada, sem reinstalar checklist visual ou aceite humano obrigatório.
 
@@ -89,11 +89,11 @@ Dados do usuário padrão ficam preservados e isolados; não migrar automaticame
 - CA17: cadastro/login/logout por magic link funcionam; visitantes não acessam planejamento, duas contas não leem nem alteram dados alheios, e dados legados permanecem isolados (SPEC-005).
 - CA18: claro e escuro estão disponíveis gratuitamente, seleção persiste por conta e não vaza entre sessões (SPEC-007).
 - CA19: menu corrigido, retry → backlog e exclusão respeitam cota, transações e histórico; release mantém esses contratos com contas reais (SPEC-002/004/008).
-- CA16: artefato validado é publicado com HTTPS, entrega real de links e recuperação comprovada, após fechar configuração e destino (SPEC-008).
+- CA16: release local inicializa com configuração externa e banco de teste, preserva dados após reinício e tem os fluxos da aplicação validados sem provedor externo (SPEC-008).
 
-### Pendências restritas à produção remota
+### Fronteira da entrega de código — decisão de 13/10/2026
 
-Hospedagem, domínio e serviço de e-mail ainda não escolhidos, conforme resposta do responsável. Definir remetente e recuperação no destino antes das tarefas correspondentes; essas decisões não impedem correções locais, auth, mailbox ou temas. O plano não autoriza publicação imediata.
+O trabalho dos agentes termina no código Phoenix funcional e no release local validado. Hospedagem, domínio/HTTPS, provedor e remetente de e-mail, publicação e operação de backups são responsabilidade do usuário, fora desta entrega e sem constituir bloqueios da fila de código. O usuário pode configurar o provedor posteriormente usando a integração Swoosh existente; desenvolvimento e testes validam o fluxo sem envio externo. A expressão “MVP de produção” identifica o incremento com contas e temas, não uma obrigação de operar um ambiente remoto.
 
 ## 8. Evolução após o MVP de produção
 
