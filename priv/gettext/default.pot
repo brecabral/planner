@@ -342,7 +342,7 @@ msgstr ""
 msgid "Already registered?"
 msgstr ""
 
-#: lib/planner_web/live/user_live/registration.ex:70
+#: lib/planner_web/live/user_live/registration.ex:66
 #, elixir-autogen, elixir-format
 msgid "An email was sent to %{email}, please access it to confirm your account."
 msgstr ""
@@ -504,4 +504,9 @@ msgstr ""
 #: lib/planner_web/live/task_live/index.ex:13
 #, elixir-autogen, elixir-format
 msgid "Theme"
+msgstr ""
+
+#: lib/planner_web/live/user_live/registration.ex:76
+#, elixir-autogen, elixir-format
+msgid "We could not send the confirmation email. Request a new link to log in."
 msgstr ""

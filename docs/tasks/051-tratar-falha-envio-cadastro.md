@@ -1,6 +1,6 @@
 ---
 id: "TASK-051"
-status: planned
+status: in_review
 execution_level: standard
 execution_rationale: "Tratamento delimitado de retorno de envio na LiveView, com recuperação pela autenticação existente e testes de integração web."
 specs: ["SPEC-005", "SPEC-008"]
@@ -33,3 +33,18 @@ Tratar o retorno de erro do envio após cadastro na LiveView existente e orienta
 ## Execução, validação e conclusão
 
 Aplicar fluxo de implementação e TDD enxuto. Registrar autoavaliação pelo fluxo de review, testes direcionados, `mix precommit` e `mix ci` conforme README, com cobertura mínima de 70% preservada e limites explícitos. Revisão independente não é gate automático. O coordenador confere conclusão operacional e registra commit integrado antes de marcar `done` e liberar TASK-011. R3 permanece aberto até a correção comprovada; não alterar o relatório histórico para simular aprovação. Release e aceite final pertencem a TASK-011/050.
+
+### Entrega e autoavaliação — 13/10/2026
+
+Implementador `/root/implement_051`, alvo: diff local dos cinco arquivos desta entrega sobre `5e1a8bf`. Dependências TASK-046/048 concluídas e integradas; nenhum impedimento encontrado. O cadastro agora trata os retornos de sucesso e erro do notifier explicitamente, sem capturar exceções ou alterar persistência, concessões e protocolo de tokens.
+
+| Aceite | Evidência | Resultado |
+| --- | --- | --- |
+| 1 — Falha controlada e feedback | Regressão permanente em `LocalMagicLinkTest` submete cadastro com `FailingMailAdapter`, segue a navegação ao login e verifica flash de erro pt-BR e ausência de flash de sucesso | A primeira execução reproduziu R3 com `MatchError` em registration.ex:60; após correção passa sem exceção |
+| 2 — Conta, concessões e isolamento | Mesmo teste verifica conta não confirmada, nenhum token de sessão, visitante redirecionado de `/tasks` e as duas concessões gratuitas | Conta persistida preservada; concessões idênticas antes/depois da recuperação, sem duplicação |
+| 3 — Recuperação e regressões | Restaura adapter de teste, solicita link na LiveView de login, captura destinatário/link e consome token pelo controller; verifica sessão da conta original e rejeição de cadastro normalizado duplicado | Autentica a mesma conta; testes existentes de cadastro bem-sucedido e falha controlada do login continuam aprovados |
+| 4 — Teste e tradução | Suíte síncrona existente restaura configuração via `on_exit`; nova mensagem inglesa extraída em POT e traduzida no catálogo pt_BR | Sem envio externo; tradução efetivamente renderizada no login |
+
+Validações após consulta de ajuda Mix: teste vermelho **4/5**, testes direcionados de magic link/autenticação **11/11**, `mix precommit` **241 testes, 0 falhas**, `mix ci` **241 testes, 0 falhas**, Credo estrito sem achados, assets compilados e npm audit sem vulnerabilidades. Cobertura total **94,09%** (base documentada **94,08%**), Registration **93,10%**, mínimo de **70%** preservado. Extração/mesclagem atualizada após formatação; `git diff --check` aprovado.
+
+Autoavaliação conforme fluxo de review: conclusão técnica `approved`, sem achados bloqueantes no escopo e sem revisão independente ou alteração do marco histórico. A regressão cobre ambos os resultados de envio, navegação, tradução, segurança da sessão e recuperação; cobertura de linhas não prova todos os ramos. LiveViewTest/Plug não executam navegador real nem comprovam entrega externa. Nenhum hook alterado. Entrega aguarda conferência operacional e commit do coordenador; TASK-011 não iniciada pelo implementador.
