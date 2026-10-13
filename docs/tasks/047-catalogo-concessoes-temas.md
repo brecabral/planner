@@ -1,6 +1,6 @@
 ---
 id: "TASK-047"
-status: "in_review"
+status: "done"
 execution_level: "advanced"
 execution_rationale: "Modela propriedade única, preparação de contas existentes/futuras e preferência autorizada transacional."
 specs: ["SPEC-007", "SPEC-005"]
@@ -45,3 +45,7 @@ Antes de iniciar, conferir dependências integradas e specs prontas. Aplicar o f
 - `mix ci` final: aprovado, seed `953588`; Credo estrito sem achados, 235 testes, cobertura total **93,93%** (mínimo 70% preservado), `Planner.Themes` e schemas **100%**, Accounts **89,74%**, User **92,86%**; assets compilados e auditoria npm sem vulnerabilidades. A primeira execução do CI identificou apenas ajustes locais de Credo, corrigidos antes dos gates finais.
 - Limitação observada: uma execução intermediária de precommit (seed `638548`) teve 234/235 testes verdes; `TasksTest` em `test/planner/tasks_test.exs:125` comparou structs completas e falhou apenas por `updated_at` atravessar um segundo (`12:07:51` → `12:07:52`) em cenário preexistente e fora desta entrega. Não alterado fora do escopo. Repetição seed `347582`, precommit final e CI final passaram. A ocorrência foi preservada como evidência de instabilidade, sem afirmar sua correção.
 - Autoavaliação pelo fluxo de review: alvo são as alterações locais desta tarefa sobre a base acima, incluindo arquivos novos Themes, migration e testes. Critérios 1–4 atendidos; sem achados bloqueantes identificados. Não constitui revisão independente nem avança seu marco. Testes medem domínio/PostgreSQL e assets existentes, não UX do seletor, navegador ou deploy. Commit/integração ainda a cargo do coordenador; nenhuma consumidora iniciada pelo implementador.
+
+### Conferência operacional — 13/10/2026
+
+Coordenador `/root`: entrega integrada em `839951e` na branch `feat/ux`. Conferidos escopo, autoavaliação, gates finais relatados aprovados (235 testes e cobertura 93,93%) e ausência de impedimentos. Instabilidade intermediária preexistente preservada no registro, sem alegar correção. Sem reprodução de testes ou revisão independente. Conclusão operacional libera TASK-048.
