@@ -1,6 +1,6 @@
 # Planner
 
-Planner pessoal para escolher prioridades do dia, manter um backlog e consultar tarefas concluídas. O MVP local está concluído e aprovado em [revisão independente](docs/review.md), com aceite do responsável confirmado em 11/10/2026. O [plano do MVP de produção](docs/prd.md#7-mvp-de-produção--plano-autorizado-em-11102026) adiciona contas por magic link, isolamento, ajustes de tarefas e temas; essas funcionalidades ainda não estão implementadas.
+Planner pessoal para escolher prioridades do dia, manter um backlog e consultar tarefas concluídas. O MVP local está concluído e aprovado em [revisão independente](docs/review.md), com aceite do responsável confirmado em 11/10/2026. O [plano do MVP de produção](docs/prd.md#7-mvp-de-produção--plano-autorizado-em-11102026) adiciona contas por magic link, isolamento, ajustes de tarefas e temas. Contas e isolamento já estão implementados; as demais entregas seguem o plano de tarefas.
 
 A aplicação usa Phoenix, Elixir e PostgreSQL. O servidor roda na máquina; o banco local roda em Docker, com dados persistidos em volume.
 
@@ -54,7 +54,21 @@ O cadastro é aberto por e-mail e o acesso usa exclusivamente magic link, sem se
 
 Tarefas, labels, histórico e as três escolhas diárias pertencem à conta autenticada. Novas contas começam sem os dados das demais. A identidade antiga `default` e seus registros são preservados sem e-mail de acesso, não são transferidos para o primeiro cadastro e não ficam disponíveis a visitantes. Nenhum ambiente cria ou resolve automaticamente um usuário compartilhado. Seeds não criam contas nem alteram o legado; testes preparam fixtures isoladas.
 
-O fluxo de autenticação está implementado. A TASK-046 documentará o procedimento completo de teste de e-mail local após validá-lo; esta etapa ainda não autoriza publicação em produção.
+### Testar magic link localmente
+
+Com a aplicação iniciada em desenvolvimento pelos passos acima, o Swoosh usa `Swoosh.Adapters.Local`: nenhuma credencial de e-mail é necessária e nenhuma mensagem é enviada para fora da aplicação.
+
+1. Abra `/users/register`, cadastre `primeira@example.com` (ou outro endereço ainda não cadastrado) e aguarde o redirecionamento para login.
+2. Abra [a mailbox local](http://localhost:4000/dev/mailbox) em outra aba. Selecione a mensagem destinada à conta cadastrada e copie a URL de confirmação para a barra do navegador. Na página aberta, confirme a conta usando um dos botões de entrada. O dashboard em `/tasks` começa vazio.
+3. Crie uma tarefa para essa conta e clique em **Sair**. Cadastre `segunda@example.com`, abra sua mensagem na mailbox e confirme a entrada. O dashboard da segunda conta não deve mostrar a tarefa da primeira.
+4. Saia novamente. Em `/users/log-in`, solicite um link para a primeira conta; atualize a mailbox e abra a mensagem mais recente desse destinatário. Conclua a entrada pelo botão da página para voltar às tarefas da primeira conta.
+5. Para testar expiração, solicite outro link sem consumi-lo e aguarde mais de 15 minutos. Abrir esse link deve retornar ao login com aviso de link inválido ou expirado. Solicite um novo link no formulário de login e use a mensagem mais recente. Para testar uso único, saia após consumir um link e tente abri-lo novamente: ele também deve ser recusado. Não altere o TTL nem registros do banco para este procedimento.
+
+Use sempre o mesmo host nas abas de login e mailbox. Por padrão, o endereço é `http://localhost:4000`; `PORT=4107 mix phx.server` muda a porta HTTP e os links locais gerados. Para usar outro host local, configure `url: [host: "127.0.0.1"]` no `PlannerWeb.Endpoint` de `config/dev.exs`, reinicie e abra `http://127.0.0.1:4107`. Se definir `url: [port: ...]` explicitamente, mantenha essa porta igual à HTTP configurada por `PORT`. O servidor continua vinculado ao loopback.
+
+A mailbox guarda mensagens em memória e é esvaziada ao reiniciar a aplicação; contas e tarefas persistem no banco. Depois de reiniciar, solicite novo link em vez de cadastrar novamente o mesmo e-mail. A mensagem genérica de login não comprova entrega: confira a mailbox. Em testes, `Swoosh.Adapters.Test` captura destinatário e link sem envio real; `mix test test/planner_web/local_magic_link_test.exs` verifica também o adapter local, troca de contas e falha de entrega sem sessão indevida.
+
+`/dev/mailbox` e `/dev/dashboard` só são habilitados em desenvolvimento e ficam ausentes na configuração de produção. O teste local valida a aplicação, mas não comprova entrega externa, reputação de remetente ou configuração de domínio. A definição e validação do provedor real pertencem à preparação de produção; esta etapa não autoriza publicação.
 
 ## Sobre o projeto
 
@@ -72,4 +86,4 @@ Para alterações no hook de arraste, execute também o teste JavaScript listado
 
 ## Evolução planejada para produção
 
-O [plano de tarefas](docs/tasks/README.md) prevê auth padrão Phoenix com magic link, home direcionada ao login/dashboard, teste local de e-mail com Swoosh, temas claro/escuro por conta e preparação de release. Autenticação e isolamento por conta já estão implementados. A TASK-046 atualizará aqui os passos executáveis para testar magic link; as tarefas de produção documentarão aqui configuração e recuperação depois de definidos e validados. Hospedagem, domínio e provedor de e-mail estão pendentes. Créditos e loja ficam para evolução futura.
+O [plano de tarefas](docs/tasks/README.md) prevê auth padrão Phoenix com magic link, home direcionada ao login/dashboard, teste local de e-mail com Swoosh, temas claro/escuro por conta e preparação de release. Autenticação, isolamento por conta e teste local de e-mail já estão implementados. As tarefas de produção documentarão aqui configuração e recuperação depois de definidos e validados. Hospedagem, domínio e provedor de e-mail estão pendentes. Créditos e loja ficam para evolução futura.
