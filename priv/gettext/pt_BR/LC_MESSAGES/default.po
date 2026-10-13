@@ -342,7 +342,7 @@ msgstr "Tarefa excluída."
 msgid "Already registered?"
 msgstr "Já tem cadastro?"
 
-#: lib/planner_web/live/user_live/registration.ex:70
+#: lib/planner_web/live/user_live/registration.ex:66
 #, elixir-autogen, elixir-format
 msgid "An email was sent to %{email}, please access it to confirm your account."
 msgstr "Enviamos um e-mail para %{email}. Acesse-o para confirmar sua conta."
@@ -505,3 +505,8 @@ msgstr "Claro"
 #, elixir-autogen, elixir-format
 msgid "Theme"
 msgstr "Tema"
+
+#: lib/planner_web/live/user_live/registration.ex:76
+#, elixir-autogen, elixir-format
+msgid "We could not send the confirmation email. Request a new link to log in."
+msgstr "Não foi possível enviar o e-mail de confirmação. Solicite um novo link para entrar."

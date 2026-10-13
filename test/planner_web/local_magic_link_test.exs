@@ -101,6 +101,62 @@ defmodule PlannerWeb.LocalMagicLinkTest do
     refute Repo.reload!(user).confirmed_at
   end
 
+  test "failed registration delivery preserves the account and grants for login recovery", %{
+    conn: conn
+  } do
+    Application.put_env(:planner, Planner.Mailer, adapter: Planner.FailingMailAdapter)
+    email = unique_user_email()
+    {:ok, registration, _} = live(conn, "/users/register")
+
+    result =
+      registration
+      |> form("#registration_form", user: %{email: String.upcase(email)})
+      |> render_submit()
+
+    {:ok, login, _} = follow_redirect(result, conn, "/users/log-in")
+
+    assert has_element?(
+             login,
+             "#flash-error",
+             "Não foi possível enviar o e-mail de confirmação. Solicite um novo link para entrar."
+           )
+
+    refute has_element?(login, "#flash-info")
+    user = Accounts.get_user_by_email(email)
+    refute user.confirmed_at
+    refute Repo.get_by(UserToken, user_id: user.id, context: "session")
+    assert conn |> get("/tasks") |> redirected_to() == "/users/log-in"
+
+    grants = Repo.all_by(Planner.Themes.Entitlement, user_id: user.id) |> Enum.sort_by(& &1.id)
+    assert Enum.sort(Enum.map(grants, & &1.theme_code)) == ["planner", "planner_dark"]
+
+    Application.put_env(:planner, Planner.Mailer, adapter: Swoosh.Adapters.Test)
+    login |> form("#login_form_magic", user: %{email: email}) |> render_submit()
+    assert_redirect(login, "/users/log-in")
+    assert_received {:email, message}
+    assert message.to == [{"", email}]
+    [url] = Regex.run(~r{http://[^\s]+/users/log-in/[^\s]+}, message.text_body)
+    path = URI.parse(url).path
+    {:ok, confirmation, _} = live(conn, path)
+    assert has_element?(confirmation, "#confirmation_form")
+    token = List.last(String.split(path, "/"))
+    logged_in = post(conn, "/users/log-in", user: %{token: token}, _action: "confirmed")
+    assert redirected_to(logged_in) == "/tasks"
+
+    assert {authenticated, _} =
+             Accounts.get_user_by_session_token(get_session(logged_in, :user_token))
+
+    assert authenticated.id == user.id
+    assert authenticated.confirmed_at
+    assert Repo.all_by(Planner.Accounts.User, email: email) |> Enum.map(& &1.id) == [user.id]
+
+    assert Repo.all_by(Planner.Themes.Entitlement, user_id: user.id) |> Enum.sort_by(& &1.id) ==
+             grants
+
+    assert {:error, changeset} = Accounts.register_user(%{email: String.upcase(email)})
+    assert changeset.errors[:email]
+  end
+
   test "dev uses local delivery while test uses its test adapter and production has no dev routes" do
     dev = Config.Reader.read!("config/config.exs", env: :dev, target: :host)
     test = Config.Reader.read!("config/config.exs", env: :test, target: :host)
