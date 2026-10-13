@@ -1,6 +1,6 @@
 ---
 id: "TASK-046"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Integra o notifier autenticado à mailbox Swoosh já instalada e documenta o fluxo verificável."
 specs: ["SPEC-005"]
@@ -44,3 +44,7 @@ Validações executadas via RTK após consulta das ajudas Mix: teste direcionado
 Autoavaliação pelo implementador `implement_046`, conforme fluxo de review: alvo é o diff local dos quatro arquivos sobre `8217228`; critérios acima atendidos, sem achados bloqueantes dentro do escopo. Não constitui revisão independente nem avança seu marco. LiveViewTest e Plug verificam servidor e submissões, sem navegação real ou JavaScript de navegador; o procedimento manual não foi executado em navegador nesta entrega. Entrega externa permanece não verificada e fora do escopo. Nenhum hook alterado.
 
 Entrega em `in_review`, aguardando conferência operacional e commit de integração do coordenador. Nenhum staging, commit ou publicação efetuado pelo implementador; consumidoras não iniciadas.
+
+### Conferência operacional — 13/10/2026
+
+Coordenador `/root`: entrega integrada em `b13245f` na branch `feat/ux`. Conferidos escopo, autoavaliação, gates relatados aprovados (227 testes e cobertura 93,76%) e ausência de impedimentos. Sem reprodução de testes ou revisão independente. A conclusão operacional libera TASK-047; limites de navegador e entrega externa preservados.
