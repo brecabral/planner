@@ -70,6 +70,12 @@ A mailbox guarda mensagens em memória e é esvaziada ao reiniciar a aplicação
 
 `/dev/mailbox` e `/dev/dashboard` só são habilitados em desenvolvimento e ficam ausentes na configuração de produção. O teste local valida a aplicação, mas não comprova entrega externa, reputação de remetente ou configuração de domínio. A definição e validação do provedor real pertencem à preparação de produção; esta etapa não autoriza publicação.
 
+## Temas por conta
+
+O seletor **Tema** no painel oferece **Claro** e **Escuro**, gratuitos para todas as contas. A escolha é confirmada após salvar e acompanha a conta em recargas e novos dispositivos. Login e páginas públicas usam claro; preferências antigas do navegador não são aplicadas. Falhas conservam o último tema confirmado e mostram uma mensagem.
+
+Para alterações na sincronização de tema, execute `mix cmd node --test assets/js/account_theme.test.mjs`. O teste verifica montagem, atualização, reconexão e saída em DOM mínimo; não comprova contraste ou interação real no navegador.
+
 ## Sobre o projeto
 
 O fluxo implementado permite selecionar tarefas do backlog para hoje, ordenar prioridades e registrar conclusões. O escopo está no [PRD](docs/prd.md): contas por magic link, interface pt-BR com Gettext, data corrente sem configuração de fuso e recarga manual. A correção de falhas no cadastro foi concluída na [TASK-038](docs/tasks/038-tratar-falha-cadastro.md).

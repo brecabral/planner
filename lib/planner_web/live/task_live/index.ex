@@ -1,12 +1,33 @@
 defmodule PlannerWeb.TaskLive.Index do
   use PlannerWeb, :live_view
 
-  alias Planner.Tasks
+  alias Planner.Accounts.Scope
+  alias Planner.{Tasks, Themes}
 
   @impl true
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
+      <div id="account-theme" phx-hook="AccountTheme" data-theme={@theme_code}>
+        <fieldset id="theme-selector" class="flex flex-wrap items-center gap-2">
+          <legend class="text-sm font-medium">{gettext("Theme")}</legend>
+          <button
+            :for={theme <- @available_themes}
+            id={"theme-#{theme.code}"}
+            type="button"
+            class="btn btn-sm"
+            phx-click="select_theme"
+            phx-value-theme_code={theme.code}
+            aria-pressed={to_string(@theme_code == theme.code)}
+            phx-disable-with={gettext("Saving...")}
+          >
+            {theme_label(theme.code)}
+          </button>
+        </fieldset>
+        <p :if={@theme_error} id="theme-error" role="alert" class="alert alert-error mt-2">
+          {@theme_error}
+        </p>
+      </div>
       <.header>
         {gettext("Planner")}
         <:actions>
@@ -242,6 +263,9 @@ defmodule PlannerWeb.TaskLive.Index do
 
     {:ok,
      socket
+     |> assign(:theme_code, Layouts.authorized_theme(socket.assigns.current_scope))
+     |> assign(:available_themes, Themes.list_available_themes(socket.assigns.current_scope))
+     |> assign(:theme_error, nil)
      |> assign(:user, user)
      |> assign(:page_title, gettext("Planner"))
      |> assign(:planning_error, nil)
@@ -265,6 +289,23 @@ defmodule PlannerWeb.TaskLive.Index do
   end
 
   @impl true
+  def handle_event("select_theme", params, socket) do
+    case select_theme(socket.assigns.current_scope, params) do
+      {:ok, user} ->
+        {:noreply,
+         assign(socket,
+           theme_code: user.theme_code,
+           theme_error: nil,
+           current_scope: Scope.for_user(user),
+           user: user
+         )}
+
+      {:error, _reason} ->
+        {:noreply,
+         assign(socket, :theme_error, gettext("Could not save the theme. Please try again."))}
+    end
+  end
+
   def handle_event("toggle_history", _params, socket) do
     {:noreply, assign(socket, :history_open, !socket.assigns.history_open)}
   end
@@ -309,6 +350,21 @@ defmodule PlannerWeb.TaskLive.Index do
     result = run_action("move_task", socket.assigns.user, params)
     {:noreply, socket} = finish_action(socket, result, "move_task")
     {:reply, %{ok: match?({:ok, _}, result)}, socket}
+  end
+
+  defp theme_label("planner"), do: gettext("Light")
+  defp theme_label("planner_dark"), do: gettext("Dark")
+
+  defp select_theme(scope, params) do
+    Themes.select_theme(scope, params)
+  rescue
+    _error in [
+      Ecto.ConstraintError,
+      Ecto.StaleEntryError,
+      Postgrex.Error,
+      DBConnection.ConnectionError
+    ] ->
+      {:error, :persistence_failed}
   end
 
   defp pending_deletion_task(user, id) do
