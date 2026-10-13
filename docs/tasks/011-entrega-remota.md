@@ -1,6 +1,6 @@
 ---
 id: "TASK-011"
-status: "planned"
+status: "in_progress"
 execution_level: "standard"
 execution_rationale: "Empacota aplicação pronta com assets e migrations, sem escolher infraestrutura remota."
 specs: ["SPEC-005", "SPEC-007", "SPEC-008"]
@@ -8,7 +8,7 @@ depends_on: ["TASK-048", "TASK-051"]
 provides: ["release-scaffold"]
 consumes: ["user-theme-switching", "registration-delivery-recovery"]
 write_scope: ["lib/planner/release.ex", "rel/", "Dockerfile", ".dockerignore", "README.md", "docs/tasks/011-entrega-remota.md"]
-blockers: ["BLOCK-005: tentativas de delegação interrompidas sem retorno; retomar com implementador responsivo."]
+blockers: []
 ---
 
 # 011 — Preparar release local do MVP de produção
@@ -36,3 +36,7 @@ Ajuda `mix help phx.gen.release` consultada em 11/10/2026. Gerar uma vez com `mi
 ## Execução, validação e conclusão
 
 Antes de iniciar, conferir dependências integradas e specs prontas. Aplicar o fluxo de implementação, TDD enxuto aos comportamentos alterados e referências técnicas pertinentes. Consultar a ajuda Mix antes de tarefas/geradores. Registrar autoavaliação pelo fluxo de review, testes/gates executados e limites; finalizar com `mix precommit` e `mix ci` conforme README, mantendo cobertura mínima de 70%. Mudança em hook exige também teste JavaScript documentado; LiveViewTest não executa navegador. Revisão independente não é gate adicional automático. Registrar commit de integração e conferência operacional antes de `done`; documentação pronta não comprova implementação. Não publicar nem iniciar consumidoras automaticamente.
+
+### Retomada efetiva — 13/10/2026
+
+TASK-051 integrada em `118ba28` e concluída em `2ed68a2`. Implementador `/root/implement_051` respondeu com achados de leitura de mix.exs/configs na base limpa `2ed68a2`, sem build em andamento na consulta de processos. BLOCK-005 resolvido pela coordenação conforme evidências no relatório; implementação liberada. Aceites de release permanecem pendentes.
