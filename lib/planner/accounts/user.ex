@@ -5,6 +5,7 @@ defmodule Planner.Accounts.User do
   schema "users" do
     field :email, :string
     field :identifier, :string
+    field :theme_code, :string, default: "planner"
     field :confirmed_at, :utc_datetime
     field :authenticated_at, :utc_datetime, virtual: true
 

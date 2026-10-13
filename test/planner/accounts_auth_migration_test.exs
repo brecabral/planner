@@ -68,6 +68,8 @@ defmodule Planner.AccountsAuthMigrationTest do
                  legacy
 
         assert Repo.query!("SELECT email, confirmed_at FROM users").rows == [[nil, nil]]
+        Ecto.Migrator.run(Repo, migrations, :up, all: true, prefix: schema, log: false)
+
         assert {:ok, first} = Accounts.register_user(%{email: "first@example.com"})
         assert {:ok, second} = Accounts.register_user(%{email: "second@example.com"})
         assert first.id != 1 and second.id != 1 and first.id != second.id
