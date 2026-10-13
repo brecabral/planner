@@ -1,6 +1,6 @@
 ---
 id: "TASK-051"
-status: in_review
+status: done
 execution_level: standard
 execution_rationale: "Tratamento delimitado de retorno de envio na LiveView, com recuperação pela autenticação existente e testes de integração web."
 specs: ["SPEC-005", "SPEC-008"]
@@ -48,3 +48,7 @@ Implementador `/root/implement_051`, alvo: diff local dos cinco arquivos desta e
 Validações após consulta de ajuda Mix: teste vermelho **4/5**, testes direcionados de magic link/autenticação **11/11**, `mix precommit` **241 testes, 0 falhas**, `mix ci` **241 testes, 0 falhas**, Credo estrito sem achados, assets compilados e npm audit sem vulnerabilidades. Cobertura total **94,09%** (base documentada **94,08%**), Registration **93,10%**, mínimo de **70%** preservado. Extração/mesclagem atualizada após formatação; `git diff --check` aprovado.
 
 Autoavaliação conforme fluxo de review: conclusão técnica `approved`, sem achados bloqueantes no escopo e sem revisão independente ou alteração do marco histórico. A regressão cobre ambos os resultados de envio, navegação, tradução, segurança da sessão e recuperação; cobertura de linhas não prova todos os ramos. LiveViewTest/Plug não executam navegador real nem comprovam entrega externa. Nenhum hook alterado. Entrega aguarda conferência operacional e commit do coordenador; TASK-011 não iniciada pelo implementador.
+
+### Conferência operacional — 13/10/2026
+
+Coordenador `/root`: entrega integrada em `118ba28`. Conferidos escopo, registro de autoavaliação, gates relatados (241 testes, cobertura 94,09%) e ausência de impedimentos. Sem nova revisão independente ou reprodução dos testes. TASK-051 concluída; R3 corrigido com regressão permanente relatada. TASK-011 pode retomar após comprovar a condição operacional do BLOCK-005.
