@@ -11,6 +11,17 @@ defmodule PlannerWeb.Layouts do
   # and other static content.
   embed_templates "layouts/*"
 
+  def authorized_theme(scope) do
+    themes = Planner.Themes.list_available_themes(scope)
+    selected = scope && scope.user.theme_code
+    if Enum.any?(themes, &(&1.code == selected)), do: selected, else: "planner"
+  end
+
+  def initial_theme(%{conn: %{request_path: path}, current_scope: scope})
+      when path in ["/tasks", "/tasks/new"], do: authorized_theme(scope)
+
+  def initial_theme(_assigns), do: "planner"
+
   @doc """
   Renders your app layout.
 
