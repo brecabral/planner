@@ -8,10 +8,14 @@ depends_on: ["TASK-048"]
 provides: ["release-scaffold"]
 consumes: ["user-theme-switching"]
 write_scope: ["lib/planner/release.ex", "rel/", "Dockerfile", ".dockerignore", "README.md", "docs/tasks/011-entrega-remota.md"]
-blockers: []
+blockers: ["BLOCK-005: tentativas de delegação interrompidas sem retorno; retomar com implementador responsivo."]
 ---
 
 # 011 — Preparar release local do MVP de produção
+
+## Retomada da coordenação — 13/10/2026
+
+TASK-048 integrada em `1f388fe` e concluída em `79ac675`. Duas tentativas de delegação não retornaram progresso ou evidências e foram interrompidas; nenhuma alteração da TASK-011 foi observada após as interrupções. A tarefa permanece `planned`, pois o início efetivo da implementação não foi confirmado. Diagnóstico e condição de retomada em [BLOCK-005](../blocks/005-delegacao-release-sem-retorno.md). Nenhum build ou smoke test foi comprovado; não há conclusão operacional.
 
 ## Objetivo e entradas
 
