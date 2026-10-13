@@ -76,9 +76,11 @@ defmodule Planner.Accounts do
 
   """
   def register_user(attrs) do
-    %User{}
-    |> User.email_changeset(attrs)
-    |> Repo.insert()
+    Repo.transact(fn ->
+      with {:ok, user} <- %User{} |> User.email_changeset(attrs) |> Repo.insert() do
+        Planner.Themes.prepare_user(user)
+      end
+    end)
   end
 
   ## Settings
