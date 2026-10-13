@@ -63,7 +63,7 @@ O encerramento da TASK-040 foi reconciliado com a integração `367bf35` e o ace
 
 ## MVP de produção — plano de 11/10/2026
 
-O pedido autoriza o planejamento; execução e estados reais seguem os cabeçalhos. Sequência serializa painel, Accounts, migrations, catálogos, testes e README compartilhados. A próxima tarefa elegível é 041, após o encerramento reconciliado da 040. Não há dependência humana nova nesta sequência; escolhas externas estão explicitadas em blockers.
+Escopo revisto pelo responsável em 13/10/2026: entregar código Phoenix funcional e release local validado. Execução e estados reais seguem os cabeçalhos. A correção TASK-051 precede o release TASK-011, cuja retomada operacional também depende do BLOCK-005; depois, TASK-050 consolida o aceite local. Escolhas de infraestrutura pertencem ao usuário e não bloqueiam esta sequência.
 
 | Entrega | Tarefa |
 | --- | --- |
@@ -76,13 +76,11 @@ O pedido autoriza o planejamento; execução e estados reais seguem os cabeçalh
 | Testar magic link em dev pela mailbox local | [046](046-magic-link-dev.md) |
 | Catálogo, concessões gratuitas e preferência de tema | [047](047-catalogo-concessoes-temas.md) |
 | Tema claro/escuro e seletor persistido | [048](048-temas-claro-escuro.md) |
+| Recuperação de falha de envio no cadastro (R3) | [051](051-tratar-falha-envio-cadastro.md) |
 | Release local com assets e migrations | [011](011-entrega-remota.md) |
-| Runtime de produção e entrega real de e-mail | [033](033-configurar-producao.md) |
-| Backup/restauração isolada | [035](035-validar-restauracao.md) |
-| Aceite integrado do candidato de produção | [050](050-aceite-mvp-producao.md) |
-| Publicação do artefato validado | [034](034-publicar-aplicacao.md) |
+| Aceite integrado do código e release local | [050](050-aceite-mvp-producao.md) |
 
-Cadastro aberto e dados antigos isolados foram confirmados. Exclusão preserva concluídas e restitui uma escolha somente ao excluir pendência de hoje. Os dois temas são gratuitos para todas as contas; catálogo/concessões preparam propriedade futura sem saldo ou loja. Hosting/domínio/e-mail e recuperação remota ainda precisam de definição na SPEC-008; tarefas locais não dependem dessas escolhas.
+Cadastro aberto e dados antigos isolados foram confirmados. Exclusão preserva concluídas e restitui uma escolha somente ao excluir pendência de hoje. Os dois temas são gratuitos para todas as contas; catálogo/concessões preparam propriedade futura sem saldo ou loja. A SPEC-008 define a entrega local. Configuração remota, publicação e backups pertencem ao usuário. As antigas tarefas [033](033-configurar-producao.md), [034](034-publicar-aplicacao.md) e [035](035-validar-restauracao.md) ficam apenas como registros de cancelamento por escopo.
 
 ## Evolução futura — não bloqueia o MVP de produção
 
@@ -95,4 +93,12 @@ Cadastro aberto e dados antigos isolados foram confirmados. Exclusão preserva c
 | Atualização automática do painel | [031](031-atualizar-dia-liveview.md) |
 | Adição de créditos por usuário, com regras a definir | [049](049-creditos-usuarios.md) |
 
-Compra de temas, preços, loja e pagamentos serão decompostos depois de decisões próprias na SPEC-009. Não são dependências dos dois temas gratuitos nem da publicação do MVP de produção.
+Compra de temas, preços, loja e pagamentos serão decompostos depois de decisões próprias na SPEC-009. Não são dependências dos dois temas gratuitos nem da entrega do release local.
+
+## Retomada após revisão de 13/10/2026
+
+A [TASK-051 — Tratar falha de envio no cadastro](051-tratar-falha-envio-cadastro.md) é a próxima correção elegível: dependências integradas e contrato na SPEC-005 RN15/CA-005-13. Depois de sua integração, a coordenação pode retomar TASK-011 conforme a condição operacional do [BLOCK-005](../blocks/005-delegacao-release-sem-retorno.md); TASK-050 aguarda o release integrado. Nenhuma implementação é iniciada por esta reconciliação.
+
+R4 foi reconciliado na tabela de seeds do README e R5 na declaração de implementação da SPEC-002. O relatório histórico de revisão permanece inalterado por este ajuste; R3 continua aberto e não há nova aprovação independente.
+
+Conferência documental desta reconciliação: 51 cabeçalhos verificados quanto a IDs, produtores únicos, referências, ciclos, consumos alcançáveis e dependências de entregas concluídas; links locais e diff sem erros. `mix precommit` aprovado com 240 testes (seed 481085). Esse gate não cobre ainda R3 e não substitui a regressão exigida na TASK-051.

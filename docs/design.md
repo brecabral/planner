@@ -50,7 +50,7 @@ Plano autorizado em 09/10/2026: SortableJS via npm (licença MIT), instalado pel
 
 Decisão de 11/10/2026 substitui, para o novo incremento, a resolução pública do usuário padrão em D04/D06/D08/D14. Reutilizar Accounts/User/users com migration aditiva e scaffold de `phx.gen.auth` instalado, sem regenerar tarefas/labels. A TASK-015 é produtora única de auth, tokens, notifier e scope; TASK-045 integra o proprietário autenticado às entradas HTTP/LiveView e mantém APIs de domínio com usuário explícito derivado do scope. Preservar default sem e-mail autenticável, não transferir seus dados e não resetar banco. A restrição de `identifier` legado precisa acomodar contas por e-mail.
 
-Cadastro aberto, magic link sem senha, `/` redireciona ao login ou `/tasks` conforme sessão. Usar os mecanismos de sessão/token/revogação do gerador, sem criar protocolo próprio. Ajuda local e templates de Phoenix 1.8.13 consultados; o template de token usa validade de 15 minutos para login. Configuração local usa Swoosh existente; operação vai ao README na TASK-046. Fornecedor de e-mail/hosting de produção ainda pendentes.
+Cadastro aberto, magic link sem senha, `/` redireciona ao login ou `/tasks` conforme sessão. Usar os mecanismos de sessão/token/revogação do gerador, sem criar protocolo próprio. Ajuda local e templates de Phoenix 1.8.13 consultados; o template de token usa validade de 15 minutos para login. Configuração local usa Swoosh existente; operação vai ao README na TASK-046. A configuração posterior do provedor de e-mail e a operação de hosting pertencem ao usuário e não bloqueiam a entrega de código.
 
 ## D18 — Ajustes de tarefas e preservação da cota
 

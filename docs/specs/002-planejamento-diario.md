@@ -58,7 +58,7 @@ Distribuída em tarefas pequenas; consultar o [mapa de entregas](../tasks/README
 
 ## MVP de produção — 11/10/2026
 
-Incremento autorizado pelo responsável. Os aceites anteriores permanecem históricos; RN11–RN13 ainda exigem implementação. Na produção, “usuário padrão” nas regras anteriores é substituído pelo proprietário autenticado da SPEC-005.
+Incremento autorizado pelo responsável. Os aceites anteriores permanecem históricos. RN11–RN13 foram implementadas e integradas pelas TASK-042/043, com interface na TASK-044; as evidências constam nessas tarefas e na revisão de 13/10/2026 em [review](../review.md). O aceite integrado do release local permanece na TASK-050. Na produção, “usuário padrão” nas regras anteriores é substituído pelo proprietário autenticado da SPEC-005.
 
 - RN11: enviar retry ao backlog preserva identidade, título e labels, compacta retry e insere no fim pelo menu ou na posição escolhida pelo arraste. Não consome nem restitui escolhas, inclusive com cota esgotada. Usa a mesma transação, normalização de data e validação de conjuntos de RN08–RN10. Backlog → retry e hoje → retry continuam proibidos. Após a virada, um comando de arraste com origem antiga é rejeitado e recompõe o estado; não é reinterpretado silenciosamente.
 - RN12: excluir definitivamente uma pendência própria em backlog/retry/hoje remove tarefa e seus vínculos, preserva o catálogo de labels e compacta a lista. Excluir de hoje restitui exatamente uma escolha corrente; backlog/retry não alteram consumo. Concluídas não podem ser excluídas. O responsável confirmou esse contrato em 11/10/2026.

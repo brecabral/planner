@@ -1,14 +1,56 @@
 ---
-review_base_commit: "2b8ba19ce2657126423256d3fd2596875c7ca661"
-reviewed_commit: "452083a6a4a117a39622c96bd1aec4bf9cd60f50"
+review_base_commit: "367bf3555bc2b06e5ce90aedc2118e46e00986de"
+reviewed_commit: "b0810ba49cf6049c7d5aac49960950a5236be22b"
 last_approved_commit: "2b8ba19ce2657126423256d3fd2596875c7ca661"
-reviewed_at: "2026-10-11"
-reviewer: "/root — revisão independente de prontidão e da correção local R2"
-status: approved
-reviewed_tasks: ["TASK-039", "TASK-040"]
+reviewed_at: "2026-10-13"
+reviewer: "/root — revisão independente de código e alinhamento documental"
+status: changes_requested
+reviewed_tasks: ["TASK-041", "TASK-042", "TASK-043", "TASK-044", "TASK-015", "TASK-045", "TASK-046", "TASK-047", "TASK-048"]
 ---
 
 # Revisão incremental das tarefas concluídas
+
+## Revisão das últimas entregas e documentação — 13/10/2026
+
+Resultado: **changes_requested**, por R3. O gate existente passa, mas a falha de envio durante o cadastro derruba a LiveView. Autenticação, isolamento, movimentos, exclusão e temas estão majoritariamente alinhados aos contratos inspecionados; há também desatualizações documentais R4/R5. Nenhum código de produto ou contrato foi corrigido nesta revisão.
+
+### Alvo e reconstrução da base
+
+Alvo commitado: `b0810ba49cf6049c7d5aac49960950a5236be22b`. O código executável local coincide com HEAD. O marco histórico `2b8ba19ce2657126423256d3fd2596875c7ca661` existe, mas `git merge-base --is-ancestor` retornou 1; não é ancestral do alvo. A história atual integra o MVP local em `367bf3555bc2b06e5ce90aedc2118e46e00986de` (`MVP Local (#7)`), também registrado como integração na TASK-041. Essa é a base reconstruída para o incremento 041–048/015. Não se presume equivalência integral entre o antigo histórico e essa integração. `last_approved_commit` permanece como evidência histórica, sem avanço e sem servir automaticamente de base ancestral futura.
+
+As 13 alterações locais preexistentes são documentais: README, BLOCK-005, design, PRD, SPEC-005/008, índice de specs, TASK-011/033/034/035/050 e índice de tarefas. Foram consideradas decisões vigentes, separadas do SHA do código e preservadas. A entrega termina no release local; infraestrutura remota não é requisito. TASK-011 continua planejada com BLOCK-005 aberto; TASK-050 depende dela. Nenhuma dessas duas tarefas foi tratada como entregue.
+
+### R3 — P2: falha de envio no cadastro encerra a LiveView
+
+Local: [registration.ex:60](../lib/planner_web/live/user_live/registration.ex#L60), introduzido na TASK-015 (`d36fed4`). Depois de persistir a conta, o evento exige `{:ok, _}` de `Accounts.deliver_login_instructions/2`. Se o adapter retorna `{:error, :delivery_unavailable}`, ocorre `MatchError` e o processo LiveView encerra. A conta já foi criada em transação anterior; repetir o cadastro encontra e-mail ocupado, sem orientação controlada para recuperar o acesso. Não foi identificada criação indevida de sessão.
+
+Reprodução independente: teste temporário `/tmp/planner_review_registration_delivery_test.exs`, usando ConnCase/Sandbox, restauração de configuração em `on_exit` e o adapter existente `Planner.FailingMailAdapter`. Abrir `/users/register` e submeter um e-mail novo reproduziu a exceção em `registration.ex:60`. `rtk mix test /tmp/planner_review_registration_delivery_test.exs`: **1 teste, 1 falha**, saída 2, seed 72785. Nenhum envio real ou dado permanente foi criado. O teste adicional está fora da suíte do repositório.
+
+Correção esperada: tratar retorno de falha do envio após cadastro, apresentar resposta traduzida e recuperação coerente para a conta já persistida, sem anunciar entrega nem abrir sessão; acrescentar teste web desse caminho. A TASK-046 testa falha na solicitação de login, mas não no cadastro (`test/planner_web/local_magic_link_test.exs:88`), portanto seu teste verde não cobre R3. O defeito pertence ao fluxo introduzido pela TASK-015, não às alterações documentais locais nem aos temas.
+
+### R4 — P3: README descreve comportamento removido dos seeds
+
+Local: [README.md:37](../README.md#L37). A tabela afirma que `mix run priv/repo/seeds.exs` prepara o usuário padrão. O arquivo atual contém apenas comentário e não grava nada; a seção de autenticação do próprio README afirma corretamente que seeds não criam contas nem alteram o legado. Quem seguir a tabela esperando preparar identidade não obterá o resultado prometido. Atualizar a descrição operacional conforme o comportamento entregue pela TASK-045, sem restaurar o bootstrap antigo.
+
+### R5 — P3: SPEC-002 apresenta regras entregues como não implementadas
+
+Local: [SPEC-002:61](specs/002-planejamento-diario.md#L61). A frase “RN11–RN13 ainda exigem implementação” contradiz as TASK-042/043 concluídas e o código/testes de retry → backlog e exclusão. Reconciliar o estado declarado com as evidências de integração, preservando a origem histórica da decisão e distinguindo o aceite do release ainda pendente. Não é defeito dessas operações.
+
+### Critérios e validação
+
+| Entregas | Resultado da revisão |
+| --- | --- |
+| 041 | Composição à esquerda, espaço dos controles e separação de texto presentes; testes estruturais aprovados. Layout real não medido. |
+| 042–044 | Whitelist cliente/servidor, retorno de retry sem restituição, exclusão própria pendente, preservação de labels/histórico, compactação, lock, rollback e confirmação conferidos com os testes. Sem novo achado bloqueante nesses contratos. |
+| 015/045 | Tokens com hash/TTL, consumo serializado, sessão/CSRF/logout, rotas HTTP/mount protegidas, proprietário do servidor e migrations de preservação conferidos. R3 impede aprovação integral do cadastro; R4 afeta documentação operacional. |
+| 046 | Captura local/teste, destinatário/URL, duas contas e ausência de rotas dev em configuração prod cobertos. Falha no login coberta; falha no cadastro ausente. Procedimento em navegador e envio externo não executados. |
+| 047/048 | Catálogo/concessões, backfill, cadastro transacional, autorização da escolha, preferência por conta, HTML inicial, patches e erros conferidos. Sem achado bloqueante identificado; persistência após reinício do release pertence à TASK-050. |
+
+Após leitura dos aliases, política e ajuda: `rtk mix ci` passou com **240 testes**, seed 519817, cobertura Elixir **94,08%**, limiar 70% preservado; compilação, formato, Credo estrito, assets e npm audit aprovados. `rtk mix cmd node --test assets/test/task_drag.test.mjs assets/js/account_theme.test.mjs`: **9 testes aprovados**. `rtk git diff --check`: aprovado. A reprodução adicional de R3 falhou conforme descrito, apesar do gate verde.
+
+Conferência estrutural dos 50 cabeçalhos: nenhuma dependência inexistente/cíclica, tarefa concluída com dependência não concluída ou consumo sem produtor alcançável entre tarefas planejadas/em execução/concluídas. A cadeia vigente TASK-048 → TASK-011 → TASK-050 é coerente; cancelamento de 033/034/035 não quebra essa cadeia. Essa conferência não certifica todo o planejamento histórico nem executa tarefas pendentes.
+
+Limites: sem nova medição da base, sem alegação de variação de cobertura; sem navegador real, contraste, gestos ou reinício do release. CI remoto não consultado. `precommit` não repetido porque formata e pode alterar lockfile; verificações sem correção foram reproduzidas via `ci`, e nenhuma implementação foi feita. Registros de autoavaliação anteriores permanecem evidências históricas. Revisão independente não muda status operacional das tarefas, não aprova publicação e não encerra BLOCK-005.
 
 ## Prontidão do MVP e revalidação de R2 — 11/10/2026
 

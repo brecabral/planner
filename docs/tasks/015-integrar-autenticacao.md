@@ -59,3 +59,11 @@ Estado `in_review`: aguarda conferência operacional e commit de integração pe
 ### Conferência operacional — 12/10/2026
 
 Coordenador `/root`: entrega integrada em `d36fed4` na branch `feat/ux`. Conferidos escopo, registro de autoavaliação, gates relatados aprovados (222 testes, cobertura 92,81%) e ausência de impedimentos. Sem reprodução de testes ou revisão independente. Estado anterior histórico; conclusão operacional libera TASK-045. Limites de validação em navegador e de publicação da etapa intermediária preservados.
+
+### Revisão independente — 13/10/2026
+
+Revisor `/root`, alvo `b0810ba49cf6049c7d5aac49960950a5236be22b`, base reconstruída `367bf3555bc2b06e5ce90aedc2118e46e00986de`. Correção solicitada: R3 reproduzido, falha de envio no cadastro encerra a LiveView em registration.ex:60. O gate existente não cobre esse caminho. `mix ci`: 240 testes aprovados, cobertura 94,08%; testes JavaScript de arraste/tema: 9 aprovados. Escopo, reprodução adicional com falha, achados documentais e limites em [docs/review.md](../review.md#revisão-das-últimas-entregas-e-documentação--13102026). Sem correção de produto ou mudança do estado operacional nesta revisão.
+
+### Encaminhamento do planejamento — 13/10/2026
+
+R3 será corrigido pela [TASK-051](051-tratar-falha-envio-cadastro.md), pré-requisito do release TASK-011. Preserva-se a conclusão operacional histórica desta entrega; ela não equivale à aprovação do caminho defeituoso. O achado permanece aberto até correção e evidências.

@@ -22,7 +22,9 @@ Reutilizar `Planner.Accounts.User` e tabela `users`, adaptando o scaffold Phoeni
 - RN11: `/tasks`, `/tasks/new` e toda entrada de planejamento exigem identidade válida tanto no HTTP quanto no mount/reconexão LiveView. Não há fallback para usuário padrão em dev/test/prod após integração da TASK-045. Sessão ausente/revogada impede leitura/comando e exige login conforme os helpers gerados.
 - RN12: tarefas, labels, histórico, cota e preferências pertencem ao usuário autenticado. IDs/params de outro usuário têm o mesmo resultado de IDs inexistentes; nunca listar, mover, excluir, concluir, associar ou alterar dados alheios. Não confiar em user_id de params, eventos, formulário ou armazenamento local. Duas contas têm cotas independentes.
 - RN13: preservar o usuário legado `default`, seus IDs, tarefas, labels, histórico e cota, mas sem e-mail de login/token nem acesso por visitantes/novas contas. Não associar seus dados ao primeiro cadastro, não criar e-mail fictício e não apagar o banco. Migrations aditivas acomodam usuários legados sem e-mail; contas autenticáveis exigem e-mail válido com unicidade normalizada. Cadastro novo não herda `identifier=default` nem depende desse campo legado obrigatório.
-- RN14: desenvolvimento usa Swoosh local e `/dev/mailbox`, já existentes, para capturar links com host/porta locais configurados. Não requer credencial nem envio externo. Produção não expõe mailbox/LiveDashboard de desenvolvimento e usa entrega real definida na SPEC-008. Interface/e-mails usam Gettext com mensagens-base em inglês e pt-BR.
+- RN14: desenvolvimento usa Swoosh local e `/dev/mailbox`, já existentes, para capturar links com host/porta locais configurados. Não requer credencial nem envio externo. Produção não expõe mailbox/LiveDashboard de desenvolvimento; o provedor de envio real pode ser configurado posteriormente pelo usuário, fora do aceite local da SPEC-008. Interface/e-mails usam Gettext com mensagens-base em inglês e pt-BR.
+
+- RN15: se o envio do link falhar após persistir o cadastro, preservar a conta e suas concessões, sem abrir sessão, anunciar entrega ou encerrar a LiveView por erro não tratado. Redirecionar ao login com mensagem de erro traduzida que informe a falha e oriente solicitar novo link. A recuperação usa a conta existente e o fluxo de solicitação, sem repetir cadastro, criar conta duplicada ou alterar o protocolo de tokens. Esclarecimento do contrato RN08 e SPEC-008 RN02 após R3 da revisão de 13/10/2026.
 
 ## Cenários de aceite
 
@@ -33,15 +35,17 @@ Reutilizar `Planner.Accounts.User` e tabela `users`, adaptando o scaffold Phoeni
 - CA-005-11: aplicar migration sobre banco com `default` e dados preserva registros/FKs; criar duas contas reais não revela nem transfere o legado. Fixtures e seeds deixam de depender de acesso público ao default; banco novo e existente funcionam.
 - CA-005-12: solicitar link em dev entrega mensagem somente na mailbox local; abrir link permite login e sair/entrar com outra conta testa isolamento. Em configuração prod, rotas dev não existem. README contém o procedimento somente após implementado.
 
+- CA-005-13: dado e-mail novo e adapter retornando erro, submeter cadastro mantém uma única conta persistida, não autentica e leva ao login com erro pt-BR e orientação de nova solicitação, sem flash de envio bem-sucedido nem exceção da LiveView. Restaurado o adapter, solicitar link para o mesmo e-mail e consumi-lo permite entrar nessa mesma conta; a unicidade e as concessões iniciais permanecem intactas. O caminho de envio bem-sucedido continua funcionando.
+
 ## Dados, limites e entregas
 
 Tokens e preferências não pertencem ao usuário padrão compartilhado. Sem migração de propriedade, exclusão de conta, alteração de e-mail, senha ou gestão administrativa neste incremento. Preservar mecanismos internos necessários do scaffold; não expor telas extras apenas porque foram geradas.
 
-TASK-015 produz auth/schema/scope e telas de entrada; TASK-045 protege o planejamento e substitui a resolução padrão; TASK-046 prepara e documenta teste de e-mail local. As três são sequenciais e não autorizam publicação intermediária. Sem dúvidas bloqueantes de produto; provedor de produção é pendência da SPEC-008.
+TASK-015 produz auth/schema/scope e telas de entrada; TASK-045 protege o planejamento e substitui a resolução padrão; TASK-046 prepara e documenta teste de e-mail local. A TASK-051 corrige a falha de envio no cadastro (RN15/CA-005-13) antes do release. As três entregas originais são sequenciais e não autorizam publicação intermediária. Sem dúvidas bloqueantes de produto; provedor de produção é responsabilidade posterior do usuário e não bloqueia a entrega do código.
 
 ## Contrato histórico do MVP local — substituído no incremento de produção
 
-RN01–RN07 e CA-005-01–06 abaixo preservam a rastreabilidade das TASK-009/037 e de seus aceites. Não autorizam acesso compartilhado depois da TASK-045; as regras vigentes do novo incremento são RN08–RN14 acima.
+RN01–RN07 e CA-005-01–06 abaixo preservam a rastreabilidade das TASK-009/037 e de seus aceites. Não autorizam acesso compartilhado depois da TASK-045; as regras vigentes do novo incremento são RN08–RN15 acima.
 
 
 - RN01: preparar os dados cria o usuário padrão uma única vez, com identificador estável. Repetir seeds não duplica o usuário nem altera seus dados de planejamento.

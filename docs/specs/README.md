@@ -37,7 +37,7 @@ Arraste integrado na [TASK-040](../tasks/040-arrastar-tarefas.md), com aceite lo
 | [004 — Painel](004-experiencia-e-acesso.md) | Ready: menu à esquerda e novas ações; TASK-041/042/044. |
 | [005 — Contas](005-contas-e-acesso.md) | Ready: cadastro aberto, magic link, isolamento e dev; TASK-015/045/046. |
 | [007 — Temas](007-temas-e-creditos.md) | Ready: dois temas gratuitos, concessão e preferência por usuário; TASK-047/048. |
-| [008 — Produção](008-producao.md) | Draft: contratos locais definidos, destino e serviços remotos pendentes. |
+| [008 — Código Phoenix e release local](008-producao.md) | Ready: empacotamento e aceite local; infraestrutura e serviços externos sob responsabilidade do usuário. |
 | [009 — Créditos e compras](009-creditos-e-compras.md) | Draft: evolução futura; não bloqueia o MVP de produção. |
 
 As versões históricas citadas nos aceites de 05/10 não atestam login, temas ou operações novas. SPEC-003 preserva data UTC/histórico; SPEC-006 preserva classificação, com novo proprietário autenticado integrado pela TASK-045.

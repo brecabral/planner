@@ -34,7 +34,7 @@ Abra [localhost:4000](http://localhost:4000). Para usar o console interativo, ex
 | `mix assets.build` | Instala o frontend pelo lockfile (`npm ci`) e compila CSS/JS. |
 | `mix precommit` | Compila com warnings como erros, verifica dependências, formata e testa. |
 | `mix cmd node --test assets/test/task_drag.test.mjs` | Testa o ciclo técnico do hook de arraste com SortableJS instalado, sem navegador. Executar após instalar os assets. |
-| `mix run priv/repo/seeds.exs` | Prepara o usuário padrão; repetir preserva sua identidade e dados. |
+| `mix run priv/repo/seeds.exs` | Executa o arquivo de seeds, atualmente sem criação ou alteração de dados. |
 | `mix ecto.reset` | Apaga e recria a base do ambiente atual. |
 | `docker compose stop postgres` | Para o banco sem apagar o volume. |
 
@@ -68,7 +68,7 @@ Use sempre o mesmo host nas abas de login e mailbox. Por padrão, o endereço é
 
 A mailbox guarda mensagens em memória e é esvaziada ao reiniciar a aplicação; contas e tarefas persistem no banco. Depois de reiniciar, solicite novo link em vez de cadastrar novamente o mesmo e-mail. A mensagem genérica de login não comprova entrega: confira a mailbox. Em testes, `Swoosh.Adapters.Test` captura destinatário e link sem envio real; `mix test test/planner_web/local_magic_link_test.exs` verifica também o adapter local, troca de contas e falha de entrega sem sessão indevida.
 
-`/dev/mailbox` e `/dev/dashboard` só são habilitados em desenvolvimento e ficam ausentes na configuração de produção. O teste local valida a aplicação, mas não comprova entrega externa, reputação de remetente ou configuração de domínio. A definição e validação do provedor real pertencem à preparação de produção; esta etapa não autoriza publicação.
+`/dev/mailbox` e `/dev/dashboard` só são habilitados em desenvolvimento e ficam ausentes na configuração de produção. O teste local valida a aplicação, mas não comprova entrega externa, reputação de remetente ou configuração de domínio. O usuário pode configurar posteriormente o adapter Swoosh, as credenciais e o remetente do provedor real. Essa configuração e a publicação estão fora da entrega de código; o adapter local não envia e-mail externo.
 
 ## Temas por conta
 
@@ -92,4 +92,4 @@ Para alterações no hook de arraste, execute também o teste JavaScript listado
 
 ## Evolução planejada para produção
 
-O [plano de tarefas](docs/tasks/README.md) prevê auth padrão Phoenix com magic link, home direcionada ao login/dashboard, teste local de e-mail com Swoosh, temas claro/escuro por conta e preparação de release. Autenticação, isolamento por conta e teste local de e-mail já estão implementados. As tarefas de produção documentarão aqui configuração e recuperação depois de definidos e validados. Hospedagem, domínio e provedor de e-mail estão pendentes. Créditos e loja ficam para evolução futura.
+O [plano de tarefas](docs/tasks/README.md) prevê auth padrão Phoenix com magic link, home direcionada ao login/dashboard, teste local de e-mail com Swoosh, temas claro/escuro por conta e preparação de release. Autenticação, isolamento por conta e teste local de e-mail já estão implementados. A entrega dos agentes termina no código funcional e no release local validado, com procedimentos testados documentados aqui. Hospedagem, domínio, configuração do provedor de e-mail, publicação e backups ficam sob responsabilidade do usuário e não são pendências da fila de código. Créditos e loja ficam para evolução futura.

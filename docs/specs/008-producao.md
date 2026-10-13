@@ -1,31 +1,30 @@
 ---
 id: "SPEC-008"
-status: draft
+status: ready
 requirements: ["RF11", "CA16", "CA19"]
 ---
 
-# 008 — Entrega do MVP de produção
+# 008 — Entrega de código Phoenix e release local
 
-## Escopo
+## Escopo e origem
 
-Empacotar a aplicação com contas isoladas, magic link, ajustes de tarefas e dois temas gratuitos. Release local pode ser preparada antes do destino remoto; publicação depende de decisões externas, não de implementar créditos, idiomas ou fuso.
+Decisão do responsável em 13/10/2026: entregar código Phoenix funcional; infraestrutura e operação remota ficam sob sua responsabilidade. Substitui o contrato remoto anterior desta spec, preservando os IDs. Prontidão do contrato não significa implementação concluída.
 
-## Contratos confirmados
+## Regras
 
-- RN01: release contém assets e migrations, executa com configuração externa e banco PostgreSQL persistente; não inicia Compose de desenvolvimento nem cria conta compartilhada acessível. Não inclui segredos na imagem/repositório. Assets usam dependências e lockfiles existentes.
-- RN02: produção usa domínio/HTTPS e entrega real de magic link pelo Swoosh existente, com host correto e remetente configurado. Não usar mailbox local como transporte de produção. Falha no envio não autentica usuário nem anuncia entrega efetiva não confirmada.
-- RN03: rotas de desenvolvimento ficam ausentes; reinício preserva contas, tokens válidos segundo suas regras, tarefas, cotas, labels, concessões e preferências. Scripts de migration não resetam nem transferem dados legados.
-- RN04: backup/restauração precisa ser comprovado em destino isolado, preservando relações de proprietário, histórico, cota e temas. Não testar restauração destruindo a base ativa.
-- RN05: aceite integrado exercita cadastro, entrega de link, login/logout, duas contas isoladas, exclusão e retry → backlog, temas, persistência após reinício e restauração. Gates mantêm cobertura mínima de 70%; evidências automatizadas não equivalem a publicação nem a teste visual real.
-- CA-008-01: construir release local e iniciar com banco/configuração de teste permite migrations e acesso sem Mix no runtime; arquivos e imagens não contêm segredos locais.
-- CA-008-02: no destino homologado, link entregue ao e-mail correto usa host HTTPS correto, permite login e rejeita reuso; contas A/B permanecem isoladas e `/dev/mailbox`/`/dev/dashboard` não existem.
-- CA-008-03: reiniciar release e restaurar backup isolado preservam dados/relacionamentos e preferências das duas contas; registrar evidência do procedimento.
-- CA-008-04: aceite integrado das SPEC-002/004/005/007 passa no artefato candidato; publicação usa esse artefato e registra destino/versão e verificação posterior.
+- RN01: release contém assets e migrations, executa com configuração externa e PostgreSQL; não inicia Compose de desenvolvimento nem cria conta compartilhada acessível. Não inclui segredos na imagem/repositório. Assets usam dependências e lockfiles existentes.
+- RN02: e-mail reutiliza Planner.Mailer/Swoosh e os fluxos Phoenix existentes. Desenvolvimento captura mensagens na mailbox local; testes capturam mensagens sem envio externo. A configuração de adapter, credenciais e remetente reais cabe posteriormente ao usuário. Não criar abstração de provedores nem escolher serviço para esta entrega. Falha de envio não autentica nem anuncia entrega efetiva não confirmada.
+- RN03: rotas de desenvolvimento ficam ausentes na configuração de produção. Reinício preserva contas, tokens válidos segundo suas regras, tarefas, cotas, labels, concessões e preferências. Scripts de migration não resetam nem transferem dados legados.
+- RN04: backup, retenção e restauração de ambiente remoto estão fora da entrega de código e sob responsabilidade do usuário; não constituem gate do release local.
+- RN05: aceite integrado exercita cadastro, captura de link, login/logout, duas contas isoladas, exclusão e retry → backlog, temas e persistência após reinício. Gates mantêm cobertura mínima de 70%. Evidências distinguem testes da aplicação, smoke test do release e limites de navegador.
 
-## Dúvidas bloqueantes
+## Cenários de aceite
 
-Responsável confirmou em 11/10/2026 que hospedagem, domínio e serviço de e-mail ainda não foram escolhidos. Definir também remetente, destino/retenção de backups e acesso necessário para validar o ambiente. Essas escolhas bloqueiam runtime específico, restauração remota e publicação, não tarefas locais. Não presumir fornecedor, criar conta externa ou enviar e-mail real durante planejamento.
+- CA-008-01: dado banco isolado e configuração de teste, construir e iniciar o release permite migrations e acesso sem Mix no runtime; artefato contém assets e não contém segredos locais.
+- CA-008-02: dado adapter local em desenvolvimento ou de teste nos testes, solicitar link captura destinatário/URL corretos; consumir o link autentica e reuso/expiração são rejeitados conforme SPEC-005. Falha de envio não concede sessão. Na configuração de produção, rotas de desenvolvimento estão ausentes. Nenhum envio externo é exigido.
+- CA-008-03: dadas duas contas com tarefas e preferências persistidas, reiniciar o release sobre o mesmo banco isolado preserva dados, relações e isolamento; tokens seguem suas regras de validade e revogação. Não exige backup/restauração remota.
+- CA-008-04: dado release identificado por versão/base, consolidar evidências das SPEC-002/004/005/007, gates e smoke test permite entregar o código ao usuário, com limites explícitos. Não exige domínio, publicação ou provedor real. Testes com captura de e-mail não comprovam entrega externa.
 
-## Entregas
+## Entregas e limites
 
-TASK-011 cobre empacotamento local usando RN01/CA-008-01 já definidos, com SPEC-005/007 prontas como entrada; SPEC-008 permanece rascunho para a parte remota. TASK-033, TASK-035, TASK-050 e TASK-034 só iniciam com contrato remoto pronto e dependências integradas. Procedimentos operacionais serão escritos exclusivamente no README durante implementação.
+TASK-011 produz o release local; TASK-050 consolida o aceite do código e do artefato. TASK-033, TASK-034 e TASK-035 foram canceladas por retirada da operação remota do escopo, sem alegação de execução. Não há dúvida externa bloqueante neste contrato. Procedimentos efetivamente testados e pontos de configuração ficam exclusivamente no README.
