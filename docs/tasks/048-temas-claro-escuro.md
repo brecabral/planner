@@ -1,6 +1,6 @@
 ---
 id: "TASK-048"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Integra concessões e preferência pronta aos tokens semânticos e renderização inicial autenticada."
 specs: ["SPEC-007", "SPEC-004"]
@@ -54,3 +54,7 @@ Autoavaliação pelo implementador `/root/implement_048`, conforme fluxo de revi
 - Extração/mesclagem Gettext restrita ao catálogo pt_BR, com as quatro mensagens novas traduzidas. `git diff --check` sem erros.
 - Limites: LiveViewTest e DOM mínimo verificam atribuições/eventos, não executam navegador, contraste visual, gestos reais ou reinício de processo. Persistência após nova sessão/montagem é coberta usando o banco real de teste.
 - Aguardando conferência operacional e commit de integração pelo coordenador; não iniciar consumidoras antes da integração. Nenhuma publicação realizada.
+
+### Conferência operacional — 13/10/2026
+
+Coordenador `/root`: entrega integrada em `1f388fe` na branch `feat/ux`. Conferidos escopo, autoavaliação, gates relatados aprovados (240 testes, cobertura 94,08% e teste JavaScript aprovado) e ausência de impedimentos. Sem reprodução de testes ou revisão independente. Limites de validação visual preservados. Conclusão operacional libera TASK-011; TASK-049 permanece fora do MVP e bloqueada por decisões próprias.
