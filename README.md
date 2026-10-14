@@ -90,6 +90,66 @@ O responsável confirmou a configuração da proteção da `main` e do check obr
 
 Para alterações no hook de arraste, execute também o teste JavaScript listado acima; ele é separado dos aliases `precommit` e `ci`. O harness usa o SortableJS do lockfile com DOM e timers mínimos controlados. Cobre cancelamento, restauração e retomada, mas não simula layout, propagação completa de eventos, mouse/touch reais ou patches do LiveView no navegador.
 
+## Release local
+
+O `Dockerfile` gera um release de produção com assets compilados pelo lockfile, nove migrations e scripts `bin/server`/`bin/migrate`. O estágio final roda como `nobody`, sem Mix, Node.js ou Compose. `.dockerignore` exclui `.env`, chaves e artefatos de desenvolvimento. O build precisa de acesso aos registries de imagens, pacotes e assets; não publica a imagem.
+
+Procedimento validado em 14/10/2026, com Docker e Python 3 para gerar configuração temporária. Use nomes livres para os recursos abaixo. O PostgreSQL de smoke tem rede interna própria, sem porta publicada nem volume compartilhado com desenvolvimento. A configuração é exclusiva desse teste; não reutilize o `.env` de desenvolvimento.
+
+```sh
+docker build -t planner:task-011 .
+python3 - <<'PY'
+import os, secrets
+path = "/tmp/planner-release-task011.env"
+fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+password = secrets.token_hex(24)
+content = (
+    "POSTGRES_USER=planner_smoke\nPOSTGRES_DB=planner_release_smoke\n"
+    + "POSTGRES_PASSWORD=" + password + "\n"
+    + "DATABASE_URL=ecto://planner_smoke:" + password
+    + "@planner-release-db/planner_release_smoke\n"
+    + "SECRET_KEY_BASE=" + secrets.token_hex(64) + "\n"
+    + "PHX_HOST=localhost\nPORT=4000\n"
+)
+os.write(fd, content.encode())
+os.close(fd)
+PY
+docker network create --internal planner-release-smoke
+docker run -d --name planner-release-db --network planner-release-smoke \
+  --env-file /tmp/planner-release-task011.env postgres:17
+```
+
+Confirme que o banco está pronto antes de aplicar as migrations. O comando de migration não cria banco, executa seeds nem reseta dados.
+
+```sh
+docker exec planner-release-db pg_isready -U planner_smoke -d planner_release_smoke
+docker run --rm --network planner-release-smoke \
+  --env-file /tmp/planner-release-task011.env planner:task-011 /app/bin/migrate
+docker run -d --name planner-release-app --network planner-release-smoke \
+  --env-file /tmp/planner-release-task011.env \
+  -p 127.0.0.1:4107:4000 planner:task-011
+```
+
+Abra [localhost:4107](http://localhost:4107). `/`, `/tasks` e `/tasks/new` redirecionam visitantes ao login; `/users/log-in` e os assets respondem com sucesso. `/dev/mailbox` e `/dev/dashboard` retornam 404. Esse smoke usa HTTP no loopback, permitido pela configuração existente; a URL pública configurada em produção usa HTTPS. O release não configura entrega real de e-mail e não oferece mailbox: para exercitar cadastro e links sem envio externo, use o procedimento de desenvolvimento acima.
+
+Para repetir migrations e reiniciar preservando o mesmo banco:
+
+```sh
+docker run --rm --network planner-release-smoke \
+  --env-file /tmp/planner-release-task011.env planner:task-011 /app/bin/migrate
+docker restart planner-release-app
+```
+
+A repetição foi validada com duas contas sintéticas: contas, tarefas, labels, cotas, tokens de sessão, concessões e preferências permaneceram idênticos; tokens continuaram válidos e consultas conservaram o isolamento. Essa verificação via API do release não substitui o aceite integrado em navegador. O OTP emitiu aviso sobre `libsctp.so.1` ausente; PostgreSQL e HTTP por TCP funcionaram normalmente.
+
+Para encerrar o smoke sem apagar seus dados:
+
+```sh
+docker stop planner-release-app planner-release-db
+```
+
+Os containers, a rede, a imagem e o arquivo temporário ficam disponíveis para inspeção. Mantenha o arquivo de configuração restrito: ele contém credenciais de teste. Ao usar outro PostgreSQL, forneça `DATABASE_URL` e `SECRET_KEY_BASE` externamente; `PHX_HOST`, `PORT` e `POOL_SIZE` ajustam host público, porta de escuta e pool. `bin/server` habilita o servidor; `bin/migrate` aplica apenas migrations pendentes. Hospedagem, provedor de e-mail e publicação permanecem sob responsabilidade do usuário.
+
 ## Evolução planejada para produção
 
 O [plano de tarefas](docs/tasks/README.md) prevê auth padrão Phoenix com magic link, home direcionada ao login/dashboard, teste local de e-mail com Swoosh, temas claro/escuro por conta e preparação de release. Autenticação, isolamento por conta e teste local de e-mail já estão implementados. A entrega dos agentes termina no código funcional e no release local validado, com procedimentos testados documentados aqui. Hospedagem, domínio, configuração do provedor de e-mail, publicação e backups ficam sob responsabilidade do usuário e não são pendências da fila de código. Créditos e loja ficam para evolução futura.
