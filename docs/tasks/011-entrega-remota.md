@@ -1,6 +1,6 @@
 ---
 id: "TASK-011"
-status: "in_progress"
+status: "in_review"
 execution_level: "standard"
 execution_rationale: "Empacota aplicação pronta com assets e migrations, sem escolher infraestrutura remota."
 specs: ["SPEC-005", "SPEC-007", "SPEC-008"]
@@ -63,3 +63,25 @@ Conferir árvore, recursos Docker com os nomes acima e disponibilidade dos tempo
 ### Retomada efetiva — 13/10/2026
 
 TASK-051 integrada em `118ba28` e concluída em `2ed68a2`. Implementador `/root/implement_051` respondeu com achados de leitura de mix.exs/configs na base limpa `2ed68a2`, sem build em andamento na consulta de processos. BLOCK-005 resolvido pela coordenação conforme evidências no relatório; implementação liberada. Aceites de release permanecem pendentes.
+
+## Entrega retomada — 14/10/2026
+
+Implementador `/root/resume_011`, base limpa `790ccea`, branch `feat/ux`. SPEC-005/007/008 conferidas como `ready`, dependências integradas e BLOCK-005 resolvido. Temporários anteriores não existiam; não havia container/rede de smoke para reutilizar. Build retomado com cache e concluído; nenhum código adicional ao scaffold do checkpoint foi necessário. Alterações finais limitadas ao README e a este registro.
+
+### Evidências por aceite
+
+1. **Artefato local aprovado na autoavaliação:** imagem `planner:task-011`, release `0.1.0`, manifest `sha256:c47ca07373900ab3c9bee4cc521859a2142a2591f3fe5c741a33748a225ee345`. Build compilou a aplicação, executou `npm ci`, Tailwind, esbuild, digest e montagem do release. Runtime como `nobody`, sem módulo/executável Mix, Node.js/npm ou Docker, com nove arquivos de migration. Smoke por Req dentro do release retornou 302 para `/`, `/tasks` e `/tasks/new`, todos para `/users/log-in`; login, CSS e JS retornaram 200; `/dev/mailbox` e `/dev/dashboard` retornaram 404. Nenhuma publicação ou Compose foi acionado pelo artefato.
+2. **Migration e preservação aprovadas na autoavaliação:** PostgreSQL 17 exclusivo em rede interna `planner-release-smoke`, banco `planner_release_smoke`, sem porta publicada ou volume compartilhado. As nove migrations rodaram com sucesso; inicialmente havia zero usuários. Preparadas duas contas sintéticas, tarefas próprias, label, consumo de cota, dois tokens de sessão e tema escuro de A/claro de B. Fotografia de todas as linhas de `users`, `users_tokens`, `tasks`, `labels`, `task_labels`, `daily_plans`, `themes`, `theme_entitlements` e `schema_migrations` permaneceu idêntica após segunda migration (`Migrations already up`) e reinício da aplicação. Tokens de sessão continuaram válidos; listagens permaneceram próprias e tentativa de conclusão de tarefa alheia retornou `:not_found`. A fotografia inclui a tabela de vínculos, mas não foi criado vínculo de label neste smoke. Nenhum reset, seed ou conta compartilhada executado. Inspeção do runtime não encontrou `.env`, chaves `.pem`/`.key`, `.git`, testes, dependências/fontes de build; configuração temporária gerada fora do repo em modo 0600.
+3. **Procedimento documentado:** README contém build, geração de configuração externa, banco isolado, prontidão, migration, start, repetição, reinício e parada efetivamente executados. Explicita HTTP local versus URL HTTPS de produção e a ausência de mailbox/provedor real no release. Nenhuma infraestrutura remota escolhida.
+
+### Gates e autoavaliação
+
+- Ajuda local de `precommit` e `ci` consultada. `mix precommit` e `mix ci` concluíram com código 0: **241 testes, 0 falhas** em ambos; Credo estrito sem achados, assets compilados e auditoria npm com zero vulnerabilidades.
+- Cobertura total **93,37%**, igual ao checkpoint e acima de 70%. `Planner.Release` continua com 0% na suíte instrumentada: `migrate/0` foi exercitado separadamente pelo artefato, sem atribuir essa execução à cobertura do Mix. `rollback/2`, gerado e preservado, não foi executado para evitar desfazer o banco do cenário; não faz parte do aceite de migration aditiva.
+- Autoavaliação pelo fluxo de review: alvo é o scaffold commitado em `790ccea` e README/registro locais, comparados ao checkpoint e aos contratos da tarefa. Scripts não executam seeds/reset; configuração externa não entra no build. Não foram encontrados achados bloqueantes. Não houve alteração de hook; nenhum teste JavaScript adicional exigido. Não é revisão independente nem avança seu marco.
+- O OTP 29 emitiu aviso de ausência de `libsctp.so.1`; todas as operações PostgreSQL/HTTP por TCP concluíram com sucesso. Build retomado reutilizou dependências em cache; esta entrega não executou auditoria adicional de advisories Hex nem afirma ausência deles. A auditoria de vulnerabilidades comprovada é a npm do gate existente.
+- Limites: smoke via HTTP/API do release, sem navegador, envio externo ou aceite integrado completo da TASK-050. Contas sintéticas foram criadas via Accounts, sem simular cadastro/login na UI. O smoke prova persistência dos tokens de sessão; expiração/revogação de magic links permanecem cobertas pela suíte da aplicação, não por este smoke.
+
+### Estado para coordenação
+
+Entrega pronta para conferência operacional e integração, sem staging/commit pelo implementador. `planner-release-app` e `planner-release-db` foram parados após o smoke; rede, imagem e dados sintéticos preservados. Configuração restrita e verificador estão em `/tmp/planner-release-task011.env` e `/tmp/planner-release-smoke.exs`; fotografia com tokens permanece somente no container parado. Nenhum segredo foi copiado ao repositório ou impresso. O gate normal iniciou o banco de desenvolvimento `planner-postgres-1`; o banco alheio `postgres-crm` não foi alterado. TASK-050 não iniciada. Estado `in_review` aguarda commit e conferência do coordenador.
