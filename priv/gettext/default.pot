@@ -337,12 +337,7 @@ msgstr ""
 msgid "Task deleted."
 msgstr ""
 
-#: lib/planner_web/live/user_live/registration.ex:16
-#, elixir-autogen, elixir-format
-msgid "Already registered?"
-msgstr ""
-
-#: lib/planner_web/live/user_live/registration.ex:66
+#: lib/planner_web/live/user_live/registration.ex:104
 #, elixir-autogen, elixir-format
 msgid "An email was sent to %{email}, please access it to confirm your account."
 msgstr ""
@@ -369,18 +364,17 @@ msgid "Confirming..."
 msgstr ""
 
 #: lib/planner_web/live/user_live/login.ex:12
-#: lib/planner_web/live/user_live/registration.ex:36
 #, elixir-autogen, elixir-format
 msgid "Create an account"
 msgstr ""
 
-#: lib/planner_web/live/user_live/registration.ex:35
+#: lib/planner_web/live/user_live/registration.ex:57
 #, elixir-autogen, elixir-format
 msgid "Creating account..."
 msgstr ""
 
 #: lib/planner_web/live/user_live/login.ex:17
-#: lib/planner_web/live/user_live/registration.ex:28
+#: lib/planner_web/live/user_live/registration.ex:35
 #, elixir-autogen, elixir-format
 msgid "Email"
 msgstr ""
@@ -407,7 +401,7 @@ msgstr ""
 
 #: lib/planner_web/live/user_live/confirmation.ex:53
 #: lib/planner_web/live/user_live/login.ex:11
-#: lib/planner_web/live/user_live/registration.ex:18
+#: lib/planner_web/live/user_live/registration.ex:70
 #, elixir-autogen, elixir-format
 msgid "Log in"
 msgstr ""
@@ -442,11 +436,6 @@ msgstr ""
 #: lib/planner_web/live/user_live/confirmation.ex:87
 #, elixir-autogen, elixir-format
 msgid "Magic link is invalid or it has expired."
-msgstr ""
-
-#: lib/planner_web/live/user_live/registration.ex:14
-#, elixir-autogen, elixir-format
-msgid "Register for an account"
 msgstr ""
 
 #: lib/planner_web/controllers/user_session_controller.ex:27
@@ -506,7 +495,32 @@ msgstr ""
 msgid "Theme"
 msgstr ""
 
-#: lib/planner_web/live/user_live/registration.ex:76
+#: lib/planner_web/live/user_live/registration.ex:114
 #, elixir-autogen, elixir-format
 msgid "We could not send the confirmation email. Request a new link to log in."
+msgstr ""
+
+#: lib/planner_web/live/user_live/registration.ex:64
+#, elixir-autogen, elixir-format
+msgid "Already have an account?"
+msgstr ""
+
+#: lib/planner_web/live/user_live/registration.ex:60
+#, elixir-autogen, elixir-format
+msgid "Create account"
+msgstr ""
+
+#: lib/planner_web/live/user_live/registration.ex:14
+#, elixir-autogen, elixir-format
+msgid "Create your account"
+msgstr ""
+
+#: lib/planner_web/live/user_live/registration.ex:17
+#, elixir-autogen, elixir-format
+msgid "Organize your tasks and choose up to three priorities each day."
+msgstr ""
+
+#: lib/planner_web/live/user_live/registration.ex:21
+#, elixir-autogen, elixir-format
+msgid "You will receive an email link to confirm your account and log in. No password needed."
 msgstr ""

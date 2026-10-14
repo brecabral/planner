@@ -19,7 +19,7 @@ defmodule PlannerWeb.PageControllerTest do
       assert LazyHTML.text(html) =~ "Entrar"
 
       assert html |> LazyHTML.query("#register-link") |> LazyHTML.attribute("href") == [
-               "/users/register"
+               "/join"
              ]
 
       assert html |> LazyHTML.query("html") |> LazyHTML.attribute("data-theme") == ["planner"]

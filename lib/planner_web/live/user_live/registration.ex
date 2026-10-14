@@ -8,35 +8,69 @@ defmodule PlannerWeb.UserLive.Registration do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
-      <div class="mx-auto max-w-sm">
-        <div class="text-center">
-          <.header>
-            {gettext("Register for an account")}
-            <:subtitle>
-              {gettext("Already registered?")}
-              <.link navigate={~p"/users/log-in"} class="font-semibold text-brand hover:underline">
-                {gettext("Log in")}
-              </.link>
-            </:subtitle>
-          </.header>
+      <section id="join" aria-labelledby="join-title" class="mx-auto max-w-sm space-y-6">
+        <div class="space-y-3">
+          <h1 id="join-title" class="text-3xl font-semibold tracking-tight">
+            {gettext("Create your account")}
+          </h1>
+          <p id="join-introduction" class="text-base-content/80">
+            {gettext("Organize your tasks and choose up to three priorities each day.")}
+          </p>
         </div>
-
-        <.form for={@form} id="registration_form" phx-submit="save" phx-change="validate">
+        <p id="join-instructions" class="text-sm text-base-content/80">
+          {gettext(
+            "You will receive an email link to confirm your account and log in. No password needed."
+          )}
+        </p>
+        <.form
+          for={@form}
+          id="registration_form"
+          phx-submit="save"
+          phx-change="validate"
+          class="space-y-4"
+        >
           <.input
-            field={@form[:email]}
+            field={%{@form[:email] | errors: []}}
             type="email"
             label={gettext("Email")}
             autocomplete="username"
             spellcheck="false"
             required
+            aria-invalid={if @email_errors != [], do: "true"}
+            aria-describedby={
+              if @email_errors == [],
+                do: "join-instructions",
+                else: "join-instructions user_email-errors"
+            }
             phx-mounted={JS.focus()}
           />
-
-          <.button phx-disable-with={gettext("Creating account...")} class="btn btn-primary w-full">
-            {gettext("Create an account")}
+          <div
+            :if={@email_errors != []}
+            id="user_email-errors"
+            role="alert"
+            class="text-sm text-error"
+          >
+            <p :for={error <- @email_errors}>{translate_error(error)}</p>
+          </div>
+          <.button
+            id="registration-submit"
+            phx-disable-with={gettext("Creating account...")}
+            class="btn btn-primary w-full"
+          >
+            {gettext("Create account")}
           </.button>
         </.form>
-      </div>
+        <p class="text-sm">
+          {gettext("Already have an account?")}
+          <.link
+            id="join-login"
+            navigate={~p"/users/log-in"}
+            class="link link-primary rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+          >
+            {gettext("Log in")}
+          </.link>
+        </p>
+      </section>
     </Layouts.app>
     """
   end
@@ -45,6 +79,10 @@ defmodule PlannerWeb.UserLive.Registration do
   def mount(_params, _session, %{assigns: %{current_scope: %{user: user}}} = socket)
       when not is_nil(user) do
     {:ok, redirect(socket, to: PlannerWeb.UserAuth.signed_in_path(socket))}
+  end
+
+  def mount(_params, _session, %{assigns: %{live_action: :legacy}} = socket) do
+    {:ok, redirect(socket, to: ~p"/join")}
   end
 
   def mount(_params, _session, socket) do
@@ -91,6 +129,7 @@ defmodule PlannerWeb.UserLive.Registration do
 
   defp assign_form(socket, %Ecto.Changeset{} = changeset) do
     form = to_form(changeset, as: "user")
-    assign(socket, form: form)
+    errors = if used_input?(form[:email]), do: form[:email].errors, else: []
+    assign(socket, form: form, email_errors: errors)
   end
 end

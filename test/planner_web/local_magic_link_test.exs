@@ -106,7 +106,7 @@ defmodule PlannerWeb.LocalMagicLinkTest do
   } do
     Application.put_env(:planner, Planner.Mailer, adapter: Planner.FailingMailAdapter)
     email = unique_user_email()
-    {:ok, registration, _} = live(conn, "/users/register")
+    {:ok, registration, _} = live(conn, "/join")
 
     result =
       registration
@@ -174,7 +174,7 @@ defmodule PlannerWeb.LocalMagicLinkTest do
 
   defp register_from_mailbox(conn) do
     email = unique_user_email()
-    {:ok, view, _} = live(conn, "/users/register")
+    {:ok, view, _} = live(conn, "/join")
     view |> form("#registration_form", user: %{email: email}) |> render_submit()
     assert_redirect(view, "/users/log-in")
     message = Enum.find(Memory.all(), &(&1.to == [{"", email}]))

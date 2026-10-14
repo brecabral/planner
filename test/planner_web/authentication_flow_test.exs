@@ -6,8 +6,8 @@ defmodule PlannerWeb.AuthenticationFlowTest do
   alias Planner.Accounts
 
   test "registration validates, normalizes email and sends translated confirmation", %{conn: conn} do
-    {:ok, view, _} = live(conn, ~p"/users/register")
-    assert has_element?(view, "#registration_form", "Criar uma conta")
+    {:ok, view, _} = live(conn, ~p"/join")
+    assert has_element?(view, "#registration_form", "Criar conta")
     refute has_element?(view, "input[type=password]")
     view |> form("#registration_form", user: %{email: "bad"}) |> render_change()
     assert has_element?(view, "#registration_form p", "deve conter @ e não ter espaços")
@@ -23,6 +23,80 @@ defmodule PlannerWeb.AuthenticationFlowTest do
       assert message.text_body =~ "Confirme sua conta"
       assert message.text_body =~ "/users/log-in/"
     end)
+  end
+
+  test "join presents an accessible single email form and login navigation", %{conn: conn} do
+    {:ok, view, _} = live(conn, ~p"/join")
+    assert has_element?(view, "h1", "Crie sua conta")
+
+    assert has_element?(
+             view,
+             "#join-introduction",
+             "Organize suas tarefas e escolha até três prioridades por dia."
+           )
+
+    assert has_element?(
+             view,
+             "#join-instructions",
+             "Você receberá um link por e-mail para confirmar sua conta e entrar. Não é necessário criar senha."
+           )
+
+    assert has_element?(view, "label[for=user_email]", "E-mail")
+    assert has_element?(view, "#user_email[aria-describedby=join-instructions]")
+
+    assert view
+           |> render()
+           |> LazyHTML.from_fragment()
+           |> LazyHTML.query("#registration_form input:not([type=hidden])")
+           |> Enum.count() == 1
+
+    assert has_element?(
+             view,
+             "#registration-submit[phx-disable-with='Criando conta...']",
+             "Criar conta"
+           )
+
+    assert has_element?(view, "#join-login[href='/users/log-in']", "Entrar")
+    {:ok, login, _} = live(conn, ~p"/users/log-in")
+
+    assert {:error, {:live_redirect, %{to: "/join"}}} =
+             login |> element("#register-link") |> render_click()
+  end
+
+  test "legacy registration redirects and authenticated visitors cannot register", %{conn: conn} do
+    assert conn |> get(~p"/users/register") |> redirected_to() == "/join"
+    assert {:error, {:redirect, %{to: "/join"}}} = live(conn, ~p"/users/register")
+    conn = log_in_user(conn, authenticated_user_fixture())
+
+    for path <- [~p"/join", ~p"/users/register"] do
+      assert conn |> get(path) |> redirected_to() == "/tasks"
+      assert {:error, {:redirect, %{to: "/tasks"}}} = live(conn, path)
+    end
+  end
+
+  test "invalid and duplicate registration preserve input and associate translated errors", %{
+    conn: conn
+  } do
+    user = authenticated_user_fixture()
+    count = Planner.Repo.aggregate(Planner.Accounts.User, :count)
+
+    for {email, error, value} <- [
+          {"bad", "deve conter @ e não ter espaços", "bad"},
+          {"  " <> String.upcase(user.email) <> "  ", "já está em uso", user.email}
+        ] do
+      {:ok, view, _} = live(conn, ~p"/join")
+      view |> form("#registration_form", user: %{email: email}) |> render_submit()
+
+      assert has_element?(
+               view,
+               "#user_email[aria-invalid=true][aria-describedby='join-instructions user_email-errors']"
+             )
+
+      assert has_element?(view, "#user_email[value='#{value}']")
+      assert has_element?(view, "#user_email-errors[role=alert]", error)
+      assert has_element?(view, "#join-login[href='/users/log-in']")
+      assert Planner.Repo.aggregate(Planner.Accounts.User, :count) == count
+    end
   end
 
   test "login requests have identical generic feedback for existing and absent emails", %{
