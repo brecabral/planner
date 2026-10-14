@@ -1,6 +1,6 @@
 ---
 id: "TASK-011"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Empacota aplicação pronta com assets e migrations, sem escolher infraestrutura remota."
 specs: ["SPEC-005", "SPEC-007", "SPEC-008"]
@@ -85,3 +85,7 @@ Implementador `/root/resume_011`, base limpa `790ccea`, branch `feat/ux`. SPEC-0
 ### Estado para coordenação
 
 Entrega pronta para conferência operacional e integração, sem staging/commit pelo implementador. `planner-release-app` e `planner-release-db` foram parados após o smoke; rede, imagem e dados sintéticos preservados. Configuração restrita e verificador estão em `/tmp/planner-release-task011.env` e `/tmp/planner-release-smoke.exs`; fotografia com tokens permanece somente no container parado. Nenhum segredo foi copiado ao repositório ou impresso. O gate normal iniciou o banco de desenvolvimento `planner-postgres-1`; o banco alheio `postgres-crm` não foi alterado. TASK-050 não iniciada. Estado `in_review` aguarda commit e conferência do coordenador.
+
+### Conferência operacional — 14/10/2026
+
+Coordenador `/root`: entrega integrada em `88cb5ed` na branch `feat/ux`, preservando o scaffold de `790ccea`. Conferidos registro de conclusão, escopo dos dois arquivos finais, autoavaliação, build/smoke relatados, gates aprovados (241 testes, cobertura 93,37%) e ausência de impedimentos. Sem reprodução dos testes ou revisão independente. Limites da validação preservados acima. Commit concluído e entrega presente na base de trabalho; TASK-011 marcada `done`. TASK-050 fica elegível, com dependência integrada e sem bloqueios, mas não foi iniciada. Nenhuma publicação remota realizada.
