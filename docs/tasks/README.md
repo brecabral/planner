@@ -106,3 +106,10 @@ A [TASK-051 — Tratar falha de envio no cadastro](051-tratar-falha-envio-cadast
 R4 foi reconciliado na tabela de seeds do README e R5 na declaração de implementação da SPEC-002. O relatório histórico de revisão permanece inalterado por este ajuste; R3 continua aberto e não há nova aprovação independente.
 
 Conferência documental desta reconciliação: 51 cabeçalhos verificados quanto a IDs, produtores únicos, referências, ciclos, consumos alcançáveis e dependências de entregas concluídas; links locais e diff sem erros. `mix precommit` aprovado com 240 testes (seed 481085). Esse gate não cobre ainda R3 e não substitui a regressão exigida na TASK-051.
+
+## Correções de login e temas — 14/10/2026
+
+- [TASK-053 — Destacar Criar conta no login](053-destacar-criar-conta-login.md): capacidade `basic`, após TASK-052; botão equivalente a entrar, mantendo navegação para `/join`.
+- [TASK-054 — Corrigir temas na navbar](054-corrigir-temas-na-navbar.md): capacidade `standard`, após TASK-048/052; reproduzir falha, corrigir aplicação visual e oferecer seletor junto de Sair.
+
+Ambas têm dependências concluídas na base e escopos de escrita separados. Contratos em SPEC-005 RN20/CA-005-18 e SPEC-007 RN07–RN08/CA-007-05–07. São correções posteriores às entregas registradas; não reabrem tarefas concluídas nem atestam novos aceites. Implementação não iniciada.

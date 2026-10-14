@@ -65,6 +65,15 @@ Origem: pedido de planejar uma página de join, com confirmação do responsáve
 
 Sem nova entidade, migration, protocolo de autenticação ou provedor. A [TASK-052](../tasks/052-pagina-join.md) é a única produtora da página e da compatibilidade de rotas, consumindo as entregas existentes de autenticação e recuperação. Sem dúvidas bloqueantes após a confirmação do significado de join. Este incremento não é pré-requisito retroativo do aceite do release já planejado.
 
+## Correção de acesso ao cadastro — 14/10/2026
+
+Origem: responsável relatou que “Criar conta” fica escondido e pediu aparência de botão equivalente a entrar.
+
+- RN20: no login público, “Criar conta” é uma ação visível com o mesmo padrão de botão, altura, largura e destaque do botão de entrar. Posicionar abaixo da ação de entrar, com espaçamento entre ambas, sem depender de hover. Preservar semântica de link para `/join`, fora da submissão do formulário; navegar não exige preencher e-mail nem solicita magic link. Tema público permanece claro e textos usam Gettext.
+- CA-005-18: visitante abre `/users/log-in` e identifica as duas ações com aparência de botão; com e-mail vazio, ativa “Criar conta” por clique ou teclado e chega a `/join` sem validação do login ou envio de e-mail. Em 320 e 1280 px, ambas estão legíveis, sem sobreposição ou rolagem horizontal e com foco visível. Entrar continua submetendo o fluxo existente.
+
+Entrega: [TASK-053](../tasks/053-destacar-criar-conta-login.md). Sem mudanças de dados ou autenticação e sem dúvidas bloqueantes.
+
 ## Contrato histórico do MVP local — substituído no incremento de produção
 
 RN01–RN07 e CA-005-01–06 abaixo preservam a rastreabilidade das TASK-009/037 e de seus aceites. Não autorizam acesso compartilhado depois da TASK-045; as regras vigentes do novo incremento são RN08–RN15 acima.

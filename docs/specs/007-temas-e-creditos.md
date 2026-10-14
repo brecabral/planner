@@ -31,3 +31,15 @@ Decisão de 11/10/2026: manter o claro existente e adicionar escuro, ambos gratu
 ## Entregas
 
 TASK-047 produz catálogo, concessões e preferência persistida; TASK-048 integra paletas/seletor e renderização. Não há dúvidas bloqueantes para esses dois temas. Monetização tem rascunho separado na SPEC-009.
+
+## Correção do seletor e da aplicação visual — 14/10/2026
+
+Origem: responsável relata que os temas não funcionam e solicita seleção na barra superior, ao lado de “Sair”. O relato confirma o problema percebido; sua causa técnica ainda não foi reproduzida neste planejamento.
+
+- RN07: em `/tasks` e `/tasks/new`, apresentar um único seletor compacto com rótulo “Tema”, opções “Claro” e “Escuro” e valor atual visível, na barra superior imediatamente antes de “Sair”. Usar controle de seleção acessível por teclado, com nome acessível e foco visível. Remover os botões de tema do corpo do painel. Em 320 px e desktop, seletor e saída permanecem acessíveis sem sobreposição ou rolagem horizontal. Páginas públicas não exibem seletor.
+- RN08: selecionar uma opção concedida e confirmar a persistência aplica imediatamente a paleta à página inteira, incluindo barra, fundo, painel e formulário aberto, sem recarregar manualmente. Durante gravação, indicar processamento e impedir envios repetidos pelo controle. Falha mantém a última escolha confirmada no controle e na página e apresenta erro acessível junto ao seletor. Preservar RN03–RN05.
+- CA-007-05: conta autenticada em `/tasks` vê um único seletor “Tema” ao lado de “Sair”, com opção persistida selecionada; teclado permite alternar claro → escuro → claro. Em 320 e 1280 px os dois controles são utilizáveis; login e `/join` não apresentam seletor.
+- CA-007-06: no navegador com assets compilados, alternar temas muda as cores computadas do fundo, barra e painel, e mantém texto legível. Abrir/fechar `/tasks/new`, atualizar dados do painel, recarregar e reconectar preserva a seleção e a paleta. Abrir diretamente `/tasks/new` recupera a preferência. Verificar CSS efetivo, não apenas atributo `data-theme` ou resposta do servidor.
+- CA-007-07: falha de persistência mantém opção e paleta anteriores, permite nova tentativa e anuncia erro; código inválido/não concedido não altera preferência. Logout retorna ao claro, e login de outra conta aplica somente a preferência dela. Preservar os cenários CA-007-02/03.
+
+Entrega corretiva: [TASK-054](../tasks/054-corrigir-temas-na-navbar.md). Reutilizar catálogo, concessões e preferência existentes, sem migration, novas paletas, tema do sistema, armazenamento global no navegador ou dependências adicionais. Sem dúvidas bloqueantes de produto; diagnóstico técnico faz parte da implementação.

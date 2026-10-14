@@ -41,3 +41,5 @@ Arraste integrado na [TASK-040](../tasks/040-arrastar-tarefas.md), com aceite lo
 | [009 — Créditos e compras](009-creditos-e-compras.md) | Draft: evolução futura; não bloqueia o MVP de produção. |
 
 As versões históricas citadas nos aceites de 05/10 não atestam login, temas ou operações novas. SPEC-003 preserva data UTC/histórico; SPEC-006 preserva classificação, com novo proprietário autenticado integrado pela TASK-045.
+
+Correções solicitadas em 14/10/2026: SPEC-005 RN20/CA-005-18 define destaque do cadastro no login ([TASK-053](../tasks/053-destacar-criar-conta-login.md)); SPEC-007 RN07–RN08/CA-007-05–07 define seletor na navbar e regressão visual ([TASK-054](../tasks/054-corrigir-temas-na-navbar.md)). Contratos prontos; implementação corretiva pendente.
