@@ -43,6 +43,28 @@ Tokens e preferências não pertencem ao usuário padrão compartilhado. Sem mig
 
 TASK-015 produz auth/schema/scope e telas de entrada; TASK-045 protege o planejamento e substitui a resolução padrão; TASK-046 prepara e documenta teste de e-mail local. A TASK-051 corrige a falha de envio no cadastro (RN15/CA-005-13) antes do release. As três entregas originais são sequenciais e não autorizam publicação intermediária. Sem dúvidas bloqueantes de produto; provedor de produção é responsabilidade posterior do usuário e não bloqueia a entrega do código.
 
+## Página join — planejamento de 14/10/2026
+
+Origem: pedido de planejar uma página de join, com confirmação do responsável de que se trata de criar conta no Planner. A composição e a compatibilidade de rotas abaixo são decisões deste planejamento, dentro do cadastro aberto RF08. Não representam implementação concluída.
+
+### Regras
+
+- RN16: `/join` é a entrada pública de criação de conta e reutiliza a Registration LiveView e Accounts existentes. `/users/register` permanece compatível, redirecionando visitantes para `/join`. Links internos de criação de conta passam a apontar para `/join`. Acessar qualquer uma dessas entradas autenticado leva a `/tasks`. A regra de `/` e o destino de logout permanecem RN10.
+- RN17: apresentar marca Planner, título “Crie sua conta”, explicação curta “Organize suas tarefas e escolha até três prioridades por dia.”, campo “E-mail”, botão “Criar conta” e “Já tem uma conta? Entrar”, com destino `/users/log-in`. Antes do envio, explicar “Você receberá um link por e-mail para confirmar sua conta e entrar. Não é necessário criar senha.” Textos são a versão pt-BR; implementação usa mensagens-base em inglês via Gettext. Não solicitar nome, senha, convite ou pagamento.
+- RN18: composição em coluna única com largura limitada, apresentação antes do formulário, espaçamento consistente com os componentes e tokens existentes. Em 320 px e em desktop, conteúdo e ações ficam acessíveis sem rolagem horizontal. Campo possui rótulo associado; foco visível e ordem de teclado seguem a leitura. Erros ficam associados ao campo e feedback de envio é perceptível por tecnologia assistiva. Não criar seletor público nem persistência de tema para visitantes.
+- RN19: submissão indica processamento e impede repetição enquanto pendente. E-mail inválido ou já cadastrado mantém o formulário com erro traduzido, preserva a entrada e permite correção ou ida ao login. Cadastro válido com envio bem-sucedido leva ao login com orientação de conferir o e-mail, sem autenticar antes de consumir o link. Falha de envio segue RN15; nunca anunciar sucesso nesse caminho. Preservar unicidade normalizada, concessões iniciais, tokens e isolamento existentes.
+
+### Cenários de aceite
+
+- CA-005-14 (RN16): visitante abre `/join` e vê o cadastro; abre `/users/register` e termina em `/join`; segue o link de cadastro no login e chega a `/join`. Autenticado abre cada uma dessas entradas e termina em `/tasks`, sem formulário de cadastro.
+- CA-005-15 (RN17/RN18): visitante vê apresentação, explicação de magic link e somente o campo de e-mail. Pelo teclado, preenche, submete e acessa “Entrar” com foco visível. Em larguras de 320 e 1280 px não há corte de ações nem rolagem horizontal; rótulo e erros têm associação verificável. Conferência em navegador registra o que foi efetivamente observado.
+- CA-005-16 (RN19): dado e-mail inválido, submeter mantém valor e apresenta erro sem criar conta. Dado e-mail já registrado, inclusive variante de caixa/espaços aceita pela normalização existente, submeter não duplica a conta e oferece acesso ao login. Enquanto envio estiver pendente, o controle apresenta processamento e não permite nova submissão pela interface.
+- CA-005-17 (RN19): dado e-mail novo, cadastrar por `/join` com adapter local/de teste bem-sucedido cria uma conta com concessões iniciais e leva ao login com orientação de confirmação; consumir o link abre `/tasks` da conta. Com adapter retornando erro, repetir o cenário de CA-005-13 a partir de `/join`, preservando recuperação e ausência de sessão antecipada.
+
+### Dados e entrega
+
+Sem nova entidade, migration, protocolo de autenticação ou provedor. A [TASK-052](../tasks/052-pagina-join.md) é a única produtora da página e da compatibilidade de rotas, consumindo as entregas existentes de autenticação e recuperação. Sem dúvidas bloqueantes após a confirmação do significado de join. Este incremento não é pré-requisito retroativo do aceite do release já planejado.
+
 ## Contrato histórico do MVP local — substituído no incremento de produção
 
 RN01–RN07 e CA-005-01–06 abaixo preservam a rastreabilidade das TASK-009/037 e de seus aceites. Não autorizam acesso compartilhado depois da TASK-045; as regras vigentes do novo incremento são RN08–RN15 acima.

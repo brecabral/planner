@@ -82,6 +82,10 @@ Escopo revisto pelo responsável em 13/10/2026: entregar código Phoenix funcion
 
 Cadastro aberto e dados antigos isolados foram confirmados. Exclusão preserva concluídas e restitui uma escolha somente ao excluir pendência de hoje. Os dois temas são gratuitos para todas as contas; catálogo/concessões preparam propriedade futura sem saldo ou loja. A SPEC-008 define a entrega local. Configuração remota, publicação e backups pertencem ao usuário. As antigas tarefas [033](033-configurar-producao.md), [034](034-publicar-aplicacao.md) e [035](035-validar-restauracao.md) ficam apenas como registros de cancelamento por escopo.
 
+## Página de criação de conta — plano de 14/10/2026
+
+[TASK-052 — Página pública em /join](052-pagina-join.md): apresentação do Planner e cadastro por e-mail sobre o magic link existente, com compatibilidade de `/users/register`. Depende da TASK-051 concluída; capacidade mínima `standard`. Contrato em SPEC-005 RN16–RN19/CA-005-14–17. Planejada, sem implementação iniciada; não altera dependências do release anterior.
+
 ## Evolução futura — não bloqueia o MVP de produção
 
 | Evolução | Tarefa |
