@@ -1,6 +1,6 @@
 ---
 id: "TASK-053"
-status: planned
+status: in_review
 execution_level: basic
 execution_rationale: "Ajuste localizado de apresentação e navegação, com padrão de botão existente e contrato fechado."
 specs: ["SPEC-005"]
@@ -31,4 +31,26 @@ Regressão enxuta do destino e da independência da submissão; testes de login 
 
 ## Estado
 
-Planejada em 14/10/2026; dependência concluída na base. Implementação não iniciada.
+Implementada em 14/10/2026 sobre `1b5b5a8`, com TASK-052 integrada. Retomada em 15/10/2026 e encaminhada para conferência operacional e integração. O usuário instruiu explicitamente: “nao valide no navegador, eu valido”. A validação visual e por teclado fica a cargo do usuário; não foi executada nem presumida nesta entrega.
+
+## Evidências de implementação
+
+- `register-link` reutiliza o componente `.button` com `navigate`, que produz um link nativo; fica após e fora do formulário, com as mesmas classes de tamanho e destaque de entrar. O contêiner existente fornece espaçamento. Texto Gettext e ID preservados.
+- Criado `test/planner_web/live/user_live/login_test.exs` (o arquivo previsto no escopo ainda não existia). Regressão verifica ordem após o formulário, navegação independente com e-mail vazio, ausência de feedback de login e nenhum envio de e-mail. Testes existentes de autenticação preservados.
+- TDD: teste final executado contra a apresentação anterior falhou na posição esperada do link; implementação restaurada e validada. Ajustes no teste alinharam o texto à tradução existente e trataram a ausência do campo de flash no redirecionamento.
+- `rtk mix test test/planner_web/live/user_live/login_test.exs test/planner_web/authentication_flow_test.exs`: 10 testes aprovados.
+- Após consulta às ajudas, `rtk mix precommit`: 245 testes aprovados. `rtk mix ci`: 245 testes aprovados, Credo sem achados, cobertura total 93,62% e Login 100%, assets compilados e auditoria npm sem vulnerabilidades. Limiar de 70% preservado.
+
+## Autoavaliação
+
+Implementador original `/root/task053`; retomada por `/root/finish053` em 15/10/2026. Alvo: diff local dos arquivos de Login e seu teste sobre `1b5b5a8`, conforme fluxo de review. Escopo restrito à apresentação/navegação; fluxo de magic link preservado e coberto pela suíte existente. Nenhum achado técnico bloqueante no diff. Não constitui revisão independente nem avança seu marco. Commit será registrado pelo coordenador após a conferência operacional.
+
+| Critério | Evidência e limites |
+| --- | --- |
+| 1 — Apresentação da ação | Inspeção do diff e do componente `.button`: mesmas classes de entrar, link após o formulário, espaçamento no contêiner, texto Gettext e ID preservados. Não comprova dimensões renderizadas. |
+| 2 — Navegação independente | Regressão LiveView registrada acima verifica `/join`, link fora do formulário, ausência de flash de login e nenhum e-mail enviado; suíte existente cobre autenticação. Interação real por clique/teclado não observada. |
+| 3 — Navegador em 320/1280 px | Dispensada para o agente por instrução explícita do usuário em 15/10/2026; apresentação, foco e teclado reservados à validação dele. Não alegar aceite visual concluído. |
+
+Na retomada, nenhuma alteração de código ou teste foi necessária; mantidas as evidências anteriores de `precommit` e `ci`, sem repetir os gates sobre o mesmo código. `rtk git diff --check` aprovado. Autoavaliação técnica apta ao encaminhamento, com a limitação de navegador explicitamente aceita pelo usuário.
+
+Ainda em 15/10/2026, o usuário confirmou: “ui esta correto o botao esta destacado”. Essa confirmação registra aceite humano da apresentação e do destaque do botão. Não implica verificação de teclado, foco ou das duas larguras, que não foram especificados na confirmação; permanece a dispensa de validação em navegador pelo agente.

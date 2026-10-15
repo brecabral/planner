@@ -9,7 +9,6 @@ defmodule PlannerWeb.UserLive.Login do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <div class="mx-auto max-w-sm space-y-4">
         <.header>{gettext("Log in")}</.header>
-        <.link id="register-link" navigate={~p"/join"}>{gettext("Create an account")}</.link>
         <.form for={@form} id="login_form_magic" phx-submit="submit_magic">
           <.input
             field={@form[:email]}
@@ -22,6 +21,9 @@ defmodule PlannerWeb.UserLive.Login do
           />
           <.button class="btn btn-primary w-full">{gettext("Log in with email")}</.button>
         </.form>
+        <.button id="register-link" navigate={~p"/join"} class="btn btn-primary w-full">
+          {gettext("Create an account")}
+        </.button>
       </div>
     </Layouts.app>
     """
