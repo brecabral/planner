@@ -12,10 +12,19 @@ defmodule PlannerWeb.ThemeTest do
     user: user
   } do
     {:ok, view, _} = live(conn, ~p"/tasks")
-    assert has_element?(view, "#theme-planner", "Claro")
-    assert has_element?(view, "#theme-planner_dark", "Escuro")
+    assert has_element?(view, "nav #account-theme + #log-out")
+    assert has_element?(view, "nav label[for=theme-selector]", "Tema")
+    assert has_element?(view, "#theme-selector option[value=planner][selected]", "Claro")
+    assert has_element?(view, "#theme-selector option[value=planner_dark]", "Escuro")
+
+    assert render(view)
+           |> LazyHTML.from_fragment()
+           |> LazyHTML.query("select[name=theme_code]")
+           |> Enum.count() == 1
+
+    refute has_element?(view, "main #theme-selector")
     assert has_element?(view, "#account-theme[data-theme=planner]")
-    view |> element("#theme-planner_dark") |> render_click()
+    render_hook(view, "select_theme", %{"theme_code" => "planner_dark"})
     assert Repo.reload!(user).theme_code == "planner_dark"
     assert has_element?(view, "#account-theme[data-theme=planner_dark]")
     view |> element("#new-task") |> render_click()
@@ -28,6 +37,13 @@ defmodule PlannerWeb.ThemeTest do
            |> LazyHTML.from_document()
            |> LazyHTML.filter("html[data-theme=planner_dark]")
            |> Enum.any?()
+
+    {:ok, direct, _} = live(conn, ~p"/tasks/new")
+    assert has_element?(direct, "#theme-selector option[value=planner_dark][selected]")
+    assert has_element?(direct, "#task-form")
+    render_hook(direct, "select_theme", %{"theme_code" => "planner"})
+    assert Repo.reload!(user).theme_code == "planner"
+    assert has_element?(direct, "#theme-selector option[value=planner][selected]")
 
     other = authenticated_user_fixture()
     {:ok, b, _} = live(log_in_user(build_conn(), other), ~p"/tasks")
@@ -62,7 +78,7 @@ defmodule PlannerWeb.ThemeTest do
            |> Enum.any?()
 
     {:ok, view, _} = live(conn, ~p"/tasks")
-    refute has_element?(view, "#theme-planner_dark")
+    refute has_element?(view, "#theme-selector option[value=planner_dark]")
     render_click(view, "select_theme", %{"theme_code" => "planner_dark"})
     assert has_element?(view, "#theme-error")
     assert has_element?(view, "#account-theme[data-theme=planner]")
@@ -78,11 +94,15 @@ defmodule PlannerWeb.ThemeTest do
       "ALTER TABLE users ADD CONSTRAINT reject_dark_theme CHECK (theme_code != 'planner_dark') NOT VALID"
     )
 
-    view |> element("#theme-planner_dark") |> render_click()
+    render_hook(view, "select_theme", %{"theme_code" => "planner_dark"})
     Repo.query!("ALTER TABLE users DROP CONSTRAINT reject_dark_theme")
     assert has_element?(view, "#account-theme[data-theme=planner]")
     assert has_element?(view, "#theme-error", "Não foi possível salvar o tema")
     assert Repo.reload!(user).theme_code == "planner"
+    assert has_element?(view, "#theme-selector option[value=planner][selected]")
+    render_hook(view, "select_theme", %{"theme_code" => "planner_dark"})
+    assert has_element?(view, "#theme-selector option[value=planner_dark][selected]")
+    refute has_element?(view, "#theme-error")
   end
 
   test "public login and logout stay light", %{conn: conn, user: user} do
@@ -90,8 +110,14 @@ defmodule PlannerWeb.ThemeTest do
 
     for public <- [
           get(build_conn(), ~p"/users/log-in"),
+          get(build_conn(), ~p"/join"),
           conn |> delete(~p"/users/log-out") |> recycle() |> get(~p"/users/log-in")
         ] do
+      refute html_response(public, 200)
+             |> LazyHTML.from_document()
+             |> LazyHTML.query("#theme-selector")
+             |> Enum.any?()
+
       assert html_response(public, 200)
              |> LazyHTML.from_document()
              |> LazyHTML.filter("html[data-theme=planner]")

@@ -42,28 +42,34 @@ defmodule PlannerWeb.Layouts do
     default: nil,
     doc: "the current [scope](https://phoenix.hexdocs.pm/scopes.html)"
 
+  slot :theme_selector
   slot :inner_block, required: true
 
   def app(assigns) do
     ~H"""
     <header class="border-b border-base-300 bg-base-100">
       <nav
-        class="mx-auto flex max-w-6xl items-center px-4 py-5 sm:px-8"
+        class="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-5 sm:px-8"
         aria-label={gettext("Main navigation")}
       >
-        <.link href={~p"/"} class="flex items-center gap-3 text-lg font-semibold tracking-tight">
+        <.link
+          href={~p"/"}
+          class="mr-auto flex items-center gap-3 text-lg font-semibold tracking-tight"
+        >
           <span class="grid size-9 place-items-center rounded-xl bg-primary text-primary-content">
             <.icon name="hero-check" class="size-5" />
           </span>
           {gettext("Planner")}
         </.link>
-        <.link
-          :if={@current_scope}
-          id="log-out"
-          href={~p"/users/log-out"}
-          method="delete"
-          class="btn btn-ghost ml-auto"
-        >{gettext("Log out")}</.link>
+        <div :if={@current_scope} class="ml-auto flex max-w-full items-center gap-3">
+          {render_slot(@theme_selector)}
+          <.link
+            id="log-out"
+            href={~p"/users/log-out"}
+            method="delete"
+            class="btn btn-ghost shrink-0"
+          >{gettext("Log out")}</.link>
+        </div>
       </nav>
     </header>
     <main class="mx-auto max-w-6xl px-4 py-8 sm:px-8 sm:py-12">

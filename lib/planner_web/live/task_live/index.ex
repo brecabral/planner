@@ -8,26 +8,24 @@ defmodule PlannerWeb.TaskLive.Index do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
-      <div id="account-theme" phx-hook="AccountTheme" data-theme={@theme_code}>
-        <fieldset id="theme-selector" class="flex flex-wrap items-center gap-2">
-          <legend class="text-sm font-medium">{gettext("Theme")}</legend>
-          <button
-            :for={theme <- @available_themes}
-            id={"theme-#{theme.code}"}
-            type="button"
-            class="btn btn-sm"
-            phx-click="select_theme"
-            phx-value-theme_code={theme.code}
-            aria-pressed={to_string(@theme_code == theme.code)}
-            phx-disable-with={gettext("Saving...")}
-          >
-            {theme_label(theme.code)}
-          </button>
-        </fieldset>
-        <p :if={@theme_error} id="theme-error" role="alert" class="alert alert-error mt-2">
-          {@theme_error}
-        </p>
-      </div>
+      <:theme_selector>
+        <div id="account-theme" phx-hook="AccountTheme" data-theme={@theme_code} class="max-w-full">
+          <.input
+            type="select"
+            id="theme-selector"
+            name="theme_code"
+            label={gettext("Theme")}
+            value={@theme_code}
+            options={Enum.map(@available_themes, &{theme_label(&1.code), &1.code})}
+            class="select select-sm w-28"
+            aria-describedby={if @theme_error, do: "theme-error"}
+          />
+          <span id="theme-saving" hidden role="status" class="text-xs">{gettext("Saving...")}</span>
+          <p :if={@theme_error} id="theme-error" role="alert" class="max-w-28 text-sm text-error">
+            {@theme_error}
+          </p>
+        </div>
+      </:theme_selector>
       <.header>
         {gettext("Planner")}
         <:actions>
