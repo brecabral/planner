@@ -1,6 +1,6 @@
 ---
 id: "TASK-054"
-status: in_review
+status: done
 execution_level: standard
 execution_rationale: "Integra layout, eventos LiveView, hook e CSS compilado com preferência autorizada já existente; exige reprodução da falha e regressão no navegador."
 specs: ["SPEC-007"]
@@ -65,3 +65,7 @@ Implementação: `Layouts.app` recebe slot para o controle, mantendo o estado na
 ## Autoavaliação
 
 Implementador `/root/implement054`, diff local dos seis arquivos da entrega sobre a base inicial `1b5b5a8`, com TASK-053 integrada separadamente na base `183aae7`. Fluxo de review aplicado como autoavaliação, sem revisão independente e sem alterar seu marco. Conclusão técnica: `approved` para o escopo verificável do controle e sincronização, sem achados bloqueantes; aceite visual não verificado por instrução do responsável. Cobertura do CI: Layouts 100%, TaskLive.Index 98,71%, total 93,71%. Nenhuma redução de limiar ou exclusão de cobertura. A coordenação deve preservar a limitação sobre o relato visual original ao registrar a entrega.
+
+## Conclusão operacional — 15/10/2026
+
+Coordenador `/root`: entrega integrada na base local em `372d292`. Conferidos registro, autoavaliação, gates relatados aprovados (245 testes, 3 testes JavaScript e cobertura 93,71%) e ausência de impedimentos declarados. Sem reprodução de testes ou revisão independente. Concluída a entrega técnica do seletor e sincronização; a validação em navegador permanece com o responsável por sua instrução explícita. Este encerramento operacional não comprova resolução do relato visual original, cuja causa não foi reproduzida. Não há novas consumidoras elegíveis; tarefas de evolução futura conservam seus bloqueios de planejamento.
