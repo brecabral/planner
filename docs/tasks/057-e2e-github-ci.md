@@ -1,6 +1,6 @@
 ---
 id: "TASK-057"
-status: "planned"
+status: "in_review"
 execution_level: "standard"
 execution_rationale: "Integra infraestrutura própria ao check protegido existente, preservando diagnóstico e gates."
 specs: []
@@ -33,3 +33,15 @@ Não publicar branch nem mudar proteção da main nesta implementação sem auto
 ## Validação e entrega
 
 Consultar ajuda Mix e operação no README. Aplicar TDD enxuto aos comportamentos novos, executar gates existentes com cobertura mínima de 70% preservada e E2E completo. Registrar comandos, alvo, resultados, evidências por critério e limitações; autoavaliação pelo fluxo de review, sem aprovação independente implícita. Conferência operacional e commit integrado são necessários antes de `done`. Estado inicial: planejada, sem implementação ou validação executada neste planejamento.
+
+## Entrega e autoavaliação — 16/10/2026
+
+Implementador `/root`, base `3414439`, workflow/README locais. O job protegido `quality` mantém seus eventos e agora declara serviço PostgreSQL próprio, bases separadas, etapas de qualidade explícitas e suíte Playwright completa. Não chama Just, Compose local ou `mix ci`. Bash explícito preserva falhas em pipelines com tee. Coleta/remoção e upload são executados com `always()`, retenção de 14 dias e timeout de job/teste.
+
+- Aceites 1/2: YAML e sintaxe shell conferidos; ausência de `continue-on-error`, filtros de caminhos e chamadas ao runner local. Gates equivalentes já passaram nesta rodada na TASK-055 (245 testes, cobertura acima de 70%, Credo, assets, JavaScript e audit); não foram repetidos sobre o mesmo código Elixir. Regressões do runner passaram novamente (quatro testes).
+- Aceites 2/3: reprodução local extraiu do YAML os comandos de build, migrations, readiness e coleta/remoção. PostgreSQL próprio em tmpfs e porta exclusiva; suite completa passou com dois testes. Asserção propositalmente falsa em container descartável retornou 1. Código quebrado não foi adicionado ao repositório. Propagação de erro em pipeline Bash também conferida.
+- Evidências locais em `tmp/ci-e2e/`, incluindo `local-validation.txt`, relatório HTML, logs de build/migration/app e remoção. Todos os containers temporários dessa reprodução foram removidos.
+- Limites: navegador da reprodução usou a imagem Playwright compatível já construída, em vez de instalar Chromium no host. Não foram executados GitHub Actions, instalação nativa no Ubuntu ou upload remoto; publicação não autorizada. Configuração e evidência local não equivalem a check remoto aprovado.
+- Aceite 4: operação, artefatos, retenção, responsabilidades e limites documentados no README. TASK-056 continua responsável por cenários autenticados e fixtures compatíveis com ambos os ambientes.
+
+Autoavaliação pelo fluxo de review, sem aprovação independente nem avanço do marco histórico. `git diff --check` aprovado. Pronta para conferência operacional e integração local, com execução remota explicitamente não verificada.

@@ -93,7 +93,11 @@ Consulte as [decisões de arquitetura](docs/design.md), o [vocabulário do domí
 
 ## CI
 
-O check protegido **quality** mantém PRs para `main` e pushes na `main`. A infraestrutura independente do Just está na TASK-057; o gate local completo é `just check`. A cobertura mínima de 70% continua definida em `mix.exs`. O responsável já confirmou a proteção da `main` e o check obrigatório; esta entrega não altera essa configuração remota.
+O check protegido **quality** mantém PRs para `main` e pushes na `main`. O workflow usa Elixir 1.20.3/OTP 29, Node 24 e seu próprio serviço PostgreSQL 17, com bases separadas para ExUnit e E2E. Executa explicitamente compilação, formato, Credo, cobertura, build de assets, testes JavaScript e auditoria npm; não chama Just, Compose local ou `mix ci`. O gate local completo é `just check`. A cobertura mínima de 70% continua definida em `mix.exs`. O responsável já confirmou a proteção da `main` e o check obrigatório; esta entrega não altera essa configuração remota.
+
+No mesmo job, o workflow instala Chromium pelo lockfile, constrói o release, aplica migrations na base E2E e espera HTTP por até 180 segundos antes de executar toda a suíte Playwright (limite de dez minutos). Falha de setup, teste ou gate impede `quality` verde. O job tem limite de 30 minutos. O container de release usa rede do runner efêmero; o serviço PostgreSQL é administrado pelo GitHub. Não reutiliza a rede interna do Compose local.
+
+Logs de build/migration/aplicação e cleanup ficam em `tmp/ci-e2e`; Playwright produz `assets/playwright-report` e `assets/test-results`. Coleta/remoção e upload usam `always()`, com artefato `e2e-<run_id>-<run_attempt>` retido por 14 dias. Falhas precoces podem não produzir relatório. O workflow não depende de artefatos locais. A reprodução local dos passos não comprova execução remota: o resultado real deve ser conferido no PR após publicação autorizada.
 
 ## Testes E2E em containers
 
