@@ -113,3 +113,11 @@ Conferência documental desta reconciliação: 51 cabeçalhos verificados quanto
 - [TASK-054 — Corrigir temas na navbar](054-corrigir-temas-na-navbar.md): capacidade `standard`, após TASK-048/052; reproduzir falha, corrigir aplicação visual e oferecer seletor junto de Sair.
 
 Ambas têm dependências concluídas na base e escopos de escrita separados. Contratos em SPEC-005 RN20/CA-005-18 e SPEC-007 RN07–RN08/CA-007-05–07. São correções posteriores às entregas registradas; não reabrem tarefas concluídas nem atestam novos aceites. Implementação não iniciada.
+
+## E2E local e obrigatório no CI — plano de 16/10/2026
+
+- [055 — Consolidar ambiente E2E e comando Mix](055-comando-e2e.md): produtora do runner isolado; próxima elegível, com dependências integradas.
+- [056 — Cobrir os fluxos autenticados no navegador](056-cenarios-e2e.md): consome o runner e acrescenta fixtures/cenários de interface.
+- [057 — Tornar E2E obrigatório no GitHub CI](057-e2e-github-ci.md): executa a suíte no check `quality` existente.
+
+Sequência 055 → 056 → 057 serializa README e configuração compartilhada. O esboço E2E local é entrada da 055, sem implementação concluída por este planejamento. Não há nova tarefa humana nem alteração da proteção remota: a TASK-003 já tem aceite humano. Política de uso por front e revisores no [PRD](../prd.md#e2e-obrigatório--decisão-de-16102026); decisões em D20. Entregas históricas permanecem com suas evidências originais.

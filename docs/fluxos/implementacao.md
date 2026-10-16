@@ -23,3 +23,7 @@ Regra ambígua, dependência não entregue, conflito de escopo, contrato compart
 ## Tarefas humanas
 
 Verificar `execution_level` antes de executar. Se for `human`, ou existir pré-requisito humano incompleto, aplicar a [reserva do AGENTS.md](../../AGENTS.md#execução-exclusiva-por-humano): informar a intervenção necessária e recusar execução dessa tarefa. Explicação e inspeção de evidências em leitura são permitidas; execução parcial, delegação e reclassificação para contornar o bloqueio não são.
+
+## Avaliação E2E
+
+Tarefas que alterem front devem criar/adaptar cenários E2E pertinentes e executá-los durante o trabalho; a autoavaliação executa a suíte completa. Registrar alvo, cenários, resultado e artefatos. Aplicar a [política e transição do PRD](../prd.md#e2e-obrigatório--decisão-de-16102026), com operação no README. Falha ou indisponibilidade não é aprovação; validação exclusivamente documental não exige navegador.

@@ -99,3 +99,7 @@ Cada tarefa registra autoavaliação, gates relatados, conferência operacional 
 Pode-se explicar instruções e conferir evidência em leitura. Não criar workflow, alterar configuração local/remota ou executar passos da tarefa humana. Trabalho independente continua permitido. Apenas confirmação explícita da pessoa, acompanhada das evidências de aceite, permite registrar conclusão. Para este nível, a validação humana documentada substitui a exigência de aprovação independente por agente; uma revisão em leitura pode complementar, mas não substituir a execução humana.
 
 O corpo é escrito para humanos: objetivo, passos essenciais, aceite e onde procurar ajuda externa. Evitar instruções de prompting, inventário exaustivo e exigência de produzir logs extensos. O cabeçalho mantém o mesmo esquema; `write_scope` cobre arquivos locais, e configurações externas são descritas no corpo. A classificação `human` já é a reserva, não precisa ser repetida em `blockers`.
+
+## Contrato E2E nas novas entregas
+
+Tarefas de front declaram cenários E2E afetados e evidências no navegador. Enquanto a infraestrutura não estiver integrada, declarar dependência da TASK-055 quando seu contrato for necessário; se consumir os fixtures autenticados, depender da TASK-056. Revisores e autoavaliações seguem a [política transversal](../prd.md#e2e-obrigatório--decisão-de-16102026). Não reescrever evidências históricas como se o gate já existisse.

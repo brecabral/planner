@@ -19,3 +19,7 @@ assert_receive {:DOWN, ^ref, :process, ^pid, :normal}
 - Não considerar testes verdes prova suficiente de aderência ao produto: conferir também os exemplos e invariantes da spec.
 
 Execução dos testes: [README](../../README.md). Regras específicas de formulários: [formulários](formularios.md).
+
+## E2E de interface
+
+Playwright/Chromium exercita JavaScript, CSS, gestos e patches LiveView no navegador real, conforme [D20](../design.md#d20--e2e-em-navegador-real). Usar contas/dados isolados e seletores estáveis ou semânticos; aguardar condições observáveis, sem sleeps fixos. Cobrir resultado e persistência após recarga; interação de tema requer estilo computado, arraste requer gesto e ordem persistida. Viewport estreito não comprova gesto touch real. Preservar traces, screenshots de falha e relatório. Não usar retries ou skips para esconder falhas; cenário instável precisa de correção. Comandos, pré-requisitos e localização dos artefatos ficam no README.

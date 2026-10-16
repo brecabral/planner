@@ -90,6 +90,35 @@ O responsável confirmou a configuração da proteção da `main` e do check obr
 
 Para alterações no hook de arraste, execute também o teste JavaScript listado acima; ele é separado dos aliases `precommit` e `ci`. O harness usa o SortableJS do lockfile com DOM e timers mínimos controlados. Cobre cancelamento, restauração e retomada, mas não simula layout, propagação completa de eventos, mouse/touch reais ou patches do LiveView no navegador.
 
+## Testes E2E em containers
+
+O `compose.e2e.yaml` é independente do Compose de desenvolvimento. Constrói o release pelo `Dockerfile` existente e executa Playwright/Chromium na imagem oficial, sem instalar navegadores no Fedora. Requer Docker com Compose; downloads de imagens e dependências ocorrem durante o build.
+
+```sh
+docker compose -f compose.e2e.yaml build
+docker compose -f compose.e2e.yaml up --abort-on-container-exit --exit-code-from playwright
+```
+
+O segundo comando retorna o código de saída dos testes. A aplicação aguarda o PostgreSQL, aplica migrations e passa pelo healthcheck antes de iniciar o navegador. O projeto Compose chama-se `planner-e2e`: não execute esta configuração com o nome do projeto de desenvolvimento.
+
+Os serviços usam rede interna, sem portas publicadas, bind mounts, socket Docker ou acesso ao perfil do navegador pessoal. O runner usa `pwuser`, sem capabilities adicionais, e memória compartilhada própria. Ele compartilha apenas a rede do container da aplicação para acessar `localhost:4000`, compatível com a configuração HTTP local do release. Isso não compartilha a rede do Fedora. Containers compartilham o kernel do host; este ambiente não é uma VM nem uma garantia contra código malicioso.
+
+O banco E2E usa credenciais sintéticas declaradas no Compose e armazenamento em memória (`tmpfs`), perdido quando o container é parado. Não utiliza o `.env` ou o volume `postgres_data` do desenvolvimento. A rede interna impede acesso externo durante os testes; o build precisa de internet. O código e as dependências são copiados para imagens próprias, sem compartilhar `node_modules` com o host.
+
+Antes de remover os containers, copie as evidências:
+
+```sh
+docker compose -f compose.e2e.yaml cp playwright:/e2e/playwright-report assets/playwright-report
+docker compose -f compose.e2e.yaml cp playwright:/e2e/test-results assets/test-results
+docker compose -f compose.e2e.yaml down
+```
+
+Relatórios e traces ficam fora do Git. Para repetir com ambiente novo, execute `down` antes de `up`; após alterar testes ou código, execute também `build`. A versão da imagem em `assets/Dockerfile.e2e` deve corresponder exatamente ao Playwright resolvido no lockfile; o build verifica essa correspondência.
+
+Os cenários em `assets/e2e` verificam conexão LiveView na página de login, navegação para cadastro e redirecionamento de visitantes em `/tasks`. Não substituem ExUnit, os testes JavaScript existentes ou o aceite humano. O release não tem `/dev/mailbox`: fluxos autenticados por magic link ainda precisam de infraestrutura própria de e-mail de teste. O ambiente E2E não foi adicionado automaticamente ao CI.
+
+Validação em 15/10/2026: build das duas imagens, migrations no banco descartável e dois testes Chromium aprovados, com saída 0 e cópia do relatório. `mix precommit` e `mix ci` passaram com 245 testes e cobertura de 93,71%. Os containers e a rede E2E foram removidos após a conferência; imagens e relatório local foram preservados.
+
 ## Release local
 
 O `Dockerfile` gera um release de produção com assets compilados pelo lockfile, nove migrations e scripts `bin/server`/`bin/migrate`. O estágio final roda como `nobody`, sem Mix, Node.js ou Compose. `.dockerignore` exclui `.env`, chaves e artefatos de desenvolvimento. O build precisa de acesso aos registries de imagens, pacotes e assets; não publica a imagem.
@@ -153,3 +182,9 @@ Os containers, a rede, a imagem e o arquivo temporário ficam disponíveis para 
 ## Evolução planejada para produção
 
 O [plano de tarefas](docs/tasks/README.md) prevê auth padrão Phoenix com magic link, home direcionada ao login/dashboard, teste local de e-mail com Swoosh, temas claro/escuro por conta e preparação de release. Autenticação, isolamento por conta e teste local de e-mail já estão implementados. A entrega dos agentes termina no código funcional e no release local validado, com procedimentos testados documentados aqui. Hospedagem, domínio, configuração do provedor de e-mail, publicação e backups ficam sob responsabilidade do usuário e não são pendências da fila de código. Créditos e loja ficam para evolução futura.
+
+## Evolução planejada do E2E
+
+Decisão de 16/10/2026, ainda não implementada: [TASK-055](docs/tasks/055-comando-e2e.md) entregará `mix e2e` como entrada local separada de `mix ci` e `mix precommit`, incluindo preparação, execução, coleta de evidências e limpeza. Até sua integração, esse comando não está disponível; o esboço em containers está incluído nesta entrega, mas ainda não fornece o comando Mix nem integração ao CI.
+
+A [TASK-056](docs/tasks/056-cenarios-e2e.md) ampliará a cobertura para fluxos autenticados. A [TASK-057](docs/tasks/057-e2e-github-ci.md) executará o mesmo comando no check obrigatório `quality` do GitHub, com artefatos em falhas. Tarefas de front e toda revisão de código/autoavaliação seguirão a [política E2E](docs/prd.md#e2e-obrigatório--decisão-de-16102026). Pré-requisitos e opções definitivos serão documentados aqui na entrega do runner.

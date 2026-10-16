@@ -46,3 +46,7 @@ Implementadores aplicam os mesmos critérios, registram resultados e encaminham 
 ## Tarefas humanas
 
 Verificar `execution_level` antes de executar. Se for `human`, ou existir pré-requisito humano incompleto, aplicar a [reserva do AGENTS.md](../../AGENTS.md#execução-exclusiva-por-humano): informar a intervenção necessária e recusar execução dessa tarefa. Explicação e inspeção de evidências em leitura são permitidas; execução parcial, delegação e reclassificação para contornar o bloqueio não são.
+
+## Avaliação E2E
+
+Todo revisor de código e toda autoavaliação devem executar a suíte E2E completa, inclusive para alterações sem front. Registrar alvo, cenários, resultado e artefatos. Aplicar a [política e transição do PRD](../prd.md#e2e-obrigatório--decisão-de-16102026), com operação no README. Falha ou indisponibilidade não é aprovação; validação exclusivamente documental não exige navegador.

@@ -1,0 +1,61 @@
+name: planner-e2e
+
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: planner_e2e
+      POSTGRES_PASSWORD: local_e2e_only
+      POSTGRES_DB: planner_e2e
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U planner_e2e -d planner_e2e"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+    networks: [e2e]
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: ecto://planner_e2e:local_e2e_only@postgres:5432/planner_e2e
+      SECRET_KEY_BASE: e2e_only_not_a_production_secret_0123456789abcdefghijklmnopqrstuvwxyz
+      PHX_HOST: localhost
+      PORT: "4000"
+      POOL_SIZE: "5"
+    command: ["sh", "-c", "/app/bin/migrate && exec /app/bin/server"]
+    init: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "/app/bin/planner", "rpc", "if Req.get!(\"http://localhost:4000/users/log-in\").status != 200, do: raise(\"Application is not ready\")"]
+      interval: 5s
+      timeout: 15s
+      retries: 30
+      start_period: 15s
+    networks: [e2e]
+
+  playwright:
+    build:
+      context: ./assets
+      dockerfile: Dockerfile.e2e
+    # Share only the app container's network, never the host's network.
+    network_mode: service:app
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      CI: "true"
+    init: true
+    shm_size: 1gb
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  e2e:
+    internal: true

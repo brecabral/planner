@@ -52,3 +52,7 @@ Comece pela tarefa solicitada. Leia apenas os documentos e trechos necessários;
 - Usar dependências existentes: HTTP com `Req`. Não adicionar ferramentas ou camadas sem necessidade concreta.
 - Registrar descobertas reutilizáveis nas referências do conceito, decisões em `design.md` e progresso no arquivo da tarefa. Não duplicar uma memória de conversa.
 - Manter instruções operacionais somente no README. Ao mover documentos, corrigir os links e índices afetados.
+
+## Gate E2E
+
+Tarefas de front devem manter e usar cenários E2E para avaliar as mudanças. Todo revisor de código e toda autoavaliação executam a suíte completa, mesmo sem mudança de front. Aplicar a [política e transição](docs/prd.md#e2e-obrigatório--decisão-de-16102026); comandos no README. Validação exclusivamente documental permanece documental.

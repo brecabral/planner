@@ -104,3 +104,9 @@ O trabalho dos agentes termina no código Phoenix funcional e no release local v
 ## 9. Planejamento
 
 O [índice de tarefas](tasks/README.md) organiza entregas do MVP de produção; cabeçalhos são a fonte de dependências e prontidão. Comportamentos estão nas [specs](specs/README.md), arquitetura em [design](design.md). Créditos têm contrato futuro separado e não bloqueiam os dois temas gratuitos.
+
+## E2E obrigatório — decisão de 16/10/2026
+
+A infraestrutura e os aceites estão em [D20](design.md#d20--e2e-em-navegador-real). Tarefas que alterem front (templates, estilos, navegação, formulários, LiveView ou hooks) devem criar/adaptar cenários E2E do comportamento afetado, usá-los durante a implementação e executar a suíte completa antes da entrega. Todo revisor de código deve executar a suíte completa, inclusive em mudanças de backend, e registrar alvo, resultado e artefatos; evidência de terceiros não substitui essa execução. Autoavaliação segue a mesma regra. Revisão exclusivamente documental usa validação documental.
+
+A exigência passa a ser executável com a integração da TASK-055; até lá, registrar a indisponibilidade como critério não verificado, sem declarar aprovação E2E. Falha ou impossibilidade de execução depois da integração impede aprovação e segue o protocolo de bloqueios. Exceções antigas de execução manual de navegador são históricas e não dispensam a nova política em entregas futuras. Isso não cria revisão independente automática. Operação e comandos ficam no README.
