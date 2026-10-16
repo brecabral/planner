@@ -53,6 +53,10 @@ Comece pela tarefa solicitada. Leia apenas os documentos e trechos necessários;
 - Registrar descobertas reutilizáveis nas referências do conceito, decisões em `design.md` e progresso no arquivo da tarefa. Não duplicar uma memória de conversa.
 - Manter instruções operacionais somente no README. Ao mover documentos, corrigir os links e índices afetados.
 
+## Encerramento de rodada
+
+Todos os perfis, inclusive planejador e revisor, devem encerrar cada rodada com commit das próprias alterações, inclusive documentação e relatórios. Conferir o diff e selecionar arquivos explicitamente, preservando alterações preexistentes de terceiros. Sem alterações próprias, informar que não há commit necessário; não criar commit vazio. Commit de progresso ou de impedimento não significa aprovação, conclusão da tarefa ou publicação remota. Na revisão, o SHA avaliado continua sendo o código revisado, não o commit posterior do relatório.
+
 ## Gate E2E
 
 Tarefas de front devem manter e usar cenários E2E para avaliar as mudanças. Todo revisor de código e toda autoavaliação executam a suíte completa, mesmo sem mudança de front. Aplicar a [política e transição](docs/prd.md#e2e-obrigatório--decisão-de-16102026); comandos no README. Validação exclusivamente documental permanece documental.

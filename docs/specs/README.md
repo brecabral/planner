@@ -35,11 +35,11 @@ Arraste integrado na [TASK-040](../tasks/040-arrastar-tarefas.md), com aceite lo
 | --- | --- |
 | [002 — Planejamento](002-planejamento-diario.md) | Ready: retry → backlog e exclusão de pendências; TASK-042/043. |
 | [004 — Painel](004-experiencia-e-acesso.md) | Ready: menu à esquerda e novas ações; TASK-041/042/044. |
-| [005 — Contas](005-contas-e-acesso.md) | Ready: cadastro aberto, magic link, isolamento e dev; TASK-015/045/046/051. Página `/join` planejada na TASK-052. |
+| [005 — Contas](005-contas-e-acesso.md) | Ready: cadastro aberto, magic link, isolamento e dev; TASK-015/045/046/051. Página `/join` integrada na TASK-052. |
 | [007 — Temas](007-temas-e-creditos.md) | Ready: dois temas gratuitos, concessão e preferência por usuário; TASK-047/048. |
 | [008 — Código Phoenix e release local](008-producao.md) | Ready: empacotamento e aceite local; infraestrutura e serviços externos sob responsabilidade do usuário. |
 | [009 — Créditos e compras](009-creditos-e-compras.md) | Draft: evolução futura; não bloqueia o MVP de produção. |
 
 As versões históricas citadas nos aceites de 05/10 não atestam login, temas ou operações novas. SPEC-003 preserva data UTC/histórico; SPEC-006 preserva classificação, com novo proprietário autenticado integrado pela TASK-045.
 
-Correções solicitadas em 14/10/2026: SPEC-005 RN20/CA-005-18 define destaque do cadastro no login ([TASK-053](../tasks/053-destacar-criar-conta-login.md)); SPEC-007 RN07–RN08/CA-007-05–07 define seletor na navbar e regressão visual ([TASK-054](../tasks/054-corrigir-temas-na-navbar.md)). Contratos prontos; implementação corretiva pendente.
+Correções solicitadas em 14/10/2026: SPEC-005 RN20/CA-005-18 define destaque do cadastro no login ([TASK-053](../tasks/053-destacar-criar-conta-login.md)); SPEC-007 RN07–RN08/CA-007-05–07 define seletor na navbar e regressão visual ([TASK-054](../tasks/054-corrigir-temas-na-navbar.md)). Implementações integradas; evidências nas tarefas. A reprodução visual original da TASK-054 permanece não verificada; cobertura autenticada de paletas está planejada na TASK-056.

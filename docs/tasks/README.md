@@ -63,7 +63,7 @@ O encerramento da TASK-040 foi reconciliado com a integração `367bf35` e o ace
 
 ## MVP de produção — plano de 11/10/2026
 
-Escopo revisto pelo responsável em 13/10/2026: entregar código Phoenix funcional e release local validado. Execução e estados reais seguem os cabeçalhos. A correção TASK-051 precede o release TASK-011, cuja retomada operacional também depende do BLOCK-005; depois, TASK-050 consolida o aceite local. Escolhas de infraestrutura pertencem ao usuário e não bloqueiam esta sequência.
+Escopo revisto pelo responsável em 13/10/2026: entregar código Phoenix funcional e release local validado. Execução e estados reais seguem os cabeçalhos. TASK-051 e TASK-011 estão integradas e BLOCK-005 encerrado; TASK-050 consolida o aceite local. Escolhas de infraestrutura pertencem ao usuário e não bloqueiam esta sequência.
 
 | Entrega | Tarefa |
 | --- | --- |
@@ -84,7 +84,7 @@ Cadastro aberto e dados antigos isolados foram confirmados. Exclusão preserva c
 
 ## Página de criação de conta — plano de 14/10/2026
 
-[TASK-052 — Página pública em /join](052-pagina-join.md): apresentação do Planner e cadastro por e-mail sobre o magic link existente, com compatibilidade de `/users/register`. Depende da TASK-051 concluída; capacidade mínima `standard`. Contrato em SPEC-005 RN16–RN19/CA-005-14–17. Planejada, sem implementação iniciada; não altera dependências do release anterior.
+[TASK-052 — Página pública em /join](052-pagina-join.md): apresentação do Planner e cadastro por e-mail sobre o magic link existente, com compatibilidade de `/users/register`. Depende da TASK-051 concluída; capacidade mínima `standard`. Contrato em SPEC-005 RN16–RN19/CA-005-14–17. Integrada; evidências e limites no arquivo da tarefa.
 
 ## Evolução futura — não bloqueia o MVP de produção
 
@@ -101,23 +101,19 @@ Compra de temas, preços, loja e pagamentos serão decompostos depois de decisõ
 
 ## Retomada após revisão de 13/10/2026
 
-A [TASK-051 — Tratar falha de envio no cadastro](051-tratar-falha-envio-cadastro.md) é a próxima correção elegível: dependências integradas e contrato na SPEC-005 RN15/CA-005-13. Depois de sua integração, a coordenação pode retomar TASK-011 conforme a condição operacional do [BLOCK-005](../blocks/005-delegacao-release-sem-retorno.md); TASK-050 aguarda o release integrado. Nenhuma implementação é iniciada por esta reconciliação.
-
-R4 foi reconciliado na tabela de seeds do README e R5 na declaração de implementação da SPEC-002. O relatório histórico de revisão permanece inalterado por este ajuste; R3 continua aberto e não há nova aprovação independente.
-
-Conferência documental desta reconciliação: 51 cabeçalhos verificados quanto a IDs, produtores únicos, referências, ciclos, consumos alcançáveis e dependências de entregas concluídas; links locais e diff sem erros. `mix precommit` aprovado com 240 testes (seed 481085). Esse gate não cobre ainda R3 e não substitui a regressão exigida na TASK-051.
+Reconciliação de R6 em 16/10/2026: TASK-051 e TASK-011 estão integradas; BLOCK-005 foi encerrado. TASK-050 está elegível para consolidar os aceites locais. R3 foi revalidado pelo revisor; R4/R5 já foram reconciliados. O relatório preserva suas evidências históricas e não recebe aprovação retroativa.
 
 ## Correções de login e temas — 14/10/2026
 
 - [TASK-053 — Destacar Criar conta no login](053-destacar-criar-conta-login.md): capacidade `basic`, após TASK-052; botão equivalente a entrar, mantendo navegação para `/join`.
 - [TASK-054 — Corrigir temas na navbar](054-corrigir-temas-na-navbar.md): capacidade `standard`, após TASK-048/052; reproduzir falha, corrigir aplicação visual e oferecer seletor junto de Sair.
 
-Ambas têm dependências concluídas na base e escopos de escrita separados. Contratos em SPEC-005 RN20/CA-005-18 e SPEC-007 RN07–RN08/CA-007-05–07. São correções posteriores às entregas registradas; não reabrem tarefas concluídas nem atestam novos aceites. Implementação não iniciada.
+Ambas estão integradas, conforme registros das tarefas. O responsável confirmou o destaque do cadastro. A TASK-054 conserva a limitação da reprodução visual original; cenários autenticados da TASK-056 ainda devem verificar paletas no navegador.
 
 ## E2E local e obrigatório no CI — plano de 16/10/2026
 
-- [055 — Consolidar ambiente E2E e comando Mix](055-comando-e2e.md): produtora do runner isolado; próxima elegível, com dependências integradas.
+- [055 — Consolidar ambiente E2E e operação local Just](055-comando-e2e.md): produtora do runner isolado; próxima elegível, com dependências integradas.
 - [056 — Cobrir os fluxos autenticados no navegador](056-cenarios-e2e.md): consome o runner e acrescenta fixtures/cenários de interface.
 - [057 — Tornar E2E obrigatório no GitHub CI](057-e2e-github-ci.md): executa a suíte no check `quality` existente.
 
-Sequência 055 → 056 → 057 serializa README e configuração compartilhada. O esboço E2E local é entrada da 055, sem implementação concluída por este planejamento. Não há nova tarefa humana nem alteração da proteção remota: a TASK-003 já tem aceite humano. Política de uso por front e revisores no [PRD](../prd.md#e2e-obrigatório--decisão-de-16102026); decisões em D20. Entregas históricas permanecem com suas evidências originais.
+Sequência 055 → 057 → 056 serializa README e configuração compartilhada. O esboço E2E local é entrada da 055, sem implementação concluída por este planejamento. Não há nova tarefa humana nem alteração da proteção remota: a TASK-003 já tem aceite humano. Política de uso por front e revisores no [PRD](../prd.md#e2e-obrigatório--decisão-de-16102026); decisões em D20. Entregas históricas permanecem com suas evidências originais.
