@@ -20,6 +20,16 @@ Em revisões incrementais das entregas, consultar o front matter YAML de [docs/r
 
 Conferir a regra com estes casos: entrega aprovada avança o marco; falha de gate mantém o anterior; código local divergente não é atribuído a HEAD; histórico reescrito exige reconstrução da base; tarefa fora do escopo exige revisão própria mesmo antes do marco.
 
+## Manutenção do relatório atual
+
+Ao encerrar cada rodada, limpar `docs/review.md`: manter apenas achados abertos, limitações e aceites ainda relevantes ao contexto atual, além do alvo/base, marco de aprovação e evidências necessárias para interpretar a conclusão vigente. Conferir a resolução nas tarefas, entregas e decisões atuais antes de retirar um achado; ausência de menção não prova correção.
+
+Remover do relatório corrente questões resolvidas ou superadas, aprovações antigas, orientações de fila obsoletas e memória de conversa. Preservar o histórico no Git e as evidências pertinentes nas tarefas, sem acumular um arquivo de relatórios antigos dentro da review. Corrigir links para seções removidas, apontando para a evidência vigente ou para a versão histórica identificada por commit. Documentos temporários de retomada podem ser excluídos quando a tarefa já foi integrada e não guardam pendência ou decisão exclusiva ainda necessária.
+
+A limpeza não transforma `changes_requested` ou `blocked` em `approved`, não avança `last_approved_commit` e não atribui testes antigos a código novo. Em rodada exclusivamente documental, conservar o SHA efetivamente avaliado e identificar a limpeza separadamente. Não remover limitações ainda abertas só porque os testes passaram, nem reabrir entregas aceitas por apagar seu relato histórico.
+
+Validar a manutenção com estes casos: achado corrigido com evidência sai; achado sem resolução permanece; aprovação histórica sai sem apagar o marco; mudança de escopo remove recomendação superada sem simular implementação; link histórico continua consultável; retomada encerrada pode sair quando o registro da tarefa já sustenta a conclusão.
+
 ## Procedimento
 
 1. Relacionar cada critério de aceite a implementação e evidência. Procurar comportamento faltante, inventado ou incompatível com a spec; hipótese de produto não é fato para reprovar código.

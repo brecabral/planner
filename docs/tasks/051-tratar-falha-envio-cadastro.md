@@ -15,7 +15,7 @@ blockers: []
 
 ## Objetivo e entradas
 
-Corrigir R3 da [revisão de 13/10/2026](../review.md#r3--p2-falha-de-envio-no-cadastro-encerra-a-liveview), originado na TASK-015. Aplicar [SPEC-005](../specs/005-contas-e-acesso.md) RN08/RN09/RN15 e CA-005-07/13 e SPEC-008 RN02. TASK-046 fornece o adapter de falha e a captura local; TASK-048 integra o cadastro com concessões de temas. Ambas estão integradas na base revisada `b0810ba`.
+Corrigir R3 da revisão de 13/10/2026 (histórico em `4ed2a47:docs/review.md`, seção `r3--p2-falha-de-envio-no-cadastro-encerra-a-liveview`), originado na TASK-015. Aplicar [SPEC-005](../specs/005-contas-e-acesso.md) RN08/RN09/RN15 e CA-005-07/13 e SPEC-008 RN02. TASK-046 fornece o adapter de falha e a captura local; TASK-048 integra o cadastro com concessões de temas. Ambas estão integradas na base revisada `b0810ba`.
 
 Ler registration.ex, login.ex, Accounts.register_user/1 e deliver_login_instructions/2, testes de cadastro e local_magic_link_test.exs, Planner.FailingMailAdapter e referências LiveView, Gettext e testes. O teste temporário citado pelo revisor é evidência histórica, não dependência de execução: criar regressão permanente na suíte.
 

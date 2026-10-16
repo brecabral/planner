@@ -61,7 +61,7 @@ Sem publicação remota, CI remoto ou revisão independente nesta entrega.
 
 ## Revisão independente — 10/10/2026
 
-Revisor `/root`, árvore local sobre `43ea80314c0a47a2a8357c17064cc01ac9ed5a40`. Sem achado bloqueante identificado no escopo automatizado e inspecionado. Ainda falta conferência operacional e integração; status `in_review` preservado. Gate reproduzido: `rtk mix ci`, 157 testes, cobertura 93,44%, Credo/build/npm audit aprovados. JavaScript inspecionado, sem navegador. Evidências, limites e achado em [docs/review.md](../review.md#revisão-das-entregas-locais--10102026). Nenhum código corrigido ou commit criado.
+Revisor `/root`, árvore local sobre `43ea80314c0a47a2a8357c17064cc01ac9ed5a40`. Sem achado bloqueante identificado no escopo automatizado e inspecionado. Ainda falta conferência operacional e integração; status `in_review` preservado. Gate reproduzido: `rtk mix ci`, 157 testes, cobertura 93,44%, Credo/build/npm audit aprovados. JavaScript inspecionado, sem navegador. Evidências, limites e achado em docs/review.md (histórico em `4ed2a47:docs/review.md`, seção `revisão-das-entregas-locais--10102026`). Nenhum código corrigido ou commit criado.
 
 ## Conferência operacional e integração — 10/10/2026
 

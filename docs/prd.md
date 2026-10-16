@@ -1,6 +1,6 @@
 # PRD — Planner: MVP local e MVP de produção
 
-Escopo mínimo definido pelo responsável em 23/09/2026. MVP local concluído em 05/10/2026, com aceite aprovado na [revisão independente de prontidão](review.md#revalidação-de-prontidão-do-mvp--05102026), após a correção de CA09 na [TASK-038](tasks/038-tratar-falha-cadastro.md).
+Escopo mínimo definido pelo responsável em 23/09/2026. MVP local concluído em 05/10/2026, com aceite aprovado na revisão independente de prontidão (histórico em `4ed2a47:docs/review.md`, seção `revalidação-de-prontidão-do-mvp--05102026`), após a correção de CA09 na [TASK-038](tasks/038-tratar-falha-cadastro.md).
 
 ## 1. Objetivo do MVP local entregue
 

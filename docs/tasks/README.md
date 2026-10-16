@@ -4,7 +4,7 @@ O MVP local entregue contém o fluxo de planejamento com usuário padrão, pt-BR
 
 ## MVP
 
-MVP local encerrado em 05/10/2026: entregas integradas e [revisão independente aprovada](../review.md#revalidação-de-prontidão-do-mvp--05102026) no alvo `2b8ba19`, com R1 encerrado pela TASK-038. Gates reproduzidos pelo revisor: 139 testes aprovados, cobertura de 92,25% e Credo sem achados. A renovação da interface posterior ao MVP está registrada abaixo. A avaliação humana obrigatória foi retirada por [decisão do responsável](../prd.md#feedback-de-interface); registros anteriores de pendência são históricos.
+MVP local encerrado em 05/10/2026: entregas integradas e revisão independente aprovada (histórico em `4ed2a47:docs/review.md`, seção `revalidação-de-prontidão-do-mvp--05102026`) no alvo `2b8ba19`, com R1 encerrado pela TASK-038. Gates reproduzidos pelo revisor: 139 testes aprovados, cobertura de 92,25% e Credo sem achados. A renovação da interface posterior ao MVP está registrada abaixo. A avaliação humana obrigatória foi retirada por [decisão do responsável](../prd.md#feedback-de-interface); registros anteriores de pendência são históricos.
 
 Gate GitHub e base limpa têm aceite humano registrado. As TASK-036, TASK-002, TASK-001, TASK-009, TASK-016 e TASK-010 estão concluídas e integradas, com [revisão independente aprovada](../review.md) no escopo dessas entregas. O [BLOCK-001](../blocks/001-cobertura-apos-remocao-crud.md) está resolvido. A seleção das próximas tarefas deve respeitar suas dependências e bloqueios atuais. O MVP não depende de escolhas de autenticação, idiomas ou fuso. As demais etapas mantêm produtor único e serializam arquivos compartilhados.
 
@@ -101,7 +101,7 @@ Compra de temas, preços, loja e pagamentos serão decompostos depois de decisõ
 
 ## Retomada após revisão de 13/10/2026
 
-Reconciliação de R6 em 16/10/2026: TASK-051 e TASK-011 estão integradas; BLOCK-005 foi encerrado. TASK-050 está elegível para consolidar os aceites locais. R3 foi revalidado pelo revisor; R4/R5 já foram reconciliados. O relatório preserva suas evidências históricas e não recebe aprovação retroativa.
+Reconciliação de R6 em 16/10/2026: TASK-051 e TASK-011 estão integradas; BLOCK-005 foi encerrado. TASK-050 está elegível para consolidar os aceites locais. R3 foi revalidado pelo revisor; R4/R5 já foram reconciliados. As evidências históricas permanecem nas tarefas e no Git; a limpeza do relatório atual não concede aprovação retroativa.
 
 ## Correções de login e temas — 14/10/2026
 

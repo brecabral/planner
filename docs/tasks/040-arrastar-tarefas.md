@@ -25,7 +25,7 @@ Contrato: SPEC-002 RN08–RN10/CA-002-09–11, SPEC-003 CA-003-07 e SPEC-004 RN1
 
 Pacote de correção preservado abaixo como contrato. Correção implementada e revalidada nesta sessão; evidências ao final. Estado atual `in_review`, sem encerramento presumido da revisão independente.
 
-Objetivo: completar o cancelamento funcional previsto em SPEC-004 RN16, removendo os resíduos temporários do arraste sem enviar movimento nem substituir os nós dos streams. O [achado R2](../review.md#r2--p2-cancelamento-deixa-resíduos-do-arraste-no-dom) é procedente frente ao contrato de restauração do DOM; os gates anteriores não executam o hook e não comprovam esse aceite.
+Objetivo: completar o cancelamento funcional previsto em SPEC-004 RN16, removendo os resíduos temporários do arraste sem enviar movimento nem substituir os nós dos streams. O achado R2 (histórico em `4ed2a47:docs/review.md`, seção `r2--p2-cancelamento-deixa-resíduos-do-arraste-no-dom`) é procedente frente ao contrato de restauração do DOM; os gates anteriores não executam o hook e não comprovam esse aceite.
 
 ### Entradas e limites
 
@@ -53,7 +53,7 @@ A TASK-039 é a produtora única de `planner-renewed-interface`. Esta tarefa con
 
 ## Evidências anteriores à correção R2
 
-Implementação retomada e validada em 10/10/2026 por `/root`. O responsável instalou SortableJS via npm antes da retomada; usada a versão 1.15.7 resolvida no lockfile, substituindo a previsão anterior de vendor. Preservadas a renovação TASK-039 e as alterações locais de setup/CI/npm. Registro histórico em [retomada](../retomada-task-040.md).
+Implementação retomada e validada em 10/10/2026 por `/root`. O responsável instalou SortableJS via npm antes da retomada; usada a versão 1.15.7 resolvida no lockfile, substituindo a previsão anterior de vendor. Preservadas a renovação TASK-039 e as alterações locais de setup/CI/npm. O registro temporário de retomada foi removido após a integração; diagnóstico histórico preservado no commit `4ed2a47fe8cd1aa783a952b81a5e2754c619956a`, arquivo `docs/retomada-task-040.md`.
 
 - Domínio: ordenação persistida nas três listas, transferências autorizadas na posição escolhida, cota/compactação atômicas, normalização ao final de retry e cadastro serializado pelo mesmo lock. Corrigido retorno de changeset para proprietário ausente/inexistente.
 - Interface: hook externo `TaskDrag`, alças, pressão touch de 200 ms, animação, auto-scroll, destinos vazios e indicação de destinos permitidos/proibidos. Um evento por drop, restauração dos mesmos nós antes do envio, cancelamento do gesto antes de patches, bloqueio durante espera/desconexão e limpeza de listeners. Menus nas três listas; concluir permanece visível; histórico sem arraste.
@@ -85,7 +85,7 @@ Na entrega anterior à revisão, estado `in_review`: implementação disponível
 
 ## Revisão independente — 10/10/2026
 
-Revisor `/root`, árvore local sobre `43ea80314c0a47a2a8357c17064cc01ac9ed5a40`. **changes_requested**: R2, limpeza incompleta do arraste ao cancelar por patch/desconexão em `assets/js/task_drag.js:124`. Corrigir e revalidar antes do encerramento; status `in_review` preservado. Gate reproduzido: `rtk mix ci`, 157 testes, cobertura 93,44%, Credo/build/npm audit aprovados. JavaScript inspecionado, sem navegador. Evidências, limites e achado em [docs/review.md](../review.md#revisão-das-entregas-locais--10102026). Nenhum código corrigido ou commit criado.
+Revisor `/root`, árvore local sobre `43ea80314c0a47a2a8357c17064cc01ac9ed5a40`. **changes_requested**: R2, limpeza incompleta do arraste ao cancelar por patch/desconexão em `assets/js/task_drag.js:124`. Corrigir e revalidar antes do encerramento; status `in_review` preservado. Gate reproduzido: `rtk mix ci`, 157 testes, cobertura 93,44%, Credo/build/npm audit aprovados. JavaScript inspecionado, sem navegador. Evidências, limites e achado em docs/review.md (histórico em `4ed2a47:docs/review.md`, seção `revisão-das-entregas-locais--10102026`). Nenhum código corrigido ou commit criado.
 
 Reconciliação de planejamento em 10/10/2026: tarefa devolvida a `in_progress`, conforme o [formato](formato.md#elegibilidade-e-conclusão), porque R2 exige alteração de código. Acrescentados pacote de correção e dependência da TASK-039. O registro da revisão acima preserva o estado daquela rodada; R2 continua aberto, sem correção ou aprovação presumida.
 
@@ -117,4 +117,4 @@ Autoavaliação: **approved no escopo técnico validado**, R2 corrigido sem acha
 
 ## Revalidação independente — 11/10/2026
 
-Revisor `/root`, sem implementação nesta sessão: **approved no escopo técnico local**, R2 resolvido. Alvo: correção não commitada sobre `452083a6a4a117a39622c96bd1aec4bf9cd60f50`, incluindo hook e testes técnicos. Reproduzidos os cinco testes JavaScript e `mix ci`: 157 testes Elixir aprovados, cobertura 93,44%, Credo/build/npm audit aprovados. Inspeção contra SortableJS instalado confirma limpeza antes da perda das referências e restauração dos nós; sem navegador. Evidências e limites em [revisão de prontidão](../review.md#prontidão-do-mvp-e-revalidação-de-r2--11102026). Estado `in_review` preservado até integração e conferência operacional; marco commitado não avançado porque a correção continua local. Nenhum commit ou publicação.
+Revisor `/root`, sem implementação nesta sessão: **approved no escopo técnico local**, R2 resolvido. Alvo: correção não commitada sobre `452083a6a4a117a39622c96bd1aec4bf9cd60f50`, incluindo hook e testes técnicos. Reproduzidos os cinco testes JavaScript e `mix ci`: 157 testes Elixir aprovados, cobertura 93,44%, Credo/build/npm audit aprovados. Inspeção contra SortableJS instalado confirma limpeza antes da perda das referências e restauração dos nós; sem navegador. Evidências e limites em revisão de prontidão (histórico em `4ed2a47:docs/review.md`, seção `prontidão-do-mvp-e-revalidação-de-r2--11102026`). Estado `in_review` preservado até integração e conferência operacional; marco commitado não avançado porque a correção continua local. Nenhum commit ou publicação.

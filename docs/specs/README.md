@@ -11,7 +11,7 @@ Specs agregam arquitetura, invariantes e casos de uso; tarefas entregam passos p
 | [005 — Contas, magic link e isolamento](005-contas-e-acesso.md) | Contrato do MVP; implementação em várias tarefas. |
 | [006 — Labels reutilizáveis por usuário](006-labels.md) | Contrato do MVP; implementação em várias tarefas. |
 
-As versões do MVP local dessas seis specs foram implementadas no código integrado e tiveram aceite verificado pela [revalidação independente do MVP](../review.md#revalidação-de-prontidão-do-mvp--05102026), alvo `2b8ba19`, em 05/10/2026. Não há avaliação humana obrigatória da interface, conforme o [PRD](../prd.md#feedback-de-interface).
+As versões do MVP local dessas seis specs foram implementadas no código integrado e tiveram aceite verificado pela revalidação independente do MVP (histórico em `4ed2a47:docs/review.md`, seção `revalidação-de-prontidão-do-mvp--05102026`), alvo `2b8ba19`, em 05/10/2026. Não há avaliação humana obrigatória da interface, conforme o [PRD](../prd.md#feedback-de-interface).
 
 ## Como escrever
 
