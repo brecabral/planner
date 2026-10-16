@@ -15,7 +15,7 @@ blockers: []
 
 ## Objetivo e contexto
 
-Usar o runner integrado e cobrir comportamento existente. Ler D20, specs listadas, cenários públicos e implementação de auth, temas e arraste. Não criar regras de produto. Fixtures privadas criam contas/dados sintéticos e token pelo mecanismo existente via execução no container; navegar pela rota normal de consumo do token. Não criar endpoint de bypass nem depender de e-mail externo. Preparação falha explicitamente se o contrato de auth mudar.
+Usar o runner integrado e cobrir comportamento existente. Ler D20, specs listadas, cenários públicos e implementação de auth, temas e arraste. Não criar regras de produto. Fixtures privadas criam contas/dados sintéticos e token pelo mecanismo existente via execução no container; navegar pela rota normal de consumo do token. As fixtures devem funcionar tanto no Compose local quanto no release do GitHub, cujo container é identificado por `E2E_CONTAINER`; nenhuma preparação pode depender exclusivamente do Just. Não criar endpoint de bypass nem depender de e-mail externo. Preparação falha explicitamente se o contrato de auth mudar.
 
 ## Aceite
 

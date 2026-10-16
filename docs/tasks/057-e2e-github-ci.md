@@ -1,6 +1,6 @@
 ---
 id: "TASK-057"
-status: "in_review"
+status: "done"
 execution_level: "standard"
 execution_rationale: "Integra infraestrutura própria ao check protegido existente, preservando diagnóstico e gates."
 specs: []
@@ -45,3 +45,7 @@ Implementador `/root`, base `3414439`, workflow/README locais. O job protegido `
 - Aceite 4: operação, artefatos, retenção, responsabilidades e limites documentados no README. TASK-056 continua responsável por cenários autenticados e fixtures compatíveis com ambos os ambientes.
 
 Autoavaliação pelo fluxo de review, sem aprovação independente nem avanço do marco histórico. `git diff --check` aprovado. Pronta para conferência operacional e integração local, com execução remota explicitamente não verificada.
+
+## Conferência operacional
+
+Coordenador `/root`: registro, gates relatados, ausência de impedimentos e integração local no commit `41df5c8` conferidos. TASK-057 concluída no escopo de configuração e validação local autorizado; check remoto permanece não verificado, conforme aceite 4. TASK-056 fica elegível, sem início automático. Não houve publicação ou alteração de proteção.

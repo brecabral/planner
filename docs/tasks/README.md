@@ -112,8 +112,8 @@ Ambas estão integradas, conforme registros das tarefas. O responsável confirmo
 
 ## E2E local e obrigatório no CI — plano de 16/10/2026
 
-- [055 — Consolidar ambiente E2E e operação local Just](055-comando-e2e.md): produtora do runner isolado; próxima elegível, com dependências integradas.
+- [055 — Consolidar ambiente E2E e operação local Just](055-comando-e2e.md): produtora do runner isolado e da operação Just; evidências e integração no arquivo da tarefa.
 - [056 — Cobrir os fluxos autenticados no navegador](056-cenarios-e2e.md): consome o runner e acrescenta fixtures/cenários de interface.
 - [057 — Tornar E2E obrigatório no GitHub CI](057-e2e-github-ci.md): executa a suíte no check `quality` existente.
 
-Sequência 055 → 057 → 056 serializa README e configuração compartilhada. O esboço E2E local é entrada da 055, sem implementação concluída por este planejamento. Não há nova tarefa humana nem alteração da proteção remota: a TASK-003 já tem aceite humano. Política de uso por front e revisores no [PRD](../prd.md#e2e-obrigatório--decisão-de-16102026); decisões em D20. Entregas históricas permanecem com suas evidências originais.
+Sequência 055 → 057 → 056 serializa README e configuração compartilhada. A 055 integrou o runner local. A 057 fornece infraestrutura própria no GitHub; a 056 amplia cenários públicos para autenticados. Não há nova tarefa humana nem alteração da proteção remota: a TASK-003 já tem aceite humano. Política de uso por front e revisores no [PRD](../prd.md#e2e-obrigatório--decisão-de-16102026); decisões em D20. Entregas históricas permanecem com suas evidências originais.
