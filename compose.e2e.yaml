@@ -26,7 +26,11 @@ services:
       PHX_HOST: localhost
       PORT: "4000"
       POOL_SIZE: "5"
-    command: ["sh", "-c", "/app/bin/migrate && exec /app/bin/server"]
+      E2E_ACCOUNTS_OUTPUT: /fixtures/accounts.json
+    command: ["sh", "-c", "/app/bin/migrate && /app/bin/planner eval 'Code.eval_file(\"/e2e/accounts.exs\")' && exec /app/bin/server"]
+    volumes:
+      - ./test/support/e2e:/e2e:ro
+      - fixtures:/fixtures
     init: true
     depends_on:
       postgres:
@@ -50,6 +54,9 @@ services:
         condition: service_healthy
     environment:
       CI: "true"
+      E2E_ACCOUNTS_FILE: /fixtures/accounts.json
+    volumes:
+      - fixtures:/fixtures:ro
     init: true
     shm_size: 1gb
     cap_drop: [ALL]
@@ -59,3 +66,10 @@ services:
 networks:
   e2e:
     internal: true
+
+volumes:
+  fixtures:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: "mode=1777"

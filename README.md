@@ -119,7 +119,11 @@ docker compose --env-file /dev/null -f compose.e2e.yaml -p NOME_DO_PROJECT_TXT d
 
 Execuções concorrentes têm projetos e pastas distintos. Imagens/cache são preservados. A versão da imagem em `assets/Dockerfile.e2e` deve corresponder ao Playwright do lockfile; o build verifica isso. `just tooling-test` verifica o contrato do runner com Docker simulado, sem substituir E2E real.
 
-Os cenários atuais verificam conexão LiveView no login, navegação para cadastro e rejeição de visitantes em `/tasks`. Fluxos autenticados e interação com temas/arraste continuam no escopo da TASK-056. Os dois cenários públicos não certificam esses aceites nem entrega real de e-mail.
+A suíte mantém os cenários públicos e adiciona contas independentes para cota, labels, devolução, conclusão/histórico, isolamento entre contas, exclusão, ordem por menu/mouse/touch, diálogo e temas em desktop/320 px. Verifica resultados persistidos após recarga e cores computadas; não valida entrega real de e-mail nem substitui avaliação estética. Touch usa eventos do Chromium em contexto móvel, sem comprovar hardware físico.
+
+As fixtures privadas em `test/support/e2e/accounts.exs` registram contas sintéticas e emitem tokens pelo mecanismo existente; os testes consomem o link pela tela normal de confirmação. Cada cenário recebe duas identidades próprias, sem compartilhar cota/dados. No Compose, a preparação executa no container de release após migrations e escreve um manifesto em volume temporário exclusivo, montado somente para leitura no Playwright. Não há endpoint de bypass nem socket Docker no navegador. O manifesto contém tokens sintéticos e desaparece com a limpeza do projeto.
+
+No GitHub, o helper usa `docker exec "$E2E_CONTAINER" /app/bin/planner rpc` com o mesmo script privado, lido do checkout; não depende de Just nem de arquivo compilado no release. Falha na preparação, token incompatível ou ausência do container/manifesto reprova a suíte explicitamente. Os artefatos podem conter tokens dessas contas descartáveis. A configuração não faz retries; repetição da suíte pelo comando canônico cria nova base e novas contas.
 
 ## Release local
 

@@ -1,6 +1,6 @@
 ---
 id: "TASK-056"
-status: "planned"
+status: "in_progress"
 execution_level: "advanced"
 execution_rationale: "Prepara identidade isolada e valida interações reais entre hooks, LiveView e persistência."
 specs: ["SPEC-002", "SPEC-004", "SPEC-005", "SPEC-007"]
@@ -37,3 +37,13 @@ Consultar ajuda Mix e operação no README. Aplicar TDD enxuto aos comportamento
 ## Reconciliação de R7 — 16/10/2026
 
 Aguardar a TASK-058 para usar os gates locais com isolamento corrigido, conforme [BLOCK-006](../blocks/006-isolamento-compose-teste.md). Dependências anteriores continuam alcançáveis pela cadeia; nenhuma implementação ou validação adicional nesta rodada.
+
+## Progresso e encerramento solicitado — 16/10/2026
+
+TASK-058 integrada em `633b400`, com BLOCK-006 encerrado em `7a45081`. Implementador `/root/task056`; execução interrompida pelo coordenador a pedido do usuário para fazer commit e encerrar. Estado mantido em `in_progress`, sem conclusão operacional ou aprovação independente.
+
+Preservados sete cenários autenticados em `assets/e2e/authenticated.spec.ts`, helper de contas, fixture privada em `test/support/e2e/accounts.exs`, integração Compose, configuração Playwright e documentação no README. Cobrem planejamento/cota/histórico/isolamento, exclusão, ordem por menu/mouse/touch, diálogo e temas desktop/estreito. Verificações de interface estão na suíte versionada; teclado no tema corresponde à SPEC-007 CA-007-05 e Escape/foco ao aceite 5. Aplicar a política de validação do AGENTS.md registrada em `e5bfb02`.
+
+Evidências relatadas: `just ci` e `just precommit` aprovados com 245 testes ExUnit e limiar de cobertura de 70% preservado. Rodada anterior E2E em `tmp/e2e/run-2WxStWAQ/` passou 9/9 antes dos últimos ajustes. Houve rodadas intermediárias com falhas nos testes, corrigidas dentro da suíte. Na rodada mais recente, `tmp/e2e/run-nWYOi4iy/tests.log` registra 9/9 e Playwright com saída zero; o encerramento foi solicitado durante a finalização do runner. Isso não comprova repetição completa da versão final nem aceite de todos os contratos. Não houve CI remoto.
+
+Retomada: conferir finalização/limpeza do último runner e evidências preservadas; concluir a repetição exigida pelo aceite 1, autoavaliação e conferência operacional. TASK-050 não foi iniciada. Este commit preserva progresso, sem liberar a suíte como entrega concluída.
