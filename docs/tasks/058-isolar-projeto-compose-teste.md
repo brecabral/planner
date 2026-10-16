@@ -1,6 +1,6 @@
 ---
 id: "TASK-058"
-status: "in_review"
+status: "done"
 execution_level: "advanced"
 execution_rationale: "Corrige isolamento no ciclo de vida de containers com risco de interromper o banco de desenvolvimento; exige regressão segura de subida e remoção."
 specs: []
@@ -52,3 +52,7 @@ Implementador `/root/task058`, base `3f5b961`; alvo avaliado: alterações locai
 Artefatos E2E: `tmp/e2e/run-sdGEO2t9/`, com logs, relatório HTML, resultados, `exit-code.txt` igual a zero e confirmação de remoção dos containers/rede próprios em `cleanup.log`. Cenários: login conectado pela home e proteção do planejamento para visitantes. Limites: testes simulados verificam seleção/operação das receitas, não o daemon; resolução real do Compose complementa essa evidência. Cobertura ExUnit não mede os scripts Python; estes possuem regressão comportamental própria. Os dois cenários públicos não comprovam fluxos autenticados da TASK-056, nem execução do CI remoto.
 
 Conclusão da autoavaliação: critérios atendidos, sem achado bloqueante no diff. Entrega pronta para conferência operacional e commit pelo coordenador no diretório compartilhado; `done` e encerramento do BLOCK-006 dependem dessa integração. R7 permanece sujeito à revalidação independente.
+
+## Conferência operacional — 16/10/2026
+
+Coordenador `/root`: registro, escopo dos arquivos, autoavaliação e gates relatados conferidos, sem impedimento pendente. Entrega integrada na base local em `633b400`. TASK-058 concluída e condição operacional do BLOCK-006 atendida; TASK-056 e TASK-050 liberadas para execução serializada. Não houve revisão independente nem execução do CI remoto nesta coordenação; R7 permanece no parecer até revalidação pelo revisor.

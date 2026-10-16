@@ -1,6 +1,6 @@
 # BLOCK-006 — Isolamento do projeto Compose de teste
 
-- Estado: aberto.
+- Estado: resolvido operacionalmente em 16/10/2026.
 - Origem: TASK-055, achado R7 da revisão independente de 16/10/2026; escopo revisado conjunto TASK-055/057.
 - Alvo avaliado: `e1909ea52d038baf9336158d6f9a377df5bf1537`.
 
@@ -19,3 +19,9 @@ Entregas TASK-055/057 continuam integradas, com resultados históricos preservad
 ## Condição de retomada
 
 Coordenador confere correção validada e integrada, regressão de up/down/limpeza com ambiente adverso e gates completos, incluindo E2E. Só então encerra este registro e libera as consumidoras cujas demais dependências estejam concluídas. O revisor revalida R7 para alterar o parecer independente; planejamento ou encerramento operacional não equivalem a aprovação técnica. Até lá, R7 permanece aberto no review.
+
+## Encerramento operacional — 16/10/2026
+
+TASK-058 integrada em `633b400` e conferida operacionalmente pelo coordenador `/root`. O implementador relatou regressão vermelha na base e verde após a correção, com receitas reais interceptadas sob os três ambientes exigidos; resolução Compose real somente de leitura confirmou `planner-test`. `just check` aprovado com 245 testes ExUnit, cobertura mínima de 70% preservada e dois E2E; `just precommit` aprovado. Evidências completas e limitações no registro da tarefa; artefatos em `tmp/e2e/run-sdGEO2t9/`.
+
+Condição de retomada satisfeita; TASK-056 e TASK-050 podem prosseguir conforme o grafo. Este encerramento não altera R7 ou o parecer independente de `docs/review.md`, nem comprova CI remoto.
