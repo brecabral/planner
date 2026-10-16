@@ -1,14 +1,81 @@
 ---
-review_base_commit: "367bf3555bc2b06e5ce90aedc2118e46e00986de"
-reviewed_commit: "b0810ba49cf6049c7d5aac49960950a5236be22b"
+review_base_commit: "a55f55679f15f398a7c9541e66e5d5e11a604501"
+reviewed_commit: "e1909ea52d038baf9336158d6f9a377df5bf1537"
 last_approved_commit: "2b8ba19ce2657126423256d3fd2596875c7ca661"
-reviewed_at: "2026-10-13"
+reviewed_at: "2026-10-16"
 reviewer: "/root — revisão independente de código e alinhamento documental"
 status: changes_requested
-reviewed_tasks: ["TASK-041", "TASK-042", "TASK-043", "TASK-044", "TASK-015", "TASK-045", "TASK-046", "TASK-047", "TASK-048"]
+reviewed_tasks: ["TASK-055", "TASK-057"]
 ---
 
 # Revisão incremental das tarefas concluídas
+
+## Segurança do Just, CI e execução por agentes — 16/10/2026
+
+Resultado: **changes_requested**, por R7. Revisor independente `/root`, sem implementação nesta rodada. Alvo `e1909ea52d038baf9336158d6f9a377df5bf1537`; base do incremento de tooling `a55f55679f15f398a7c9541e66e5d5e11a604501`. Escopo: TASK-055/057, Just, scripts, Compose, aliases, workflow e respectivos contratos. O último aprovado histórico continua fora da ancestralidade (saída 1), preservado sem avanço; a base foi reconstruída pelo início das entregas de tooling. Não é aprovação integral do produto nem revisão da implementação futura da TASK-056.
+
+A alteração preexistente em `docs/review.md` é a revisão de prontidão abaixo, preservada e incluída no commit por solicitação explícita do usuário. O código executável estava idêntico ao alvo. Os resultados históricos não foram atribuídos à rodada atual.
+
+### R7 — P2: ambiente herdado pode direcionar testes ao projeto Compose de desenvolvimento
+
+Local: `justfile:30` e `justfile:33`, introduzidos pela TASK-055; `compose.test.yaml:1`. As receitas usam arquivo e env-file explícitos, mas não `-p`. Se o terminal/agente exportar `COMPOSE_PROJECT_NAME=planner`, esse valor prevalece sobre `name: planner-test`. Como desenvolvimento e teste declaram o serviço `postgres`, `just test`/`ci`/`precommit` podem recriar o container de desenvolvimento com configuração de teste; `db-test-down` pode remover o container correspondente sem a confirmação de `db-clean`. O volume persistente de desenvolvimento não está declarado no arquivo de teste: não se afirma apagamento desse volume, mas há interrupção indevida do ambiente e quebra da separação prometida.
+
+Reprodução segura, somente resolução de configuração: `rtk env COMPOSE_PROJECT_NAME=planner docker compose --env-file /dev/null -f compose.test.yaml config --format json` retornou `name: planner`, rede `planner_default` e serviço `postgres`. Nenhuma subida/remoção foi executada com essa variável. Correção esperada: fixar explicitamente a identidade exclusiva do projeto de teste em todas as operações, sem aceitar silenciosamente o nome herdado do desenvolvimento; acrescentar regressão com ambiente adverso e conferir que up/down selecionam o mesmo projeto de teste.
+
+### CI local e remoto
+
+O gate local é satisfatório para o escopo já entregue, exceto pelo isolamento de R7: `just check` executa qualidade, cobertura, assets, JS, auditoria npm, testes do runner e E2E. `just ci` e `just precommit` isoladamente não substituem esse gate completo. A suíte de navegador atual contém apenas dois cenários públicos; autenticação, arraste e temas continuam pendentes na TASK-056, conforme contrato, sem atribuir essa ausência como regressão da TASK-057.
+
+O workflow remoto preserva `quality`, eventos de PR/push para main, permissões `contents: read`, PostgreSQL próprio, bases distintas, etapas explícitas, Bash com propagação de falhas, E2E obrigatório, timeout e coleta/upload com `always()` e retenção de 14 dias. Não usa segredos de produção, `pull_request_target`, filtros de paths ou `continue-on-error`. Estrutura adequada ao contrato inspecionado, mas **execução remota não verificada**: tentativa de consulta falhou porque `gh` não está instalado. Não houve push, disparo remoto ou alteração de proteção. Instalação nativa de Chromium, disponibilidade das actions e upload no runner não são comprovados pelo sucesso local.
+
+### Adequação para agentes e melhorias não bloqueantes
+
+- Ajuda, inspeção, banco, testes, qualidade e commit explícito atendem à operação sequencial. `set positional-arguments`, `"$@"` e `"$1"` evitam interpolar os argumentos de teste/mensagem no código shell. Não foi identificada injeção shell por esses parâmetros.
+- Just organiza comandos, mas não cria uma fronteira de permissões: executar receitas ainda concede os efeitos de Docker, Mix, npm e Git. A confirmação de `db-clean` reduz acidente interativo; não representa autorização humana para tarefa reservada. Restrições do agente continuam necessárias.
+- ExUnit usa projeto/porta/base compartilhados (`planner-test`, 55432, `planner_test`). Duas sessões/worktrees não ficam isoladas por mudar somente `PLANNER_TEST_PORT`; podem reconfigurar o mesmo container. Serializar esses gates ou definir contrato completo de isolamento por sessão antes de prometer concorrência. E2E já usa projeto e artefatos por execução.
+- `just diff` mostra somente o diff sem staging; alterações staged e arquivos novos exigem inspeção adicional. `just commit` comita todo o staging, inclusive o que outro agente tiver colocado ali: a seleção/conferência continua responsabilidade do operador em workspace compartilhado.
+- Actions e imagens usam tags, sem pin por SHA/digest; auditoria automática cobre npm, não todas as dependências Hex/imagens. São limites de endurecimento e cobertura, sem vulnerabilidade específica comprovada nesta rodada.
+
+### Evidências reproduzidas
+
+Ajuda de `mix ci`, `mix precommit` e Just consultada; aliases e contratos inspecionados antes da execução.
+
+- `rtk just check`: saída 0; **245 testes ExUnit**, seed 32667, Credo sem achados em 75 arquivos, gate de cobertura de 70% aprovado, assets, testes JavaScript e auditoria npm aprovados. Quatro testes do runner passaram, incluindo falhas simuladas e concorrência. O resumo total de cobertura foi truncado pelo filtro de saída; não se atribui percentual exato nem variação contra a base. Módulos observados: Tasks 97,94%, Accounts 89,74%, TaskLive.Index 98,71%.
+- E2E completo: **2 testes Chromium aprovados**, código 0 em `tmp/e2e/run-uN5Bbgob/exit-code.txt`. Relatório em `tmp/e2e/run-uN5Bbgob/playwright-report/index.html`; logs e remoção de containers/rede confirmados em `cleanup.log`. Usa release construído e banco descartável próprios.
+- `rtk just precommit`: saída 0, 245 testes aprovados, seed 684323; nenhuma alteração executável ou de lockfile. `git diff --check` aprovado.
+- A resolução adversa do Compose reproduziu R7 sem executar ação destrutiva. Não foram executados reset de desenvolvimento nem tarefas humanas.
+
+A revisão anterior e seus achados permanecem abaixo como histórico; R7 é a pendência atual deste escopo. Nenhum código foi corrigido nesta revisão.
+
+## Prontidão para continuar a fila — 16/10/2026
+
+Resultado: **changes_requested documental**. A base permite continuar TASK-050 e TASK-055; não foi identificado impedimento técnico nos gates executados. A documentação de navegação precisa ser reconciliada com as entregas. Isso não encerra o aceite final do release nem certifica fluxos autenticados em navegador.
+
+Revisor independente: `/root`, sem implementação nesta sessão. Alvo: `60c0811be08dbef2b09b13f7014f272029849bbd`, árvore inicialmente limpa. O último aprovado `2b8ba19ce2657126423256d3fd2596875c7ca661` continua fora da ancestralidade (comando `git merge-base --is-ancestor`, saída 1); preservado como evidência histórica, sem avanço. Mantida a base reconstruída `367bf3555bc2b06e5ce90aedc2118e46e00986de`; a revisão anterior sustenta os limites do trecho até `b0810ba49cf6049c7d5aac49960950a5236be22b`. Nesta rodada, inspeção do incremento posterior de cadastro, navegação, seletor/hook, release e esboço E2E, além de conferência estrutural dos 57 cabeçalhos e contratos das tarefas abertas pertinentes. Não é uma nova auditoria integral de todos os módulos históricos.
+
+### R6 — P3: índices orientam a fila por estados anteriores às entregas
+
+Locais: `docs/tasks/README.md:87`, `:104–115`; `docs/specs/README.md:38`, `:45`. A navegação ainda apresenta TASK-052/053/054 como não implementadas, TASK-051 como próxima correção e TASK-050 aguardando release. Os cabeçalhos e commits mostram 051/011/052/053/054 concluídas; `/join`, destaque do cadastro e seletor na navbar estão no código. A regressão permanente de R3 passou nesta rodada. Quem usar esses resumos pode selecionar correção já entregue ou omitir o aceite elegível. Reconciliar os resumos, distinguindo registros históricos, implementação integrada e aceites ainda não verificados. Não apagar a limitação visual da TASK-054 nem transformar conclusão operacional em aprovação integral.
+
+### Pendências reais e sequência possível
+
+- TASK-050 permanece planejada e elegível após TASK-011: falta consolidar os aceites transversais no artefato local. Esta revisão não executa nem encerra essa tarefa.
+- TASK-055 está elegível; TASK-056 depende dela e TASK-057 depende da 056. `mix e2e`, cenários autenticados e gate E2E no GitHub ainda não existem, coerentemente com o plano e a transição do PRD.
+- TASK-050 e TASK-055 compartilham README e potencialmente testes; coordenar execução serial ou isolamento e integração explícita, sem presumir paralelismo pelo grafo.
+- TASK-054 tem entrega técnica concluída, mas o relato visual original não foi reproduzido e sua validação foi reservada ao responsável por instrução registrada. Os cenários públicos atuais não comprovam troca de paleta; TASK-056 prevê essa cobertura. Não reabrir execução humana obrigatória por inferência.
+- TASK-004/013/014/017/031/049 continuam bloqueadas por escopo/decisões futuras. As duas tarefas humanas estão concluídas com evidências registradas; nenhum BLOCK aberto encontrado.
+
+Conferência estrutural: 57 tarefas, 44 `done`, 10 `planned`, 3 `cancelled`; nenhuma referência de dependência ausente, ciclo, produtor duplicado, consumo sem produtor ancestral ou tarefa concluída com dependência incompleta/bloqueio. Specs de 050 estão `ready`; 055 é manutenção com lista vazia justificada. Os contratos atuais de autenticação e temas substituem explicitamente os limites históricos em D17/D19 e no DDD; esses trechos antigos não foram tratados como defeitos de implementação.
+
+### Evidências reproduzidas e limites
+
+Após leitura do README, aliases, política e ajuda Mix:
+
+- `rtk mix ci`: saída 0, **245 testes aprovados**, seed 927491, cobertura **93,71%**, limiar 70% preservado; formato, compilação, Credo, assets e auditoria npm aprovados. Inclui regressão de falha de envio e recuperação da conta; **R3 resolvido no alvo**. R4/R5 anteriores também estão reconciliados nas fontes indicadas.
+- `rtk mix cmd node --test assets/test/task_drag.test.mjs assets/js/account_theme.test.mjs`: **11 aprovados**, saída 0.
+- Build e execução de `compose.e2e.yaml` com projeto exclusivo `planner-review-60c0811`: migrations em banco descartável, **2 testes Chromium aprovados**, saída 0. Cobre home/login conectado, navegação para `/join` e rejeição de visitante em `/tasks`. Relatório copiado para `/tmp/planner-review-60c0811-report/index.html`, resultados em `/tmp/planner-review-60c0811-results`; containers e rede próprios removidos depois da coleta. Build aproveitou cache. Acesso Docker precisou de execução fora do sandbox.
+
+Não foram executados fluxos autenticados em navegador, novo ensaio de persistência entre reinícios ou CI remoto; essas evidências não podem ser inferidas dos testes públicos. A TASK-055 ainda não fornece o runner canônico, portanto sua aprovação não é presumida pelo smoke manual. Cobertura não medida novamente na base; nenhuma alegação de variação. `precommit` não repetido por formatar e alterar dependências; usado o gate sem correção automática. Nenhum código, contrato, estado de tarefa, commit ou publicação alterado; somente este relatório foi atualizado.
 
 ## Revisão das últimas entregas e documentação — 13/10/2026
 
