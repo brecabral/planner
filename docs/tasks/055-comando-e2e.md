@@ -1,6 +1,6 @@
 ---
 id: "TASK-055"
-status: "planned"
+status: "in_review"
 execution_level: "advanced"
 execution_rationale: "Integra ciclo de vida de containers, isolamento, códigos de saída e diagnóstico de falhas."
 specs: []
@@ -36,3 +36,14 @@ Produz runner, configuração e smoke público. Não integra workflow, não ampl
 ## Validação e entrega
 
 Consultar ajuda Mix e operação no README. Aplicar TDD enxuto aos comportamentos novos, executar gates existentes com cobertura mínima de 70% preservada e E2E completo. Registrar comandos, alvo, resultados, evidências por critério e limitações; autoavaliação pelo fluxo de review, sem aprovação independente implícita. Conferência operacional e commit integrado são necessários antes de `done`. Estado inicial: planejada, sem implementação ou validação executada neste planejamento.
+
+## Entrega e autoavaliação — 16/10/2026
+
+Implementador `/root`, base `a55f556`, alterações locais desta tarefa. Just agora centraliza banco de desenvolvimento, banco de teste descartável separado, setup, servidor, testes, qualidade, inspeção e commit do staging explícito. Mix não inicia Docker; auditoria npm passou para Just. Nenhum comportamento de produto foi alterado.
+
+- Aceites 1/5/6: `just --list`, dry-run de run/test, parse/formato Just e shell aprovados. `just precommit`: 245 testes, saída 0. `just check`: qualidade aprovada com cobertura acima do limiar de 70%, Credo, assets, testes JavaScript e auditoria npm; dois cenários Chromium aprovados, saída 0.
+- Aceites 2/3/4: quatro testes do runner aprovados, incluindo seis fases de falha (build, readiness, testes, cópia, logs e cleanup), SIGTERM e duas execuções concorrentes simuladas. Falhas mantêm saída não zero; evidências precedem remoção. Simulação não equivale a concorrência Docker real nem prova SIGKILL recuperável automaticamente.
+- E2E real: `tmp/e2e/run-jgHJ31L9/`, relatório HTML, logs, código 0 e cleanup de containers/rede comprovado. Banco em tmpfs, sem acesso ao banco local. Build atualizou imagens; cache preservado. Execução Docker exigiu acesso fora do sandbox.
+- Grafo: 57 cabeçalhos conferidos, sem ciclos, consumidores sem produtor ancestral ou dependências incompletas em tarefas concluídas. `git diff --check` aprovado.
+
+Autoavaliação pelo fluxo de review, sem aprovação independente nem alteração do marco de `docs/review.md`. Cenários autenticados continuam na TASK-056. Aguardando conferência operacional e commit integrado.

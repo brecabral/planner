@@ -6,7 +6,7 @@ A aplicação usa Phoenix, Elixir e PostgreSQL. O servidor roda na máquina; o b
 
 ## Como rodar
 
-Requer Elixir compatível com `mix.exs` (`~> 1.17`), Erlang/OTP compatível, Node.js/npm para as dependências de frontend e Docker ativo com Compose que suporte `up --wait`.
+Requer Elixir compatível com `mix.exs` (`~> 1.17`), Erlang/OTP compatível, Node.js/npm para as dependências de frontend Just, Bash, GNU coreutils (`timeout`) e Docker ativo com Compose que suporte `up --wait`. Python 3 é usado somente nos testes do runner.
 
 ```sh
 cp .env.example .env
@@ -15,28 +15,37 @@ cp .env.example .env
 Edite a senha no `.env` e execute:
 
 ```sh
-mix setup
-mix phx.server
+just setup
+just run
 ```
 
-Abra [localhost:4000](http://localhost:4000). Para usar o console interativo, execute `iex -S mix phx.server`.
+Abra [localhost:4000](http://localhost:4000). Para usar o console interativo, execute `just console`.
 
 ## Comandos úteis
 
 | Comando | O que faz |
 | --- | --- |
-| `mix setup` | Instala dependências, prepara o banco e compila os assets. |
-| `mix phx.server` | Inicia o banco e o servidor. |
-| `mix db.up` | Inicia apenas o PostgreSQL e aguarda sua disponibilidade. |
-| `mix ecto.setup` | Inicia o banco, cria a base, aplica migrations e seeds. |
-| `mix test` | Inicia o banco e executa os testes. |
-| `mix ci` | Verifica compilação, formatação, Credo estrito e testes com cobertura mínima de 70%. |
-| `mix assets.build` | Instala o frontend pelo lockfile (`npm ci`) e compila CSS/JS. |
-| `mix precommit` | Compila com warnings como erros, verifica dependências, formata e testa. |
-| `mix cmd node --test assets/test/task_drag.test.mjs` | Testa o ciclo técnico do hook de arraste com SortableJS instalado, sem navegador. Executar após instalar os assets. |
-| `mix run priv/repo/seeds.exs` | Executa o arquivo de seeds, atualmente sem criação ou alteração de dados. |
-| `mix ecto.reset` | Apaga e recria a base do ambiente atual. |
-| `docker compose stop postgres` | Para o banco sem apagar o volume. |
+| `just` | Lista os comandos locais para desenvolvedores e todos os perfis de agentes. |
+| `just setup` / `just run` | Prepara dependências/banco/assets; ou sobe o banco local e inicia Phoenix. |
+| `just db-up` / `just db-down` | Inicia com healthcheck ou remove containers/rede, preservando o volume local. |
+| `just db-clean` | Remove também os dados locais; exige confirmação. Não é chamado automaticamente. |
+| `just db-status` / `just db-logs` | Inspeciona disponibilidade e logs do banco local. |
+| `just db-test-up` / `just db-test-down` / `just db-test-clean` | Opera o PostgreSQL descartável exclusivo dos testes; parar já descarta seus dados. |
+| `just test [arquivo/opções]` | Sobe banco de teste e executa ExUnit, aceitando argumentos. |
+| `just ci` | Qualidade Elixir, cobertura mínima de 70%, assets, testes JavaScript e auditoria npm. |
+| `just precommit` | Sobe banco de teste e executa o alias Mix de formatação, compilação e testes. |
+| `just js-test` | Instala frontend pelo lockfile e testa arraste e sincronização de tema. |
+| `just tooling-test` | Testa falhas, interrupção, isolamento e coleta do runner sem Docker. |
+| `just e2e` | Constrói imagens, sobe banco/app isolados, executa toda a suíte, coleta evidências e derruba os recursos. |
+| `just check` | Executa qualidade e E2E para revisão de código/autoavaliação. |
+| `just status` / `just diff` / `just tasks` | Inspeção de alterações e cabeçalhos do plano para qualquer perfil. |
+| `just commit "mensagem"` | Comita somente o que já foi selecionado no staging; não adiciona arquivos. |
+| `just migrate` | Sobe banco local e aplica migrations. |
+| `mix assets.build` / `mix assets.deploy` | Compila assets Phoenix, com instalação npm pelo lockfile. |
+| `mix run priv/repo/seeds.exs` | Executa seeds, atualmente sem criação ou alteração de dados. |
+| `mix ecto.reset` | Apaga e recria a base configurada; exige banco previamente disponível. |
+
+Just concentra operação local. Mix executa tarefas Elixir/Phoenix e build de assets; nenhum alias inicia Docker. Planejamento e revisões documentais usam inspeção documental, sem precisar subir banco ou navegador. Cada perfil comita suas alterações ao encerrar a rodada, selecionando os arquivos próprios antes de `just commit`.
 
 Após atualizar o código de uma instalação existente, aplique as migrations com `mix ecto.migrate` antes de iniciar o servidor. A migration de ordenação preserva os dados e inicializa as posições de backlog/retry.
 
@@ -44,9 +53,9 @@ Após atualizar o código de uma instalação existente, aplique as migrations c
 
 Mix e Compose leem o `.env`, ignorado pelo Git. Variáveis exportadas no processo têm precedência. Use `KEY=value` sem aspas, espaços, interpolação ou comentários ao final; linhas vazias e comentários em linhas próprias são aceitos.
 
-O Compose usa PostgreSQL 17, publica a porta apenas em `127.0.0.1` e preserva dados no volume `postgres_data`. Os aliases aguardam o healthcheck por até 60 segundos e interrompem a execução se o banco falhar. Desenvolvimento e testes usam bases distintas (`POSTGRES_DB` e `POSTGRES_TEST_DB`); testes paralelos acrescentam `MIX_TEST_PARTITION` ao nome da base.
+O Compose usa PostgreSQL 17, publica a porta apenas em `127.0.0.1` e preserva dados no volume `postgres_data`. As receitas Just aguardam o healthcheck por até 60 segundos e interrompem a execução se o banco falhar. O banco de desenvolvimento é persistente. `just test`, `just ci` e `just precommit` usam outro projeto Compose (`planner-test`), com PostgreSQL em memória na porta 55432 e credenciais sintéticas. `PLANNER_TEST_PORT` permite mudar essa porta. Esses comandos mantêm o banco de teste disponível; `just db-test-down` o remove. Testes paralelos acrescentam `MIX_TEST_PARTITION` ao nome da base.
 
-Alterar credenciais no `.env` não altera um volume já inicializado: ajuste também o usuário no banco existente. Para CI ou banco externo, exporte `PLANNER_SKIP_COMPOSE=true` e as variáveis de conexão de `.env.example`. Produção usa `config/runtime.exs` e não inicia Compose automaticamente.
+Alterar credenciais no `.env` não altera um volume já inicializado: ajuste também o usuário no banco existente. Para CI ou banco externo, exporte as variáveis de conexão de `.env.example` e use Mix diretamente; `PLANNER_SKIP_COMPOSE` foi removida. Produção usa `config/runtime.exs` e não inicia Compose automaticamente.
 
 ## Autenticação e dados por conta
 
@@ -84,40 +93,29 @@ Consulte as [decisões de arquitetura](docs/design.md), o [vocabulário do domí
 
 ## CI
 
-O workflow `CI` executa o check **quality** em PRs para `main` e pushes na `main`, usando Elixir 1.20.3, OTP 29 e o Compose existente. Para reproduzir localmente, execute `mix ci` com Docker ativo e `.env` configurado. O comando também instala e compila os assets e verifica vulnerabilidades npm de severidade alta ou crítica. A versão resolvida do SortableJS está em `assets/package-lock.json`. O comando verifica formatação sem corrigir arquivos; a cobertura deve atingir pelo menos 70%, conforme o limiar já configurado em `mix.exs`.
-
-O responsável confirmou a configuração da proteção da `main` e do check obrigatório **quality**.
-
-Para alterações no hook de arraste, execute também o teste JavaScript listado acima; ele é separado dos aliases `precommit` e `ci`. O harness usa o SortableJS do lockfile com DOM e timers mínimos controlados. Cobre cancelamento, restauração e retomada, mas não simula layout, propagação completa de eventos, mouse/touch reais ou patches do LiveView no navegador.
+O check protegido **quality** mantém PRs para `main` e pushes na `main`. A infraestrutura independente do Just está na TASK-057; o gate local completo é `just check`. A cobertura mínima de 70% continua definida em `mix.exs`. O responsável já confirmou a proteção da `main` e o check obrigatório; esta entrega não altera essa configuração remota.
 
 ## Testes E2E em containers
 
 O `compose.e2e.yaml` é independente do Compose de desenvolvimento. Constrói o release pelo `Dockerfile` existente e executa Playwright/Chromium na imagem oficial, sem instalar navegadores no Fedora. Requer Docker com Compose; downloads de imagens e dependências ocorrem durante o build.
 
 ```sh
-docker compose -f compose.e2e.yaml build
-docker compose -f compose.e2e.yaml up --abort-on-container-exit --exit-code-from playwright
+just e2e
 ```
 
-O segundo comando retorna o código de saída dos testes. A aplicação aguarda o PostgreSQL, aplica migrations e passa pelo healthcheck antes de iniciar o navegador. O projeto Compose chama-se `planner-e2e`: não execute esta configuração com o nome do projeto de desenvolvimento.
+Cada execução cria um projeto Compose exclusivo, sem ler `.env`, publicar portas ou compartilhar volumes de desenvolvimento. O banco usa `tmpfs` e credenciais sintéticas. A aplicação aplica migrations e aguarda healthcheck; readiness tem limite de 180 segundos e testes de dez minutos. Playwright usa `pwuser`, rede interna compartilhada apenas com a aplicação, sem socket Docker ou perfil pessoal. Build precisa de rede; containers compartilham o kernel do host.
 
-Os serviços usam rede interna, sem portas publicadas, bind mounts, socket Docker ou acesso ao perfil do navegador pessoal. O runner usa `pwuser`, sem capabilities adicionais, e memória compartilhada própria. Ele compartilha apenas a rede do container da aplicação para acessar `localhost:4000`, compatível com a configuração HTTP local do release. Isso não compartilha a rede do Fedora. Containers compartilham o kernel do host; este ambiente não é uma VM nem uma garantia contra código malicioso.
+O caminho é impresso no começo e no fim: `tmp/e2e/run-XXXXXXXX/`. Contém `project.txt`, `build.log`, `startup.log`, `tests.log`, `containers.log`, `cleanup.log`, `exit-code.txt`, `playwright-report/index.html` e `test-results/` com traces/screenshots disponíveis. Falhas precoces podem não produzir relatório de navegador. Relatórios são copiados antes de remover containers, rede e volumes próprios, inclusive em falhas e sinais INT/TERM. Falha de coleta ou limpeza reprova uma execução anteriormente verde; a falha original é preservada no `exit-code.txt`. Just também retorna erro, podendo normalizar o código do script.
 
-O banco E2E usa credenciais sintéticas declaradas no Compose e armazenamento em memória (`tmpfs`), perdido quando o container é parado. Não utiliza o `.env` ou o volume `postgres_data` do desenvolvimento. A rede interna impede acesso externo durante os testes; o build precisa de internet. O código e as dependências são copiados para imagens próprias, sem compartilhar `node_modules` com o host.
-
-Antes de remover os containers, copie as evidências:
+Em encerramento forçado (SIGKILL), queda da máquina ou falha de Docker, consulte `project.txt` e `cleanup.log`; após recuperar Docker, remova somente o projeto afetado:
 
 ```sh
-docker compose -f compose.e2e.yaml cp playwright:/e2e/playwright-report assets/playwright-report
-docker compose -f compose.e2e.yaml cp playwright:/e2e/test-results assets/test-results
-docker compose -f compose.e2e.yaml down
+docker compose --env-file /dev/null -f compose.e2e.yaml -p NOME_DO_PROJECT_TXT down --volumes --remove-orphans
 ```
 
-Relatórios e traces ficam fora do Git. Para repetir com ambiente novo, execute `down` antes de `up`; após alterar testes ou código, execute também `build`. A versão da imagem em `assets/Dockerfile.e2e` deve corresponder exatamente ao Playwright resolvido no lockfile; o build verifica essa correspondência.
+Execuções concorrentes têm projetos e pastas distintos. Imagens/cache são preservados. A versão da imagem em `assets/Dockerfile.e2e` deve corresponder ao Playwright do lockfile; o build verifica isso. `just tooling-test` verifica o contrato do runner com Docker simulado, sem substituir E2E real.
 
-Os cenários em `assets/e2e` verificam conexão LiveView na página de login, navegação para cadastro e redirecionamento de visitantes em `/tasks`. Não substituem ExUnit, os testes JavaScript existentes ou o aceite humano. O release não tem `/dev/mailbox`: fluxos autenticados por magic link ainda precisam de infraestrutura própria de e-mail de teste. O ambiente E2E não foi adicionado automaticamente ao CI.
-
-Validação em 15/10/2026: build das duas imagens, migrations no banco descartável e dois testes Chromium aprovados, com saída 0 e cópia do relatório. `mix precommit` e `mix ci` passaram com 245 testes e cobertura de 93,71%. Os containers e a rede E2E foram removidos após a conferência; imagens e relatório local foram preservados.
+Os cenários atuais verificam conexão LiveView no login, navegação para cadastro e rejeição de visitantes em `/tasks`. Fluxos autenticados e interação com temas/arraste continuam no escopo da TASK-056. Os dois cenários públicos não certificam esses aceites nem entrega real de e-mail.
 
 ## Release local
 
@@ -185,6 +183,4 @@ O [plano de tarefas](docs/tasks/README.md) prevê auth padrão Phoenix com magic
 
 ## Evolução planejada do E2E
 
-Decisão de 16/10/2026, ainda não implementada: [TASK-055](docs/tasks/055-comando-e2e.md) entregará `mix e2e` como entrada local separada de `mix ci` e `mix precommit`, incluindo preparação, execução, coleta de evidências e limpeza. Até sua integração, esse comando não está disponível; o esboço em containers está incluído nesta entrega, mas ainda não fornece o comando Mix nem integração ao CI.
-
-A [TASK-056](docs/tasks/056-cenarios-e2e.md) ampliará a cobertura para fluxos autenticados. A [TASK-057](docs/tasks/057-e2e-github-ci.md) executará o mesmo comando no check obrigatório `quality` do GitHub, com artefatos em falhas. Tarefas de front e toda revisão de código/autoavaliação seguirão a [política E2E](docs/prd.md#e2e-obrigatório--decisão-de-16102026). Pré-requisitos e opções definitivos serão documentados aqui na entrega do runner.
+A [TASK-055](docs/tasks/055-comando-e2e.md) fornece a operação local por Just. A [TASK-057](docs/tasks/057-e2e-github-ci.md) mantém infraestrutura própria no GitHub e executa todos os cenários disponíveis; a [TASK-056](docs/tasks/056-cenarios-e2e.md) amplia a suíte para fluxos autenticados. Tarefas de front e revisões de código/autoavaliações seguem a [política E2E](docs/prd.md#e2e-obrigatório--decisão-de-16102026). Os estados e evidências reais estão nos arquivos das tarefas.
