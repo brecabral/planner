@@ -1,6 +1,6 @@
 ---
 id: "TASK-055"
-status: "in_review"
+status: "done"
 execution_level: "advanced"
 execution_rationale: "Integra ciclo de vida de containers, isolamento, códigos de saída e diagnóstico de falhas."
 specs: []
@@ -47,3 +47,7 @@ Implementador `/root`, base `a55f556`, alterações locais desta tarefa. Just ag
 - Grafo: 57 cabeçalhos conferidos, sem ciclos, consumidores sem produtor ancestral ou dependências incompletas em tarefas concluídas. `git diff --check` aprovado.
 
 Autoavaliação pelo fluxo de review, sem aprovação independente nem alteração do marco de `docs/review.md`. Cenários autenticados continuam na TASK-056. Aguardando conferência operacional e commit integrado.
+
+## Conferência operacional
+
+Coordenador `/root`: registro, gates relatados e integração local conferidos no commit `8525d1f`. Sem impedimentos. TASK-055 concluída; TASK-057 liberada. Esta conferência não é revisão independente.
