@@ -1,6 +1,6 @@
 ---
 id: "TASK-058"
-status: "planned"
+status: "in_review"
 execution_level: "advanced"
 execution_rationale: "Corrige isolamento no ciclo de vida de containers com risco de interromper o banco de desenvolvimento; exige regressão segura de subida e remoção."
 specs: []
@@ -39,3 +39,16 @@ Seguir TDD enxuto, referências locais de testes/Mix e ajuda das tarefas aplicá
 ## Planejamento — 16/10/2026
 
 Contrato definido e dependência integrada. Nenhum código corrigido ou teste executado nesta rodada documental. Próxima ação: implementação desta tarefa; TASK-056 e TASK-050 aguardam sua conclusão.
+
+## Entrega e autoavaliação — 16/10/2026
+
+Implementador `/root/task058`, base `3f5b961`; alvo avaliado: alterações locais em `justfile`, `scripts/test_compose_test.py` e `README.md`, acompanhadas deste registro. TASK-057 concluída e integrada em `41df5c8`. Autoavaliação conforme fluxo de review, sem aprovação independente ou alteração de `docs/review.md`.
+
+- Aceite 1: subida e remoção fixam `-p planner-test`; limpeza delega à mesma remoção. Resolução real com `docker compose --env-file /dev/null -f compose.test.yaml -p planner-test config --format json` retornou `name: planner-test` nos três ambientes: `COMPOSE_PROJECT_NAME` ausente, `planner` e `unrelated-project`. Somente `config` real foi executado sob ambiente adverso; não houve up/down real contra desenvolvimento.
+- Aceite 2: `python3 scripts/test_compose_test.py` executa receitas Just reais copiadas em diretório temporário, com Docker e ferramentas dos gates interceptados. Confere uma única operação Compose, identidade explícita, arquivo, env-file, ação e descarte na remoção; cobre up/down/clean nos três ambientes. Fase vermelha comprovada antes da correção: 12 subcasos falharam pela ausência de identidade explícita e três pela ausência da regressão no gate. Após a correção, três testes com 15 subcasos passaram.
+- Aceite 3: regressão verifica também `test`, `ci` e `precommit` usando a subida isolada. Falha simulada do novo teste retorna saída não zero em `tooling-test`, `ci` e `check`, antes de Mix/E2E. `just tooling-test` passou com três testes novos e quatro testes existentes do runner; `just check` inclui ambos. Operação e configuração descritas no README; receitas de desenvolvimento preservadas.
+- Aceite 4: após consulta a `mix help ci` e `mix help precommit`, `just check` passou com 245 testes ExUnit, cobertura acima do gate de 70% inalterado, Credo, formato/compilação, assets, testes JavaScript, auditoria npm e toda a suíte E2E atual (dois cenários públicos). `just precommit` passou com 245 testes. `git diff --check` passou. O gate emitiu avisos de redefinição de módulos de migrations, mas concluiu com saída zero; nenhuma migration foi alterada.
+
+Artefatos E2E: `tmp/e2e/run-sdGEO2t9/`, com logs, relatório HTML, resultados, `exit-code.txt` igual a zero e confirmação de remoção dos containers/rede próprios em `cleanup.log`. Cenários: login conectado pela home e proteção do planejamento para visitantes. Limites: testes simulados verificam seleção/operação das receitas, não o daemon; resolução real do Compose complementa essa evidência. Cobertura ExUnit não mede os scripts Python; estes possuem regressão comportamental própria. Os dois cenários públicos não comprovam fluxos autenticados da TASK-056, nem execução do CI remoto.
+
+Conclusão da autoavaliação: critérios atendidos, sem achado bloqueante no diff. Entrega pronta para conferência operacional e commit pelo coordenador no diretório compartilhado; `done` e encerramento do BLOCK-006 dependem dessa integração. R7 permanece sujeito à revalidação independente.

@@ -27,10 +27,10 @@ db-logs:
 
 # Start a separate disposable database for ExUnit.
 db-test-up:
-    docker compose --env-file /dev/null -f compose.test.yaml up --wait --wait-timeout 60
+    docker compose --env-file /dev/null -f compose.test.yaml -p planner-test up --wait --wait-timeout 60
 
 db-test-down:
-    docker compose --env-file /dev/null -f compose.test.yaml down --volumes
+    docker compose --env-file /dev/null -f compose.test.yaml -p planner-test down --volumes
 
 db-test-clean: db-test-down
 
@@ -64,6 +64,7 @@ js-test:
     node --test assets/test/task_drag.test.mjs assets/js/account_theme.test.mjs
 
 tooling-test:
+    python3 scripts/test_compose_test.py
     python3 scripts/e2e_runner_test.py
 
 # Build, run, collect evidence and clean isolated E2E resources.

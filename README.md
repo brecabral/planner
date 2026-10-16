@@ -6,7 +6,7 @@ A aplicação usa Phoenix, Elixir e PostgreSQL. O servidor roda na máquina; o b
 
 ## Como rodar
 
-Requer Elixir compatível com `mix.exs` (`~> 1.17`), Erlang/OTP compatível, Node.js/npm para as dependências de frontend Just, Bash, GNU coreutils (`timeout`) e Docker ativo com Compose que suporte `up --wait`. Python 3 é usado somente nos testes do runner.
+Requer Elixir compatível com `mix.exs` (`~> 1.17`), Erlang/OTP compatível, Node.js/npm para as dependências de frontend Just, Bash, GNU coreutils (`timeout`) e Docker ativo com Compose que suporte `up --wait`. Python 3 é usado nos testes de tooling.
 
 ```sh
 cp .env.example .env
@@ -35,7 +35,7 @@ Abra [localhost:4000](http://localhost:4000). Para usar o console interativo, ex
 | `just ci` | Qualidade Elixir, cobertura mínima de 70%, assets, testes JavaScript e auditoria npm. |
 | `just precommit` | Sobe banco de teste e executa o alias Mix de formatação, compilação e testes. |
 | `just js-test` | Instala frontend pelo lockfile e testa arraste e sincronização de tema. |
-| `just tooling-test` | Testa falhas, interrupção, isolamento e coleta do runner sem Docker. |
+| `just tooling-test` | Testa isolamento das receitas de banco e falhas, interrupção e coleta do runner com Docker simulado. |
 | `just e2e` | Constrói imagens, sobe banco/app isolados, executa toda a suíte, coleta evidências e derruba os recursos. |
 | `just check` | Executa qualidade e E2E para revisão de código/autoavaliação. |
 | `just status` / `just diff` / `just tasks` | Inspeção de alterações e cabeçalhos do plano para qualquer perfil. |
@@ -53,7 +53,7 @@ Após atualizar o código de uma instalação existente, aplique as migrations c
 
 Mix e Compose leem o `.env`, ignorado pelo Git. Variáveis exportadas no processo têm precedência. Use `KEY=value` sem aspas, espaços, interpolação ou comentários ao final; linhas vazias e comentários em linhas próprias são aceitos.
 
-O Compose usa PostgreSQL 17, publica a porta apenas em `127.0.0.1` e preserva dados no volume `postgres_data`. As receitas Just aguardam o healthcheck por até 60 segundos e interrompem a execução se o banco falhar. O banco de desenvolvimento é persistente. `just test`, `just ci` e `just precommit` usam outro projeto Compose (`planner-test`), com PostgreSQL em memória na porta 55432 e credenciais sintéticas. `PLANNER_TEST_PORT` permite mudar essa porta. Esses comandos mantêm o banco de teste disponível; `just db-test-down` o remove. Testes paralelos acrescentam `MIX_TEST_PARTITION` ao nome da base.
+O Compose usa PostgreSQL 17, publica a porta apenas em `127.0.0.1` e preserva dados no volume `postgres_data`. As receitas Just aguardam o healthcheck por até 60 segundos e interrompem a execução se o banco falhar. O banco de desenvolvimento é persistente. `just test`, `just ci` e `just precommit` usam outro projeto Compose (`planner-test`), com PostgreSQL em memória na porta 55432 e credenciais sintéticas. A opção de projeto nas receitas fixa `planner-test` mesmo quando `COMPOSE_PROJECT_NAME` está exportado; subida, parada e limpeza usam essa mesma identidade, com arquivo Compose e env-file explícitos. `PLANNER_TEST_PORT` permite mudar essa porta. Esses comandos mantêm o banco de teste disponível; `just db-test-down` o remove. Testes paralelos acrescentam `MIX_TEST_PARTITION` ao nome da base.
 
 Alterar credenciais no `.env` não altera um volume já inicializado: ajuste também o usuário no banco existente. Para CI ou banco externo, exporte as variáveis de conexão de `.env.example` e use Mix diretamente; `PLANNER_SKIP_COMPOSE` foi removida. Produção usa `config/runtime.exs` e não inicia Compose automaticamente.
 
