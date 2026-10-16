@@ -4,7 +4,7 @@ status: "planned"
 execution_level: "advanced"
 execution_rationale: "Consolida contratos transversais de autenticação, isolamento, tarefas e persistência no artefato local final."
 specs: ["SPEC-002", "SPEC-004", "SPEC-005", "SPEC-007", "SPEC-008"]
-depends_on: ["TASK-011"]
+depends_on: ["TASK-058"]
 provides: ["verified-local-release"]
 consumes: ["release-scaffold"]
 write_scope: ["test/", "docs/specs/", "README.md", "docs/tasks/050-aceite-mvp-producao.md"]
@@ -27,3 +27,7 @@ Verificar CA17–CA19/CA16 do PRD e SPEC-008 RN02–RN05/CA-008-02–04 no relea
 ## Execução, validação e conclusão
 
 Antes de iniciar, conferir dependências integradas e specs prontas. Aplicar o fluxo de implementação, TDD enxuto aos comportamentos alterados e referências técnicas pertinentes. Consultar a ajuda Mix antes de tarefas/geradores. Registrar autoavaliação pelo fluxo de review, testes/gates executados e limites; finalizar com `mix precommit` e `mix ci` conforme README, mantendo cobertura mínima de 70%. Mudança em hook exige também teste JavaScript documentado; LiveViewTest não executa navegador. Revisão independente não é gate adicional automático. Registrar commit de integração e conferência operacional antes de `done`; documentação pronta não comprova implementação. Não publicar nem iniciar consumidoras automaticamente.
+
+## Reconciliação de R7 — 16/10/2026
+
+Aguardar a TASK-058 para usar os gates locais com isolamento corrigido, conforme [BLOCK-006](../blocks/006-isolamento-compose-teste.md). Dependências anteriores continuam alcançáveis pela cadeia; nenhuma implementação ou validação adicional nesta rodada.

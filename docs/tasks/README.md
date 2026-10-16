@@ -101,7 +101,7 @@ Compra de temas, preços, loja e pagamentos serão decompostos depois de decisõ
 
 ## Retomada após revisão de 13/10/2026
 
-Reconciliação de R6 em 16/10/2026: TASK-051 e TASK-011 estão integradas; BLOCK-005 foi encerrado. TASK-050 está elegível para consolidar os aceites locais. R3 foi revalidado pelo revisor; R4/R5 já foram reconciliados. As evidências históricas permanecem nas tarefas e no Git; a limpeza do relatório atual não concede aprovação retroativa.
+Reconciliação de R6 em 16/10/2026: TASK-051 e TASK-011 estão integradas; BLOCK-005 foi encerrado. A elegibilidade da TASK-050 passa a depender também da correção de R7, conforme cabeçalho atual. R3 foi revalidado pelo revisor; R4/R5 já foram reconciliados. As evidências históricas permanecem nas tarefas e no Git; a limpeza do relatório atual não concede aprovação retroativa.
 
 ## Correções de login e temas — 14/10/2026
 
@@ -117,3 +117,7 @@ Ambas estão integradas, conforme registros das tarefas. O responsável confirmo
 - [057 — Tornar E2E obrigatório no GitHub CI](057-e2e-github-ci.md): executa a suíte no check `quality` existente.
 
 Sequência 055 → 057 → 056 serializa README e configuração compartilhada. A 055 integrou o runner local. A 057 fornece infraestrutura própria no GitHub; a 056 amplia cenários públicos para autenticados. Não há nova tarefa humana nem alteração da proteção remota: a TASK-003 já tem aceite humano. Política de uso por front e revisores no [PRD](../prd.md#e2e-obrigatório--decisão-de-16102026); decisões em D20. Entregas históricas permanecem com suas evidências originais.
+
+## Correção de R7 — planejamento de 16/10/2026
+
+[058 — Fixar isolamento do projeto Compose de teste](058-isolar-projeto-compose-teste.md) corrige a identidade herdada nas operações de teste e acrescenta regressão segura. Diagnóstico e condição de retomada no [BLOCK-006](../blocks/006-isolamento-compose-teste.md). O incremento parte das entregas 055/057 já integradas, sem exigir sua aprovação independente prévia. A TASK-058 precede TASK-056 e TASK-050; ambas aguardam a correção. A sequência anterior de tooling foi atualizada nos cabeçalhos, fonte única do grafo. Planejamento não encerra R7 nem comprova correção.

@@ -53,3 +53,7 @@ Coordenador `/root`: registro, gates relatados, ausência de impedimentos e inte
 ## Revisão independente — 16/10/2026
 
 Revisor `/root`, alvo `e1909ea52d038baf9336158d6f9a377df5bf1537`, base `a55f55679f15f398a7c9541e66e5d5e11a604501`. Relatório em [docs/review.md](../review.md#segurança-do-just-ci-e-execução-por-agentes--16102026): `changes_requested` no escopo conjunto por R7, colisão de projeto Compose de teste quando `COMPOSE_PROJECT_NAME` é herdado (TASK-055). `just check` aprovado: 245 testes ExUnit, gate de cobertura de 70%, qualidade/JS/audit e dois E2E. CI remoto não verificado; `gh` ausente. Estado de integração preservado, sem aprovação independente implícita ou correção de código.
+
+## Encaminhamento de R7 — 16/10/2026
+
+Correção delimitada na [TASK-058](058-isolar-projeto-compose-teste.md), com diagnóstico e retomada no [BLOCK-006](../blocks/006-isolamento-compose-teste.md). Estado de entrega integrada preservado; R7 e o parecer independente permanecem abertos. As liberações de fila registradas acima são históricas: consultar os cabeçalhos atuais das consumidoras.

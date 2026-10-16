@@ -4,7 +4,7 @@ status: "planned"
 execution_level: "advanced"
 execution_rationale: "Prepara identidade isolada e valida interações reais entre hooks, LiveView e persistência."
 specs: ["SPEC-002", "SPEC-004", "SPEC-005", "SPEC-007"]
-depends_on: ["TASK-057", "TASK-054", "TASK-040"]
+depends_on: ["TASK-058", "TASK-054", "TASK-040"]
 provides: ["e2e-authenticated-suite"]
 consumes: ["e2e-runner", "navbar-theme-selection"]
 write_scope: ["assets/e2e/", "assets/playwright.config.ts", "compose.e2e.yaml", "test/support/e2e/", "README.md", "docs/tasks/056-cenarios-e2e.md"]
@@ -33,3 +33,7 @@ Não corrigir silenciosamente defeitos de produto: se a suíte revelar falha pre
 ## Validação e entrega
 
 Consultar ajuda Mix e operação no README. Aplicar TDD enxuto aos comportamentos novos, executar gates existentes com cobertura mínima de 70% preservada e E2E completo. Registrar comandos, alvo, resultados, evidências por critério e limitações; autoavaliação pelo fluxo de review, sem aprovação independente implícita. Conferência operacional e commit integrado são necessários antes de `done`. Estado inicial: planejada, sem implementação ou validação executada neste planejamento.
+
+## Reconciliação de R7 — 16/10/2026
+
+Aguardar a TASK-058 para usar os gates locais com isolamento corrigido, conforme [BLOCK-006](../blocks/006-isolamento-compose-teste.md). Dependências anteriores continuam alcançáveis pela cadeia; nenhuma implementação ou validação adicional nesta rodada.

@@ -22,6 +22,10 @@ Local: `justfile:30` e `justfile:33`, introduzidos pela TASK-055; `compose.test.
 
 Reprodução segura, somente resolução de configuração: `rtk env COMPOSE_PROJECT_NAME=planner docker compose --env-file /dev/null -f compose.test.yaml config --format json` retornou `name: planner`, rede `planner_default` e serviço `postgres`. Nenhuma subida/remoção foi executada com essa variável. Correção esperada: fixar explicitamente a identidade exclusiva do projeto de teste em todas as operações, sem aceitar silenciosamente o nome herdado do desenvolvimento; acrescentar regressão com ambiente adverso e conferir que up/down selecionam o mesmo projeto de teste.
 
+### Encaminhamento de planejamento — 16/10/2026
+
+R7 aceito como falha do contrato de isolamento. Correção definida na [TASK-058](tasks/058-isolar-projeto-compose-teste.md), com condição de retomada no [BLOCK-006](blocks/006-isolamento-compose-teste.md). TASK-056 e TASK-050 aguardam essa entrega. Este encaminhamento é documental: R7 permanece aberto, `changes_requested` e os SHAs da revisão são preservados. Correção validada e integrada permite a retomada operacional; aprovação independente depende de revalidação do revisor.
+
 ### CI local e remoto
 
 O gate local é satisfatório para o escopo já entregue, exceto pelo isolamento de R7: `just check` executa qualidade, cobertura, assets, JS, auditoria npm, testes do runner e E2E. `just ci` e `just precommit` isoladamente não substituem esse gate completo. A suíte de navegador atual contém apenas dois cenários públicos; autenticação, arraste e temas continuam pendentes na TASK-056, conforme contrato, sem atribuir essa ausência como regressão da TASK-057.
