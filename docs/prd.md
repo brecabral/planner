@@ -119,4 +119,4 @@ Nome público passa a **Just Three**. A marca usa três traços horizontais para
 
 ## Idiomas pela engrenagem — 17/10/2026
 
-O responsável autorizou troca de idioma funcional pela engrenagem entre tema e saída, abrangendo todos os textos da interface. Marca e conteúdo do usuário são preservados. SPEC-001 descreve a evolução em draft, pendente de idiomas iniciais e persistência. TASK-013/014 deixam de ser evolução genericamente adiada e passam a incremento solicitado, ainda bloqueado pelas duas decisões. TASK-059 inclui A fazer e permanece independente dessas respostas.
+O responsável autorizou troca de idioma funcional pela engrenagem entre tema e saída, abrangendo todos os textos da interface. Marca e conteúdo do usuário são preservados. SPEC-001 descreve a evolução em draft, com português do Brasil e inglês confirmados e seletor também no login/Criar conta; pendente apenas de persistência e precedência. TASK-013/014 deixam de ser evolução genericamente adiada e passam a incremento solicitado, ainda bloqueado pela decisão de persistência/precedência. TASK-059 inclui A fazer e permanece independente dessa resposta.

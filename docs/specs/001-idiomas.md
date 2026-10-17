@@ -39,6 +39,9 @@ O contrato pt-BR acima permanece histórico e implementado. O responsável autor
 - RN07: HTTP e processos LiveView resolvem o mesmo locale, inclusive em navegação, patch, recarga e reconexão. A troca preserva rota, painel de cadastro aberto, valores digitados, erros e dados do planejamento; textos já renderizados e mensagens armazenadas precisam ser reconstruídos no novo idioma. Não compartilhar locale global entre usuários.
 - RN08: locale não permitido é rejeitado sem mudança da seleção. Gravação pendente impede envios repetidos; falha mantém idioma confirmado e mostra erro nele. Preferência de idioma não altera tema, sessão autenticada, tarefas, labels ou cota.
 
+- RN09: oferecer exatamente Português (Brasil) (`pt_BR`, HTML `pt-BR`) e English (`en`, HTML `en`), conforme confirmação do responsável. Inglês usa as mensagens-base completas; pt-BR usa catálogo traduzido, incluindo “A fazer”. Sem preferência anterior, iniciar em pt-BR; não detectar idioma do navegador automaticamente.
+- RN10: login (`/users/log-in`) e Criar conta (`/join`, incluindo acesso por `/users/register`) oferecem controle visível “Idioma” com as duas opções, utilizável sem autenticação. Não depender da engrenagem autenticada nem adicionar tema/saída às páginas públicas. Trocar idioma mantém URL e entradas do formulário, traduz textos e erros existentes e os produzidos depois da troca. Navegar entre login e cadastro conserva a escolha pública; recarga/reconexão também a preserva. O mecanismo e a precedência após login dependem da decisão de persistência abaixo.
+
 ### Aceites da evolução
 
 - CA-I04: autenticado, abrir engrenagem exibe idiomas permitidos e seleção atual; escolher cada idioma troca todos os textos de RN05 e `lang`. Fechar sem escolher não altera estado. Tema, configurações e saída mantêm ordem e alinhamento nos dois tamanhos de viewport.
@@ -46,9 +49,10 @@ O contrato pt-BR acima permanece histórico e implementado. O responsável autor
 - CA-I06: navegar, aplicar patch, recarregar e reconectar mantém a preferência conforme a persistência definida. Duas sessões de usuários diferentes não contaminam locales. Payload inválido e falha de gravação preservam idioma anterior e permitem nova tentativa.
 - CA-I07: suíte versionada verifica catálogos sem traduções vazias ou fuzzy para os idiomas oferecidos, plurais, erros e textos dinâmicos. E2E percorre páginas e estados representativos em todos os idiomas; não considerar apenas a troca do rótulo ou `lang` como tradução completa.
 
+- CA-I08: em sessão não autenticada, visitar login e `/join`, alternar Português (Brasil) ↔ English e verificar títulos, campos, botões, instruções, validações e `lang`. Navegar pelos links entre telas, recarregar/reconectar e entrar por `/users/register` conserva a escolha. Trocar com e-mail preenchido e erro visível mantém a entrada e traduz o erro. Validar nas duas larguras (320/1280 px), sem exibir controles autenticados.
+
 ### Decisões pendentes
 
-- Idiomas oferecidos inicialmente: perguntado ao responsável; opções sugeridas pt-BR/en ou pt-BR/en/es.
-- Persistência: perguntado ao responsável; conta entre dispositivos ou apenas navegador. Essa escolha deve definir precedência, páginas públicas, logout e troca de conta antes de liberar implementação.
+- Persistência: perguntado ao responsável; conta entre dispositivos ou apenas navegador. A escolha pública já deve ser conservada entre login e cadastro; resta definir armazenamento durável e precedência ao entrar, sair e trocar de conta. Recomendação ainda não aprovada: preferência por conta após login e preferência no navegador antes da autenticação.
 
-Não há autorização para inventar idiomas ou persistência; TASK-013/014 permanecem bloqueadas por essas decisões. TASK-059 é independente e continua elegível.
+Idiomas e seletor público estão confirmados; TASK-013/014 permanecem bloqueadas somente pela definição de persistência e precedência. TASK-059 é independente e continua elegível.
