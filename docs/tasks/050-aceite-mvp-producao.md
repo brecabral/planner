@@ -1,6 +1,6 @@
 ---
 id: "TASK-050"
-status: "in_progress"
+status: "in_review"
 execution_level: "advanced"
 execution_rationale: "Consolida contratos transversais de autenticação, isolamento, tarefas e persistência no artefato local final."
 specs: ["SPEC-002", "SPEC-004", "SPEC-005", "SPEC-007", "SPEC-008"]
@@ -43,3 +43,32 @@ Execução interrompida na análise inicial, sem mudança de código ou novos te
 ## Reconciliação do BLOCK-007 — 17/10/2026
 
 Decisão explícita do responsável remove o aceite de persistência após reinício do release. CA-008-03 foi retirado e os critérios 1/3 foram ajustados; não há integração de controle de reinício a produzir. A estrutura é responsabilidade das migrations do Ecto, conforme SPEC-008 RN03. O diagnóstico acima permanece histórico. BLOCK-007 resolvido pela retirada do requisito; tarefa permanece `in_progress`, na análise inicial, com os demais aceites e gates pendentes. Nenhuma execução ou aprovação técnica nesta reconciliação.
+
+## Entrega e autoavaliação — 17/10/2026
+
+Implementador `/root/task050`, base/alvo de código `50a50b7f6fddedc68f14227ef14d63cad4ab0470`, árvore inicialmente limpa. BLOCK-007 resolvido por decisão explícita; dependências integradas. A consolidação reutilizou testes automatizados versionados existentes, sem alterar comportamento ou criar testes redundantes. Alterações próprias: pontos concretos de configuração posterior de e-mail no README e este relatório. Não houve script avulso de aceite, reinício de release ou envio externo.
+
+| Critério / aceite | Evidência executada nesta rodada |
+| --- | --- |
+| 1 — CA17, CA-005-07/09/12/13, CA-008-02 | `local_magic_link_test.exs` captura destinatário/URL com adapters Test e Local, cadastra duas contas, entra/sai e recupera a primeira conta com seus dados. O caso de falha de cadastro conserva uma única conta/concessões, não autentica, apresenta erro e recupera login pelo mesmo e-mail após restaurar o adapter. `authentication_flow_test.exs` verifica home, confirmação, CSRF e logout. Todos aprovados nos gates completos. |
+| 1 — CA-005-08/10/11 | `accounts_auth_test.exs`, `accounts_auth_concurrency_test.exs`, `accounts_auth_migration_test.exs` e `private_planning_test.exs` verificam expiração/uso único/revogação, consumo concorrente, migration aditiva do legado, isolamento de consultas e todos os comandos, cota independente e rejeição de sessão revogada na reconexão. Aprovados. |
+| 2 — CA19, CA-002-12/13/14, CA-004-14/15/16 | `task_movement_test.exs`, `task_deletion_test.exs`, `tasks_test.exs` e `live/task_live_test.exs` cobrem retry → backlog no início/meio/fim/vazio e pelo menu, cota esgotada, virada, rejeições, rollback injetado, exclusão por lista, labels preservadas, restituição única e histórico não excluível. Corridas reais em conexões distintas cobrem retry/menu e exclusão/devolução/conclusão. E2E verifica menu, mouse/touch, exclusão/cancelamento, cota, histórico e recarga. Aprovados. |
+| 2 — CA18, CA-007-01/02/03/04/05/06/07 | `themes_test.exs`, `themes_storage_test.exs` e `theme_test.exs` verificam concessões gratuitas, concorrência/falhas de gravação, propriedade, seleção persistida, patches/reconexão/novo dispositivo e logout. E2E desktop/320 px alterna ambos os temas com teclado, verifica cores computadas, recarga, patches, logout e segunda conta. Aprovados. |
+| 3 — CA16, CA-008-02/04 | Runner E2E construiu e iniciou o release sobre PostgreSQL descartável com configuração externa, aplicou as migrations e executou nove cenários no Chromium, incluindo smoke público e planejamento autenticado. `local_magic_link_test.exs` comprova ausência das rotas dev e desativação da mailbox na configuração prod; isso é evidência da aplicação/configuração, não nova requisição HTTP a essas rotas no container. README identifica `runtime.exs`, `prod.exs` e `user_notifier.ex` para configuração posterior de adapter/credenciais/remetente. |
+| 4 — falhas, escopo e limites | Gates sem falhas; nenhuma feature, adapter ou camada adicionada. Sem revisão independente, publicação ou infraestrutura remota. CA-008-03 retirado não foi exigido nem declarado executado. |
+
+### Gates e artefato
+
+- Ajudas `mix help test`, `mix help precommit` e `mix help ci` consultadas. `rtk just precommit`: **245 testes aprovados**, seed 486390.
+- `rtk just ci`: **245 testes aprovados**, seed 31846; compilação/formato/Credo estrito aprovados, **7 testes de tooling** aprovados, build de assets, testes JavaScript de arraste/tema e auditoria npm aprovados. Gate de cobertura **mínima de 70% aprovado sem alteração do limiar**. Métricas visíveis: Tasks 97,94%, TaskLive.Index 98,71%, UserAuth 98,18%, Themes e UserToken 100%. O resumo total foi condensado pelo RTK e não é reproduzido como número não observado. HTML de cobertura em `cover/`. `Planner.Release` aparece com 0% na instrumentação ExUnit; execução das migrations no artefato é evidenciada pelo runner E2E, não contabilizada nessa métrica.
+- `rtk just e2e`: **9/9 aprovados em 18,8 s**, sem retries; exit code **0**, coleta e limpeza aprovadas. Artefatos em `tmp/e2e/run-sHktvPdg/`, incluindo `build.log`, `startup.log`, `containers.log`, `tests.log`, `cleanup.log`, `exit-code.txt` e `playwright-report/index.html`.
+- Release **0.1.0**, imagem local `planner-e2e-run-shktvpdg-app:latest`, manifest `sha256:5c374a0aa134cfaab342e7e88917caa3cde057c93f2c76206c4b9a3e4735d890`. Banco `planner_e2e` em tmpfs, rede interna exclusiva, credenciais sintéticas e configuração do Compose sem `.env` de desenvolvimento; nenhuma porta/volume de desenvolvimento compartilhado. O build reutilizou cache válido. Logs confirmam migrations antes do servidor e dos testes.
+- Inspeção do Dockerfile, `.dockerignore`, `Planner.Release` e configurações confirma runtime separado como `nobody`, cópia apenas do release compilado, exclusões de segredos locais e migration sem seed/reset. O smoke E2E atual comprova aplicação/JS/CSS funcionais no artefato; inspeção documental não é alegada como nova varredura do filesystem do container.
+
+### Parecer e limites
+
+Autoavaliação pelo fluxo de review: **approved nos critérios vigentes**, sem achado bloqueante nesta consolidação. Não é revisão independente e não altera o parecer histórico em `docs/review.md`. Diff documental conferido e `git diff --check` aprovado. Nenhuma alteração de produção após os gates.
+
+ExUnit/LiveViewTest e Swoosh comprovam os fluxos de cadastro e e-mail sem entrega externa; E2E autentica contas sintéticas pela confirmação normal, mas seus tokens são preparados pela fixture privada, sem provedor. Retry → backlog, concorrência, rollback e expiração têm evidência na suíte da aplicação, não gesto específico de retry no navegador. Chromium verifica mouse e eventos touch em contexto móvel, sem hardware físico, outros navegadores ou avaliação estética humana. Persistência após reinício e durabilidade do banco não integram o aceite vigente. CI remoto não executado; testes locais não comprovam publicação.
+
+Entrega `in_review`, aguardando conferência operacional e commit do coordenador. Nenhum staging/commit pelo implementador; arquivos próprios limitados a `README.md` e esta tarefa.

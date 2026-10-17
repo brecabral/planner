@@ -79,6 +79,8 @@ A mailbox guarda mensagens em memória e é esvaziada ao reiniciar a aplicação
 
 `/dev/mailbox` e `/dev/dashboard` só são habilitados em desenvolvimento e ficam ausentes na configuração de produção. O teste local valida a aplicação, mas não comprova entrega externa, reputação de remetente ou configuração de domínio. O usuário pode configurar posteriormente o adapter Swoosh, as credenciais e o remetente do provedor real. Essa configuração e a publicação estão fora da entrega de código; o adapter local não envia e-mail externo.
 
+Os pontos existentes para essa configuração são `config/runtime.exs` (adapter de `Planner.Mailer` e credenciais externas), `config/prod.exs` (cliente HTTP do Swoosh, quando necessário) e `lib/planner/accounts/user_notifier.ex` (remetente atual `Planner <contact@example.com>`). O remetente é definido no código; não há variável de ambiente para substituí-lo. `PHX_HOST` em produção define o host dos links, com HTTPS na URL pública. Os exemplos comentados de adapter não representam um provedor configurado. Não coloque credenciais no repositório nem habilite as rotas de desenvolvimento no release para capturar mensagens.
+
 ## Temas por conta
 
 O seletor **Tema** no painel oferece **Claro** e **Escuro**, gratuitos para todas as contas. A escolha é confirmada após salvar e acompanha a conta em recargas e novos dispositivos. Login e páginas públicas usam claro; preferências antigas do navegador não são aplicadas. Falhas conservam o último tema confirmado e mostram uma mensagem.
