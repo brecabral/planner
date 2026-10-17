@@ -80,3 +80,8 @@ Decisão do responsável em 17/10/2026: criação e evolução de tabelas, índi
 ## D22 — Identidade pública Just Three
 
 Decisão de 17/10/2026: marca Just Three com três linhas horizontais iguais, usando o sistema de ícones existente (por exemplo `hero-bars-3`), no lugar do check. Tema usa peça de quebra-cabeça e saída usa símbolo de encerramento de sessão. Preservar paletas semânticas, fontes e contratos de domínio. Os controles ficam lado a lado e centralizados na mesma altura. Detalhes observáveis em SPEC-004 RN21–RN24 e SPEC-007 RN09–RN10. Não renomear módulos, aplicação OTP, banco, rotas ou códigos `planner`/`planner_dark`: identidade pública não exige migração técnica. TASK-059 é a produtora única desta atualização de interface.
+
+
+## D23 — Preparação de troca de idioma
+
+Pedido de 17/10/2026 amplia a decisão de locale fixo conforme SPEC-001: manter Gettext, mensagens-base em inglês e catálogos completos; resolver locale por requisição e por processo LiveView. TASK-013 é produtora única da preferência/resolução; TASK-014 produz catálogos e engrenagem entre tema e saída. Esta composição substitui a adjacência imediata dos controles descrita em D22, mantendo alinhamento. Idiomas, persistência e precedência permanecem pendentes; não escolher armazenamento por inferência. Nenhuma alteração de dados de tarefas ou fuso.

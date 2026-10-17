@@ -98,6 +98,9 @@ Origem: pedido explícito do responsável para adotar Just Three, remeter às tr
 - CA-004-17: ao visitar as telas de RN21, a marca pública e os títulos que nomeiam o produto usam Just Three; a marca tem três traços, não check. Acionar a marca conserva a navegação existente. Conteúdo de tarefas e labels com a palavra Planner permanece intacto.
 - CA-004-18: autenticado em `/tasks` e `/tasks/new`, não há título de marca acima de Hoje; Hoje, cota e Nova tarefa permanecem funcionais. Os ícones de tema e saída ficam na mesma altura nos dois tamanhos definidos em RN24. Acionar saída encerra a sessão e aplica o destino público e tema claro já contratados.
 
-### Tradução de backlog — proposta editorial, fora do aceite da TASK-059
+### Tradução de backlog — aprovada em 17/10/2026
 
-Recomendação: **A fazer**, por ser curto e natural para a lista de tarefas disponíveis para seleção. “Pendências” também abrangeria Hoje e Retry; “Reserva” pode sugerir algo opcional. A fazer ainda é uma categoria ampla, mas a separação visual de Hoje e Retry fornece contexto. Se aprovado, aplicar consistentemente ao título, estados vazios e ações (por exemplo, “Enviar para A fazer”), mantendo `backlog` no domínio. O pedido solicita avaliar uma tradução; não confirma uma escolha. Conservar a tradução atual nesta entrega; esta proposta não bloqueia a identidade e os controles.
+- RN25: o rótulo pt-BR de backlog passa a “A fazer” em títulos, estados vazios, ações, confirmações e mensagens da interface. Usar “Enviar para A fazer” e “Devolver para A fazer” quando aplicável. Manter `backlog` como identificador técnico e preservar conteúdo do usuário.
+- CA-004-19: em pt-BR, painel vazio ou preenchido, menu de retry, devolução de Hoje e mensagens dessas operações usam A fazer consistentemente, sem texto editorial Backlog. Uma tarefa ou label chamada Backlog permanece intacta. Transferências e cota mantêm o comportamento existente.
+
+Entrega: TASK-059. O seletor de idioma posterior da TASK-014 acrescenta engrenagem entre tema e saída, conservando o alinhamento de RN24.

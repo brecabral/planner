@@ -90,8 +90,6 @@ Cadastro aberto e dados antigos isolados foram confirmados. Exclusão preserva c
 
 | Evolução | Tarefa |
 | --- | --- |
-| Locale variável em LiveView | [013](013-locale-liveview.md) |
-| Seletor de idioma | [014](014-seletor-idioma.md) |
 | Fuso configurável na conta | [004](004-configuracao-dia.md) |
 | Gerenciamento de fuso | [017](017-formulario-fuso.md) |
 | Atualização automática do painel | [031](031-atualizar-dia-liveview.md) |
@@ -125,4 +123,9 @@ Sequência 055 → 057 → 056 serializa README e configuração compartilhada. 
 
 ## Identidade Just Three — plano de 17/10/2026
 
-[TASK-059 — Aplicar identidade Just Three e controles por ícone](059-identidade-just-three.md): nível `standard`, depende da TASK-056 integrada, com TASK-054 ancestral. Produtora única da marca, remoção do título redundante e controles de tema/saída. Elegível na base deste planejamento; ainda não implementada. “A fazer” permanece proposta editorial fora da tarefa.
+[TASK-059 — Aplicar identidade Just Three e controles por ícone](059-identidade-just-three.md): nível `standard`, depende da TASK-056 integrada, com TASK-054 ancestral. Produtora única da marca, remoção do título redundante e controles de tema/saída. Elegível na base deste planejamento; ainda não implementada. Inclui a tradução aprovada “A fazer”.
+
+
+## Idiomas — retomada de 17/10/2026
+
+Sequência planejada: TASK-059 → [TASK-013](013-locale-liveview.md) → [TASK-014](014-seletor-idioma.md). A 013 (`advanced`) fornece preferência e resolução isolada de locale; a 014 (`standard`) fornece catálogos completos e engrenagem funcional entre tema e saída. A SPEC-001 está draft aguardando idiomas iniciais e persistência. Não executar 013/014 até resolver essas decisões e integrar dependências; a 059 continua elegível.

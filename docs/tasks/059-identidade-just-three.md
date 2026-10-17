@@ -15,7 +15,7 @@ blockers: []
 
 ## Objetivo e limites
 
-Entregar SPEC-004 RN21–RN24/CA-004-17–18 e SPEC-007 RN09–RN10/CA-007-08. Uma única tarefa produz a marca e os controles compartilhados, evitando conflito entre layout, painel e testes. Não implementar a proposta de tradução de backlog; não alterar cota, autenticação, catálogo, códigos de temas, dados, nomes técnicos ou paletas.
+Entregar SPEC-004 RN21–RN25/CA-004-17–19 e SPEC-007 RN09–RN10/CA-007-08. Uma única tarefa produz a marca e os controles compartilhados, evitando conflito entre layout, painel e testes. Aplicar “A fazer” consistentemente na interface pt-BR, preservando conteúdo do usuário. A engrenagem de idioma será produzida pela TASK-014 após esta entrega. Não alterar cota, autenticação, catálogo, códigos de temas, dados, nomes técnicos ou paletas.
 
 ## Contexto de entrada
 
@@ -26,7 +26,7 @@ Entregar SPEC-004 RN21–RN24/CA-004-17–18 e SPEC-007 RN09–RN10/CA-007-08. U
 
 ## Entrega e aceite
 
-1. Marca Just Three nas superfícies especificadas, três traços no símbolo e remoção apenas do título redundante acima de Hoje. Preservar Nova tarefa e conteúdo do usuário.
+1. Marca Just Three nas superfícies especificadas, três traços no símbolo e remoção apenas do título redundante acima de Hoje. Preservar Nova tarefa e conteúdo do usuário. Traduzir backlog como A fazer conforme RN25/CA-004-19 e cobrir títulos, menus e mensagens por testes versionados.
 2. Saída por ícone mantendo método/rota e nome acessível; tema por quebra-cabeça abre e fecha opções conforme RN09. Teclado, seleção atual, estado de gravação e falha seguem contrato.
 3. Atualizar testes versionados de estrutura/LiveView e hook conforme comportamento afetado. E2E deve cobrir marca em páginas públicas e autenticadas, ausência do título redundante, funcionamento de Nova tarefa, abertura/fechamento do menu, alternância real de paleta, persistência e logout pelo novo ícone. Conferir alinhamento dos centros dos controles em 320 e 1280 px no navegador, com tolerância de 1 px. Preservar cobertura de erro e isolamento; não substituir asserções de CSS efetivo por apenas `data-theme`.
 4. Autoavaliação pelo fluxo de review, suíte E2E completa e `mix precommit` conforme README, mantendo cobertura mínima de 70%. Testes exclusivamente na suíte versionada; sem auditoria geral de acessibilidade ou testes manuais adicionais.

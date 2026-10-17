@@ -98,7 +98,7 @@ O trabalho dos agentes termina no código Phoenix funcional e no release local v
 ## 8. Evolução após o MVP de produção
 
 - RF15: adição de créditos a usuários na TASK-049; loja, preços e compra de temas vêm depois. Propriedade futura aproveita as concessões da SPEC-007. Não há saldo, cobrança, pagamento ou loja no MVP de produção.
-- RF09 / CA14: fuso por conta (TASK-004/017), seletor de idioma (TASK-013/014) e atualização automática (TASK-031) continuam adiados.
+- RF09 / CA14: fuso por conta (TASK-004/017) e atualização automática (TASK-031) continuam adiados. Idiomas (TASK-013/014) foram retomados em 17/10/2026, conforme decisão abaixo.
 - Equipes, integrações, recorrência, IA, reabertura, edição/exclusão de labels e gestão completa de projetos continuam fora deste plano.
 
 ## 9. Planejamento
@@ -114,4 +114,9 @@ A exigência passa a ser executável com a integração da TASK-055; até lá, r
 
 ## Identidade Just Three — decisão de 17/10/2026
 
-Nome público passa a **Just Three**. A marca usa três traços horizontais para remeter às três escolhas diárias. Remover o título redundante acima de Hoje; saída por ícone e temas abertos por ícone de quebra-cabeça, alinhados na barra. Contratos em SPEC-004 RN21–RN24 e SPEC-007 RN09–RN10; implementação planejada na TASK-059. Nomes técnicos e registros históricos mantêm Planner. “A fazer” é proposta de tradução de backlog, ainda sem adoção autorizada.
+Nome público passa a **Just Three**. A marca usa três traços horizontais para remeter às três escolhas diárias. Remover o título redundante acima de Hoje; saída por ícone e temas abertos por ícone de quebra-cabeça, alinhados na barra. Contratos em SPEC-004 RN21–RN24 e SPEC-007 RN09–RN10; implementação planejada na TASK-059. Nomes técnicos e registros históricos mantêm Planner. “A fazer” é a tradução de backlog aprovada pelo responsável em 17/10/2026.
+
+
+## Idiomas pela engrenagem — 17/10/2026
+
+O responsável autorizou troca de idioma funcional pela engrenagem entre tema e saída, abrangendo todos os textos da interface. Marca e conteúdo do usuário são preservados. SPEC-001 descreve a evolução em draft, pendente de idiomas iniciais e persistência. TASK-013/014 deixam de ser evolução genericamente adiada e passam a incremento solicitado, ainda bloqueado pelas duas decisões. TASK-059 inclui A fazer e permanece independente dessas respostas.

@@ -40,4 +40,4 @@ A tabela anterior descreve o MVP local. No incremento de produção, `Planner.Ac
 
 ## Nome público — 17/10/2026
 
-**Just Three** é a marca do produto, em referência às três escolhas diárias. `Planner` permanece namespace técnico. Backlog mantém seu significado e identificador; “A fazer” é apenas proposta editorial na SPEC-004, sem mudança de domínio.
+**Just Three** é a marca do produto, em referência às três escolhas diárias. `Planner` permanece namespace técnico. Backlog mantém seu significado e identificador técnico; seu rótulo pt-BR é “A fazer”, aprovado em 17/10/2026 (SPEC-004 RN25).

@@ -4,7 +4,7 @@ Specs agregam arquitetura, invariantes e casos de uso; tarefas entregam passos p
 
 | Spec | Capacidade |
 | --- | --- |
-| [001 — Interface pt-BR com Gettext](001-idiomas.md) | Contrato do MVP; implementação em várias tarefas. |
+| [001 — Idiomas da interface com Gettext](001-idiomas.md) | Contrato do MVP; implementação em várias tarefas. |
 | [002 — Backlog, retry e três escolhas diárias](002-planejamento-diario.md) | Contrato do MVP; implementação em várias tarefas. |
 | [003 — Data corrente, retry e histórico](003-dia-e-historico.md) | Contrato do MVP; implementação em várias tarefas. |
 | [004 — Experiência do painel](004-experiencia-e-acesso.md) | Contrato do MVP; implementação em várias tarefas. |
@@ -45,4 +45,7 @@ As versões históricas citadas nos aceites de 05/10 não atestam login, temas o
 Correções solicitadas em 14/10/2026: SPEC-005 RN20/CA-005-18 define destaque do cadastro no login ([TASK-053](../tasks/053-destacar-criar-conta-login.md)); SPEC-007 RN07–RN08/CA-007-05–07 define seletor na navbar e regressão visual ([TASK-054](../tasks/054-corrigir-temas-na-navbar.md)). Implementações integradas; evidências nas tarefas. A reprodução visual original da TASK-054 permanece não verificada; cobertura autenticada de paletas está planejada na TASK-056.
 
 
-Identidade de 17/10/2026: SPEC-004 RN21–RN24/CA-004-17–18 e SPEC-007 RN09–RN10/CA-007-08 definem Just Three e controles por ícone. Contratos ready, entrega planejada na [TASK-059](../tasks/059-identidade-just-three.md). A proposta “A fazer” para backlog não faz parte do aceite confirmado.
+Identidade de 17/10/2026: SPEC-004 RN21–RN24/CA-004-17–18 e SPEC-007 RN09–RN10/CA-007-08 definem Just Three e controles por ícone. Contratos ready, entrega planejada na [TASK-059](../tasks/059-identidade-just-three.md). SPEC-004 RN25/CA-004-19 incorpora a tradução aprovada “A fazer” ao aceite da TASK-059.
+
+
+SPEC-001: pt-BR fixo permanece entrega histórica; evolução de 17/10/2026 em draft para tradução completa e engrenagem de idioma. TASK-013/014 retomadas, bloqueadas somente por decisões de idiomas/persistência e dependências. “A fazer” já está aprovado na TASK-059.
