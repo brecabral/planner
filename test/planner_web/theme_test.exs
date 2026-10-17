@@ -13,7 +13,19 @@ defmodule PlannerWeb.ThemeTest do
   } do
     {:ok, view, _} = live(conn, ~p"/tasks")
     assert has_element?(view, "nav #account-theme + #log-out")
-    assert has_element?(view, "nav label[for=theme-selector]", "Tema")
+
+    assert has_element?(
+             view,
+             "nav #theme-toggle[aria-label=Tema][aria-expanded=false] .hero-puzzle-piece"
+           )
+
+    assert has_element?(view, "#theme-options[hidden]")
+
+    assert has_element?(
+             view,
+             "#log-out[aria-label=Sair][data-method=delete] .hero-arrow-right-start-on-rectangle"
+           )
+
     assert has_element?(view, "#theme-selector option[value=planner][selected]", "Claro")
     assert has_element?(view, "#theme-selector option[value=planner_dark]", "Escuro")
 

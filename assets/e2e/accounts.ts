@@ -25,6 +25,8 @@ function identities() {
 export async function login(page: Page, account: Account) {
   await page.goto('/users/log-in/' + account.token);
   await expect(page.locator('.phx-connected #confirmation_form')).toBeVisible();
+  await expect(page.locator('#brand')).toHaveText('Just Three');
+  await expect(page).toHaveTitle('Just Three');
   await page.locator('#confirmation_form button').last().click();
   await expect(page).toHaveURL('/tasks');
   await expect(page.locator('.phx-connected #planning-board')).toBeVisible();

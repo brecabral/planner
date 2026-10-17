@@ -13,6 +13,31 @@ defmodule PlannerWeb.TaskLiveTest do
 
   setup :register_and_log_in_user
 
+  test "Just Three and A fazer preserve user titles, labels and planning actions", %{
+    conn: conn,
+    user: user
+  } do
+    {:ok, empty, _} = live(conn, "/tasks")
+    assert has_element?(empty, "#backlog-heading", "A fazer")
+    assert has_element?(empty, "#tasks-empty", "A fazer")
+    assert has_element?(empty, "#today-empty", "A fazer")
+    refute has_element?(empty, "main h1")
+    label = label_fixture(user, %{name: "Backlog"})
+    task = task_fixture(user, %{title: "Planner Backlog", label_ids: [label.id]})
+    {:ok, view, _} = live(conn, "/tasks")
+    assert has_element?(view, "#brand .hero-bars-3")
+    assert has_element?(view, "#brand", "Just Three")
+    assert has_element?(view, "#tasks-#{task.id} [data-task-title]", "Planner Backlog")
+    assert has_element?(view, "#tasks-#{task.id} [data-label]", "Backlog")
+    view |> form("#select-#{task.id}") |> render_submit()
+    assert has_element?(view, "#return-button-#{task.id}", "Devolver para A fazer")
+    view |> form("#return-#{task.id}") |> render_submit()
+    assert has_element?(view, "#planning-status", "Tarefa devolvida para A fazer.")
+    assert has_element?(view, "#used-choices", "0 de 3")
+    view |> element("#new-task") |> render_click()
+    assert has_element?(view, "#task-form")
+  end
+
   for kind <- [:backlog, :retry, :today] do
     @tag kind: kind
     test "confirms or cancels permanent deletion from #{kind}", %{
@@ -210,10 +235,11 @@ defmodule PlannerWeb.TaskLiveTest do
     end
 
     {:ok, view, _} = live(conn, "/tasks")
-    assert has_element?(view, "#task-menu-#{a.id} #return-button-#{a.id}", "Enviar ao backlog")
+    assert has_element?(view, "#task-menu-#{a.id} #return-button-#{a.id}", "Enviar para A fazer")
     view |> form("#return-#{a.id}") |> render_submit()
     assert has_element?(view, "#tasks-#{a.id} [data-label]", label.name)
     refute has_element?(view, "#retry-#{a.id}")
+    assert has_element?(view, "#planning-status", "Tarefa devolvida para A fazer.")
 
     params = %{
       "task_id" => b.id,
@@ -584,7 +610,7 @@ defmodule PlannerWeb.TaskLiveTest do
     assert has_element?(
              view,
              "#return-button-#{task.id}[phx-disable-with='Salvando...']",
-             "Devolver ao backlog"
+             "Devolver para A fazer"
            )
 
     assert has_element?(view, "#backlog-heading[tabindex='-1']")

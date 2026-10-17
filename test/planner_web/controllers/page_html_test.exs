@@ -3,16 +3,16 @@ defmodule PlannerWeb.PageHTMLTest do
 
   import Phoenix.LiveViewTest
 
-  test "home renders Planner identity, entry point and reconnect notices" do
+  test "home renders Just Three identity, entry point and reconnect notices" do
     html =
       render_component(&PlannerWeb.PageHTML.home/1, flash: %{})
       |> LazyHTML.from_fragment()
 
     assert html |> LazyHTML.query("h1") |> LazyHTML.text() =~ "Espaço para o que importa."
-    assert html |> LazyHTML.query("nav a[href='/']") |> LazyHTML.text() =~ "Planner"
+    assert html |> LazyHTML.query("nav a[href='/']") |> LazyHTML.text() =~ "Just Three"
 
     assert html |> LazyHTML.query("#open-planner[href='/tasks']") |> LazyHTML.text() =~
-             "Abrir Planner"
+             "Abrir Just Three"
 
     assert html |> LazyHTML.query("a[href^='https://']") |> Enum.empty?()
 

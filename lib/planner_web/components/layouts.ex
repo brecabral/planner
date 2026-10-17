@@ -53,13 +53,14 @@ defmodule PlannerWeb.Layouts do
         aria-label={gettext("Main navigation")}
       >
         <.link
+          id="brand"
           href={~p"/"}
           class="mr-auto flex items-center gap-3 text-lg font-semibold tracking-tight"
         >
           <span class="grid size-9 place-items-center rounded-xl bg-primary text-primary-content">
-            <.icon name="hero-check" class="size-5" />
+            <.icon name="hero-bars-3" class="size-5" />
           </span>
-          {gettext("Planner")}
+          Just Three
         </.link>
         <div :if={@current_scope} class="ml-auto flex max-w-full items-center gap-3">
           {render_slot(@theme_selector)}
@@ -67,8 +68,9 @@ defmodule PlannerWeb.Layouts do
             id="log-out"
             href={~p"/users/log-out"}
             method="delete"
-            class="btn btn-ghost shrink-0"
-          >{gettext("Log out")}</.link>
+            class="btn btn-ghost btn-square shrink-0"
+            aria-label={gettext("Log out")}
+          ><.icon name="hero-arrow-right-start-on-rectangle" class="size-5" /></.link>
         </div>
       </nav>
     </header>

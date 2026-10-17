@@ -9,35 +9,49 @@ defmodule PlannerWeb.TaskLive.Index do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <:theme_selector>
-        <div id="account-theme" phx-hook="AccountTheme" data-theme={@theme_code} class="max-w-full">
-          <.input
-            type="select"
-            id="theme-selector"
-            name="theme_code"
-            label={gettext("Theme")}
-            value={@theme_code}
-            options={Enum.map(@available_themes, &{theme_label(&1.code), &1.code})}
-            class="select select-sm w-28"
-            aria-describedby={if @theme_error, do: "theme-error"}
-          />
-          <span id="theme-saving" hidden role="status" class="text-xs">{gettext("Saving...")}</span>
-          <p :if={@theme_error} id="theme-error" role="alert" class="max-w-28 text-sm text-error">
-            {@theme_error}
-          </p>
+        <div
+          id="account-theme"
+          phx-hook="AccountTheme"
+          data-theme={@theme_code}
+          class="relative shrink-0"
+        >
+          <button
+            id="theme-toggle"
+            type="button"
+            class="btn btn-ghost btn-square"
+            aria-label={gettext("Theme")}
+            aria-expanded="false"
+            aria-controls="theme-options"
+          >
+            <.icon name="hero-puzzle-piece" class="size-5" />
+          </button>
+          <div
+            id="theme-options"
+            hidden
+            class="absolute right-0 top-full z-30 w-48 rounded-box border border-base-300 bg-base-100 p-3 shadow-lg"
+          >
+            <.input
+              type="select"
+              id="theme-selector"
+              name="theme_code"
+              label={gettext("Theme")}
+              value={@theme_code}
+              options={Enum.map(@available_themes, &{theme_label(&1.code), &1.code})}
+              class="select select-sm w-full"
+              aria-describedby={if @theme_error, do: "theme-error"}
+            />
+            <span id="theme-saving" hidden role="status" class="text-xs">{gettext("Saving...")}</span>
+            <p :if={@theme_error} id="theme-error" role="alert" class="text-sm text-error">
+              {@theme_error}
+            </p>
+          </div>
         </div>
       </:theme_selector>
-      <.header>
-        {gettext("Planner")}
-        <:actions>
-          <.link
-            id="new-task"
-            patch={~p"/tasks/new"}
-            class="btn btn-primary"
-          >
-            <.icon name="hero-plus" /> {gettext("New task")}
-          </.link>
-        </:actions>
-      </.header>
+      <div class="flex justify-end">
+        <.link id="new-task" patch={~p"/tasks/new"} class="btn btn-primary">
+          <.icon name="hero-plus" /> {gettext("New task")}
+        </.link>
+      </div>
       <p :if={@planning_error} id="planning-error" role="alert" class="alert alert-error">
         {@planning_error}
       </p>
@@ -265,7 +279,7 @@ defmodule PlannerWeb.TaskLive.Index do
      |> assign(:available_themes, Themes.list_available_themes(socket.assigns.current_scope))
      |> assign(:theme_error, nil)
      |> assign(:user, user)
-     |> assign(:page_title, gettext("Planner"))
+     |> assign(:page_title, "Just Three")
      |> assign(:planning_error, nil)
      |> assign(:planning_status, nil)
      |> assign(:status_version, 0)

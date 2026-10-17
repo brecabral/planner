@@ -1,6 +1,6 @@
 ---
 id: "TASK-059"
-status: planned
+status: in_review
 execution_level: standard
 execution_rationale: "Integra marca, controles de layout, interação do tema e regressões E2E com contratos existentes e comportamento definido."
 specs: ["SPEC-004", "SPEC-007"]
@@ -33,4 +33,19 @@ Entregar SPEC-004 RN21–RN25/CA-004-17–19 e SPEC-007 RN09–RN10/CA-007-08. U
 
 ## Evidências e progresso
 
-Planejada em 17/10/2026; nenhuma implementação ou validação de código realizada nesta rodada. Registrar commit, cenários/testes executados, resultado dos gates e limitações antes da conferência de integração. Dependências concluídas e specs ready tornam a tarefa elegível; planejamento não significa entrega.
+Implementada em 17/10/2026 sobre a base `9e3dc7c`; TASK-056 já integrada. Entrega local encaminhada ao coordenador para conferência operacional e commit; não há aprovação independente nem publicação remota.
+
+| Aceite | Evidência e resultado |
+| --- | --- |
+| 1 — Marca, título e A fazer | Layout compartilhado usa Just Three, `hero-bars-3` e link `/`; título do navegador atualizado. Painel remove somente o título redundante e conserva Nova tarefa. Testes de home, páginas públicas, locale e LiveView verificam identidade, títulos/vazios, menus de retry/devolução e mensagens. Tarefa “Planner Backlog” e label “Backlog” permanecem intactas, com cota e transferências exercitadas. |
+| 2 — Controles por ícone | Tema usa `hero-puzzle-piece`, botão com nome traduzido/estado de abertura e opções inicialmente fechadas. Saída usa `hero-arrow-right-start-on-rectangle`, nome Sair e rota/método existentes. Hook fecha por novo acionamento, clique externo ou Escape (devolvendo foco); sucesso fecha, falha conserva opções/seleção confirmada; espera impede repetição. Testes de hook e `theme_test.exs` preservam erros, desconexão, persistência e isolamento. |
+| 3 — Navegador e regressões | Suíte E2E completa: 9/9 cenários aprovados. Marca em login, `/join`, `/users/register`, confirmação e painel; navegação da marca, ausência do título redundante, Nova tarefa, teclado/menu, paleta computada em ambas as direções, patches/recarga, logout e segunda conta. Centros dos controles alinhados com tolerância de 1 px em 320 e 1280 px, inclusive com `/tasks/new` aberto; áreas equivalentes no painel e ausência de rolagem horizontal. |
+| 4 — Gates e autoavaliação | `just precommit`: 246 testes aprovados. `just ci`: 246 testes, Credo sem achados, assets, testes JavaScript, tooling e auditoria npm aprovados. Cobertura agregada dos relatórios HTML: 93,84% (1005 linhas cobertas/1071 instrumentadas), acima de 70%; TaskLive.Index 98,71%. `git diff --check` sem erros. |
+
+### Autoavaliação
+
+Implementador `task059`, alvo: alterações locais dos 17 arquivos desta tarefa sobre `9e3dc7c`, seguindo o fluxo de review. Conclusão técnica: `approved` em autoavaliação, sem revisão independente ou avanço do marco em `docs/review.md`. Escopo conferido: componentes/layout, home, painel, hook, catálogo pt-BR/POT e testes web/JS/E2E. Nenhuma alteração em domínio, autenticação, paletas, códigos de temas ou seleção de idioma.
+
+Evidências E2E finais em `tmp/e2e/run-brmwsUod/`: relatório, logs e `exit-code.txt` igual a 0, incluindo coleta e limpeza. Primeira execução (`tmp/e2e/run-oI00MH4u/`) revelou que o flash de confirmação interceptava o clique inicial no cenário de tema; o teste passou a fechar a notificação pelo controle existente antes de interagir. Reexecução completa passou sem retries, skips ou cliques forçados. Na fase vermelha, testes de identidade/acionador falharam pelo comportamento ausente; execução isolada do teste de locale também expôs sua dependência do arquivo fixture, depois carregada normalmente pela suíte web/completa.
+
+Limites: falha de persistência é coberta por rejeição real no banco em ExUnit e pelo hook; não foi introduzido mecanismo de falha artificial no navegador. Cobertura de linhas não mede todos os estados JavaScript; estes têm testes próprios e E2E. Arquivos de catálogo tiveram referências de origem sincronizadas após formatação, sem mudança adicional de mensagens. Commit e estado `done` ficam para a conferência do coordenador; TASK-013/014 não iniciadas nesta entrega.

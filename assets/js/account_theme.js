@@ -1,3 +1,10 @@
+const setOpen = (hook, open, restoreFocus = false) => {
+  hook.open = open
+  hook.el.querySelector("#theme-options").hidden = !open
+  hook.el.querySelector("#theme-toggle").setAttribute("aria-expanded", String(open))
+  if (restoreFocus) hook.el.querySelector("#theme-toggle").focus()
+}
+
 const applyTheme = hook => {
   const theme = hook.el.dataset.theme
   document.documentElement.dataset.theme = theme
@@ -15,6 +22,24 @@ export const AccountTheme = {
   mounted() {
     this.generation = 0
     this.offline = false
+    setOpen(this, false)
+    this.onClick = event => {
+      if (this.el.querySelector("#theme-toggle").contains(event.target)) {
+        setOpen(this, !this.open)
+        if (this.open) this.el.querySelector("select").focus()
+      } else if (!this.el.contains(event.target)) {
+        setOpen(this, false)
+      }
+    }
+    this.onKeydown = event => {
+      if (event.key === "Escape" && this.open) {
+        event.preventDefault()
+        event.stopPropagation()
+        setOpen(this, false, true)
+      }
+    }
+    document.addEventListener("click", this.onClick)
+    document.addEventListener("keydown", this.onKeydown, true)
     applyTheme(this)
     setPending(this, false)
     this.onChange = event => {
@@ -26,6 +51,7 @@ export const AccountTheme = {
         if (generation !== this.generation) return
         applyTheme(this)
         setPending(this, false)
+        setOpen(this, !!this.el.querySelector("#theme-error"), !this.el.querySelector("#theme-error"))
       })
     }
     this.el.addEventListener("change", this.onChange)
@@ -33,6 +59,7 @@ export const AccountTheme = {
   updated() {
     applyTheme(this)
     setPending(this, this.pending)
+    setOpen(this, this.open)
   },
   disconnected() {
     this.generation++
@@ -47,6 +74,8 @@ export const AccountTheme = {
   },
   destroyed() {
     this.generation++
+    document.removeEventListener("click", this.onClick)
+    document.removeEventListener("keydown", this.onKeydown, true)
     this.el.removeEventListener("change", this.onChange)
     document.documentElement.dataset.theme = "planner"
   },

@@ -14,7 +14,7 @@ defmodule PlannerWeb.PageControllerTest do
         |> LazyHTML.from_document()
 
       assert html |> LazyHTML.query("html") |> LazyHTML.attribute("lang") == ["pt-BR"]
-      assert LazyHTML.text(html) =~ "Planner"
+      assert LazyHTML.text(html) =~ "Just Three"
       refute LazyHTML.text(html) =~ "Phoenix"
       assert LazyHTML.text(html) =~ "Entrar"
 

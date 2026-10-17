@@ -16,18 +16,18 @@ msgstr ""
 msgid "Actions"
 msgstr ""
 
-#: lib/planner_web/components/layouts.ex:104
-#: lib/planner_web/components/layouts.ex:119
+#: lib/planner_web/components/layouts.ex:112
+#: lib/planner_web/components/layouts.ex:127
 #, elixir-autogen, elixir-format
 msgid "Attempting to reconnect"
 msgstr ""
 
-#: lib/planner_web/components/layouts.ex:111
+#: lib/planner_web/components/layouts.ex:119
 #, elixir-autogen, elixir-format
 msgid "Something went wrong!"
 msgstr ""
 
-#: lib/planner_web/components/layouts.ex:96
+#: lib/planner_web/components/layouts.ex:104
 #, elixir-autogen, elixir-format
 msgid "We can't find the internet"
 msgstr ""
@@ -37,38 +37,26 @@ msgstr ""
 msgid "close"
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:125
+#: lib/planner_web/live/task_live/index.ex:137
 #, elixir-autogen, elixir-format
 msgid "Add a task to start your backlog."
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:113
+#: lib/planner_web/live/task_live/index.ex:125
 #, elixir-autogen, elixir-format
 msgid "Backlog"
 msgstr ""
 
 #: lib/planner_web/live/task_live/form.ex:108
-#: lib/planner_web/live/task_live/index.ex:234
+#: lib/planner_web/live/task_live/index.ex:246
 #, elixir-autogen, elixir-format
 msgid "Cancel"
 msgstr ""
 
 #: lib/planner_web/live/task_live/form.ex:19
-#: lib/planner_web/live/task_live/index.ex:39
+#: lib/planner_web/live/task_live/index.ex:52
 #, elixir-autogen, elixir-format
 msgid "New task"
-msgstr ""
-
-#: lib/planner_web/controllers/page_html/home.html.heex:13
-#, elixir-autogen, elixir-format
-msgid "Open planner"
-msgstr ""
-
-#: lib/planner_web/components/layouts.ex:58
-#: lib/planner_web/live/task_live/index.ex:32
-#: lib/planner_web/live/task_live/index.ex:270
-#, elixir-autogen, elixir-format
-msgid "Planner"
 msgstr ""
 
 #: lib/planner_web/live/task_live/form.ex:107
@@ -77,16 +65,16 @@ msgid "Save task"
 msgstr ""
 
 #: lib/planner_web/live/task_live/form.ex:105
-#: lib/planner_web/live/task_live/index.ex:22
-#: lib/planner_web/live/task_live/index.ex:241
-#: lib/planner_web/live/task_live/index.ex:543
-#: lib/planner_web/live/task_live/index.ex:576
-#: lib/planner_web/live/task_live/index.ex:631
+#: lib/planner_web/live/task_live/index.ex:43
+#: lib/planner_web/live/task_live/index.ex:253
+#: lib/planner_web/live/task_live/index.ex:555
+#: lib/planner_web/live/task_live/index.ex:588
+#: lib/planner_web/live/task_live/index.ex:643
 #, elixir-autogen, elixir-format
 msgid "Saving..."
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:287
+#: lib/planner_web/live/task_live/index.ex:299
 #, elixir-autogen, elixir-format
 msgid "Task created successfully"
 msgstr ""
@@ -111,132 +99,132 @@ msgstr ""
 msgid "New labels"
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:71
+#: lib/planner_web/live/task_live/index.ex:83
 #, elixir-autogen, elixir-format
 msgid "%{count} choice available"
 msgid_plural "%{count} choices available"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/planner_web/live/task_live/index.ex:77
-#: lib/planner_web/live/task_live/index.ex:116
-#: lib/planner_web/live/task_live/index.ex:147
+#: lib/planner_web/live/task_live/index.ex:89
+#: lib/planner_web/live/task_live/index.ex:128
+#: lib/planner_web/live/task_live/index.ex:159
 #, elixir-autogen, elixir-format
 msgid "%{count} pending task"
 msgid_plural "%{count} pending tasks"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/planner_web/live/task_live/index.ex:68
+#: lib/planner_web/live/task_live/index.ex:80
 #, elixir-autogen, elixir-format
 msgid "Choices used: %{count} of 3"
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:647
+#: lib/planner_web/live/task_live/index.ex:659
 #, elixir-autogen, elixir-format
 msgid "Labels"
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:86
+#: lib/planner_web/live/task_live/index.ex:98
 #, elixir-autogen, elixir-format
 msgid "No tasks for today. Choose from backlog or retry."
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:156
+#: lib/planner_web/live/task_live/index.ex:168
 #, elixir-autogen, elixir-format
 msgid "No unfinished tasks from previous days."
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:145
+#: lib/planner_web/live/task_live/index.ex:157
 #, elixir-autogen, elixir-format
 msgid "Retry"
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:56
+#: lib/planner_web/live/task_live/index.ex:68
 #, elixir-autogen, elixir-format
 msgid "Today"
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:74
-#: lib/planner_web/live/task_live/index.ex:410
+#: lib/planner_web/live/task_live/index.ex:86
+#: lib/planner_web/live/task_live/index.ex:422
 #, elixir-autogen, elixir-format
 msgid "Today's choices are exhausted."
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:603
+#: lib/planner_web/live/task_live/index.ex:615
 #, elixir-autogen, elixir-format
 msgid "Bring to today"
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:475
-#: lib/planner_web/live/task_live/index.ex:484
+#: lib/planner_web/live/task_live/index.ex:487
+#: lib/planner_web/live/task_live/index.ex:496
 #, elixir-autogen, elixir-format
 msgid "Could not refresh the panel. Please reload."
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:416
+#: lib/planner_web/live/task_live/index.ex:428
 #, elixir-autogen, elixir-format
 msgid "Could not save the change. Please try again."
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:608
+#: lib/planner_web/live/task_live/index.ex:620
 #, elixir-autogen, elixir-format
 msgid "Return to backlog"
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:413
+#: lib/planner_web/live/task_live/index.ex:425
 #, elixir-autogen, elixir-format
 msgid "This task is no longer available for this action. The panel has been updated."
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:580
+#: lib/planner_web/live/task_live/index.ex:592
 #, elixir-autogen, elixir-format
 msgid "Move %{title} down"
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:579
+#: lib/planner_web/live/task_live/index.ex:591
 #, elixir-autogen, elixir-format
 msgid "Move %{title} up"
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:590
+#: lib/planner_web/live/task_live/index.ex:602
 #, elixir-autogen, elixir-format
 msgid "Move down"
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:589
+#: lib/planner_web/live/task_live/index.ex:601
 #, elixir-autogen, elixir-format
 msgid "Move up"
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:405
+#: lib/planner_web/live/task_live/index.ex:417
 #, elixir-autogen, elixir-format
 msgid "Priorities have changed or this movement is unavailable. The panel has been updated."
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:193
+#: lib/planner_web/live/task_live/index.ex:205
 #, elixir-autogen, elixir-format
 msgid "%{count} completed task"
 msgid_plural "%{count} completed tasks"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/planner_web/live/task_live/index.ex:612
+#: lib/planner_web/live/task_live/index.ex:624
 #, elixir-autogen, elixir-format
 msgid "Complete task"
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:205
+#: lib/planner_web/live/task_live/index.ex:217
 #, elixir-autogen, elixir-format
 msgid "Completed on"
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:186
+#: lib/planner_web/live/task_live/index.ex:198
 #, elixir-autogen, elixir-format
 msgid "History"
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:197
+#: lib/planner_web/live/task_live/index.ex:209
 #, elixir-autogen, elixir-format
 msgid "No completed tasks yet."
 msgstr ""
@@ -261,7 +249,7 @@ msgstr ""
 msgid "Labels (optional)"
 msgstr ""
 
-#: lib/planner_web/components/layouts.ex:52
+#: lib/planner_web/components/layouts.ex:53
 #, elixir-autogen, elixir-format
 msgid "Main navigation"
 msgstr ""
@@ -271,7 +259,7 @@ msgstr ""
 msgid "One day at a time"
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:436
+#: lib/planner_web/live/task_live/index.ex:448
 #, elixir-autogen, elixir-format
 msgid "Priorities updated."
 msgstr ""
@@ -281,58 +269,58 @@ msgstr ""
 msgid "Space for what matters."
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:435
+#: lib/planner_web/live/task_live/index.ex:447
 #, elixir-autogen, elixir-format
 msgid "Task added to today."
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:433
+#: lib/planner_web/live/task_live/index.ex:445
 #, elixir-autogen, elixir-format
 msgid "Task completed."
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:434
+#: lib/planner_web/live/task_live/index.ex:446
 #, elixir-autogen, elixir-format
 msgid "Task returned to backlog."
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:532
+#: lib/planner_web/live/task_live/index.ex:544
 #, elixir-autogen, elixir-format
 msgid "Actions for %{title}"
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:517
+#: lib/planner_web/live/task_live/index.ex:529
 #, elixir-autogen, elixir-format
 msgid "Drag %{title}"
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:432
+#: lib/planner_web/live/task_live/index.ex:444
 #, elixir-autogen, elixir-format
 msgid "Movement saved."
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:607
+#: lib/planner_web/live/task_live/index.ex:619
 #, elixir-autogen, elixir-format
 msgid "Send to backlog"
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:243
+#: lib/planner_web/live/task_live/index.ex:255
 #, elixir-autogen, elixir-format
 msgid "Delete permanently"
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:226
-#: lib/planner_web/live/task_live/index.ex:547
+#: lib/planner_web/live/task_live/index.ex:238
+#: lib/planner_web/live/task_live/index.ex:559
 #, elixir-autogen, elixir-format
 msgid "Delete task"
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:228
+#: lib/planner_web/live/task_live/index.ex:240
 #, elixir-autogen, elixir-format
 msgid "Permanently delete the task “%{title}”? This cannot be undone."
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:431
+#: lib/planner_web/live/task_live/index.ex:443
 #, elixir-autogen, elixir-format
 msgid "Task deleted."
 msgstr ""
@@ -363,7 +351,7 @@ msgstr ""
 msgid "Confirming..."
 msgstr ""
 
-#: lib/planner_web/live/user_live/login.ex:12
+#: lib/planner_web/live/user_live/login.ex:25
 #, elixir-autogen, elixir-format
 msgid "Create an account"
 msgstr ""
@@ -373,7 +361,7 @@ msgstr ""
 msgid "Creating account..."
 msgstr ""
 
-#: lib/planner_web/live/user_live/login.ex:17
+#: lib/planner_web/live/user_live/login.ex:16
 #: lib/planner_web/live/user_live/registration.ex:35
 #, elixir-autogen, elixir-format
 msgid "Email"
@@ -389,7 +377,7 @@ msgstr ""
 msgid "Hi %{email},\n\nYou can log into your account by visiting the URL below:\n\n%{url}\n\nIf you did not request this email, please ignore this."
 msgstr ""
 
-#: lib/planner_web/live/user_live/login.ex:51
+#: lib/planner_web/live/user_live/login.ex:53
 #, elixir-autogen, elixir-format
 msgid "If your email is in our system, you will receive instructions for logging in shortly."
 msgstr ""
@@ -411,7 +399,7 @@ msgstr ""
 msgid "Log in instructions"
 msgstr ""
 
-#: lib/planner_web/live/user_live/login.ex:23
+#: lib/planner_web/live/user_live/login.ex:22
 #, elixir-autogen, elixir-format
 msgid "Log in with email"
 msgstr ""
@@ -470,27 +458,28 @@ msgstr ""
 msgid "You must re-authenticate to access this page."
 msgstr ""
 
-#: lib/planner_web/components/layouts.ex:66
+#: lib/planner_web/components/layouts.ex:72
 #, elixir-autogen, elixir-format
 msgid "Log out"
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:305
+#: lib/planner_web/live/task_live/index.ex:317
 #, elixir-autogen, elixir-format
 msgid "Could not save the theme. Please try again."
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:356
+#: lib/planner_web/live/task_live/index.ex:368
 #, elixir-autogen, elixir-format
 msgid "Dark"
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:355
+#: lib/planner_web/live/task_live/index.ex:367
 #, elixir-autogen, elixir-format
 msgid "Light"
 msgstr ""
 
-#: lib/planner_web/live/task_live/index.ex:13
+#: lib/planner_web/live/task_live/index.ex:22
+#: lib/planner_web/live/task_live/index.ex:37
 #, elixir-autogen, elixir-format
 msgid "Theme"
 msgstr ""
@@ -523,4 +512,9 @@ msgstr ""
 #: lib/planner_web/live/user_live/registration.ex:21
 #, elixir-autogen, elixir-format
 msgid "You will receive an email link to confirm your account and log in. No password needed."
+msgstr ""
+
+#: lib/planner_web/controllers/page_html/home.html.heex:13
+#, elixir-autogen, elixir-format
+msgid "Open Just Three"
 msgstr ""
