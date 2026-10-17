@@ -128,4 +128,4 @@ Sequência 055 → 057 → 056 serializa README e configuração compartilhada. 
 
 ## Idiomas — retomada de 17/10/2026
 
-Sequência planejada: TASK-059 → [TASK-013](013-locale-liveview.md) → [TASK-014](014-seletor-idioma.md). A 013 (`advanced`) fornece preferência e resolução isolada de locale; a 014 (`standard`) fornece português/inglês completos, engrenagem entre tema e saída e seletor público no login/Criar conta. A SPEC-001 está draft aguardando apenas persistência e precedência. Não executar 013/014 até resolver essa decisão e integrar dependências; a 059 continua elegível.
+Sequência planejada: TASK-059 → [TASK-013](013-locale-liveview.md) → [TASK-014](014-seletor-idioma.md). A 013 (`advanced`) fornece preferência e resolução isolada de locale; a 014 (`standard`) fornece português/inglês completos, engrenagem entre tema e saída e seletor público no login/Criar conta. A SPEC-001 está ready: preferência na conta e escolha pública no navegador aprovadas, com alteração durante todo o uso. TASK-013/014 sem bloqueios de produto, aguardando integração das dependências; a 059 continua elegível.

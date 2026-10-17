@@ -48,4 +48,4 @@ Correções solicitadas em 14/10/2026: SPEC-005 RN20/CA-005-18 define destaque d
 Identidade de 17/10/2026: SPEC-004 RN21–RN24/CA-004-17–18 e SPEC-007 RN09–RN10/CA-007-08 definem Just Three e controles por ícone. Contratos ready, entrega planejada na [TASK-059](../tasks/059-identidade-just-three.md). SPEC-004 RN25/CA-004-19 incorpora a tradução aprovada “A fazer” ao aceite da TASK-059.
 
 
-SPEC-001: pt-BR fixo permanece entrega histórica; evolução de 17/10/2026 em draft para tradução completa e engrenagem de idioma. TASK-013/014 retomadas, com português/inglês e seleção pública no login/Criar conta confirmados; bloqueadas somente pela decisão de persistência/precedência e dependências. “A fazer” já está aprovado na TASK-059.
+SPEC-001: pt-BR fixo permanece entrega histórica; evolução de 17/10/2026 ready para tradução completa e engrenagem de idioma. Português/inglês, seleção pública no navegador e preferência por conta confirmados, com troca disponível durante o uso. TASK-013/014 aguardam somente integração das dependências. “A fazer” já está aprovado na TASK-059.
