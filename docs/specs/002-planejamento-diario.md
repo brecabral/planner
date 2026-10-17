@@ -36,7 +36,7 @@ Uma fronteira transacional comum serializa alterações do mesmo usuário, inclu
 - CA-002-04: reordenar três IDs próprios persiste a ordem; lista duplicada, incompleta ou alheia não altera tarefa nem cota.
 - CA-002-05: com três escolhas usadas, devolver uma pendência ao backlog reduz o consumo para duas; repetir o retorno mantém duas. Selecionar novamente essa tarefa ou outra usa a terceira escolha, preservando identidade e labels.
 - CA-002-06: outra sessão altera as pendências; reordenação com conjunto antigo é rejeitada e permite recuperar o estado atual.
-- CA-002-07: falha entre seleção/devolução e alteração da cota reverte ambas; reinício preserva a contagem. Devoluções repetidas ou concorrentes da mesma tarefa restituem uma única escolha.
+- CA-002-07: falha entre seleção/devolução e alteração da cota reverte ambas. Devoluções repetidas ou concorrentes da mesma tarefa restituem uma única escolha.
 - CA-002-08: A tem três escolhas usadas e B nenhuma; B pode escolher. Consultas e comandos de A usando IDs de B não retornam nem alteram dados de B.
 
 ## Dados

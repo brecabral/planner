@@ -50,7 +50,7 @@ Gate GitHub e base limpa têm aceite humano registrado. As TASK-036, TASK-002, T
 | SPEC-005 — Usuário padrão | 009 cria/resgata identidade; 006 a resolve no servidor sem login; 037 adiciona criação automática no acesso em dev. |
 | SPEC-006 — Labels | 010 catálogo, 018 relação, 019 cadastro atômico, 026 formulário. |
 
-TASK-008 verifica CA01–CA13 e CA15, incluindo persistência após reinício e cobertura mínima de 70% exigida pelo CI.
+TASK-008 verifica CA01–CA13 e CA15, incluindo cobertura mínima de 70% exigida pelo CI. O aceite de persistência após reinício foi retirado em 17/10/2026; evidências anteriores permanecem históricas.
 
 ## Evolução autorizada após o MVP
 

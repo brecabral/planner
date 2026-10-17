@@ -1,6 +1,6 @@
 # BLOCK-007 — Aceite automatizado de reinício do release
 
-- Estado: aberto.
+- Estado: resolvido por decisão explícita do responsável em 17/10/2026.
 - Origem: TASK-050, critérios 1 e 3; SPEC-008 RN03/RN05 e CA-008-03.
 - Data: 17/10/2026.
 - Base inspecionada: `fb9432377522049d66ff84dc810264a4e0871b1c`.
@@ -24,6 +24,12 @@ Nenhum código alterado, teste avulso criado ou comando de reinício executado. 
 
 Definir o contrato e a titularidade da integração de teste automatizado de reinício real do release com a suíte existente, incluindo escopos necessários. Não foi criado um orquestrador paralelo dentro de `test/`, ampliado escopo de tooling nem decidido o desenho da solução pelo implementador.
 
-## Condição de retomada
+## Condição de retomada original (superada)
 
 Contrato/escopo autorizado e integração versionada permitem preparar duas contas com seus dados, reiniciar o release sobre o mesmo banco isolado e verificar preservação das relações, isolamento e validade/revogação de tokens conforme SPEC-008. A correção deve ter evidências e gates pertinentes aprovados e estar integrada; o coordenador confere essa condição antes de retomar TASK-050. Planejamento ou este relatório, isoladamente, não concluem o aceite.
+
+## Resolução — 17/10/2026
+
+O responsável retirou o requisito de testar persistência após reinício e definiu que a estrutura do banco é preparada pelas migrations do Ecto, sendo consumida pelo runtime. Decisão incorporada à SPEC-008 RN03/RN05, retirada de CA-008-03, CA16 do PRD e critérios 1/3 da TASK-050. A lacuna de infraestrutura deixa de impedir a tarefa porque o aceite que a exigia foi removido; não houve implementação nem evidência nova de teste.
+
+TASK-050 pode retomar da análise inicial após conferência da decisão integrada pelo coordenador. Os demais aceites e gates continuam pendentes. O diagnóstico e as evidências anteriores são preservados como históricos, sem alegação de correção técnica ou conclusão da tarefa.

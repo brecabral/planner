@@ -89,7 +89,7 @@ Dados do usuário padrão ficam preservados e isolados; não migrar automaticame
 - CA17: cadastro/login/logout por magic link funcionam; visitantes não acessam planejamento, duas contas não leem nem alteram dados alheios, e dados legados permanecem isolados (SPEC-005).
 - CA18: claro e escuro estão disponíveis gratuitamente, seleção persiste por conta e não vaza entre sessões (SPEC-007).
 - CA19: menu corrigido, retry → backlog e exclusão respeitam cota, transações e histórico; release mantém esses contratos com contas reais (SPEC-002/004/008).
-- CA16: release local inicializa com configuração externa e banco de teste, preserva dados após reinício e tem os fluxos da aplicação validados sem provedor externo (SPEC-008).
+- CA16: release local inicializa com configuração externa e banco de teste e tem os fluxos da aplicação validados sem provedor externo (SPEC-008).
 
 ### Fronteira da entrega de código — decisão de 13/10/2026
 
