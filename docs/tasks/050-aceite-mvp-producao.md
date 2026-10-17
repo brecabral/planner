@@ -1,6 +1,6 @@
 ---
 id: "TASK-050"
-status: "planned"
+status: "in_progress"
 execution_level: "advanced"
 execution_rationale: "Consolida contratos transversais de autenticação, isolamento, tarefas e persistência no artefato local final."
 specs: ["SPEC-002", "SPEC-004", "SPEC-005", "SPEC-007", "SPEC-008"]
@@ -8,7 +8,7 @@ depends_on: ["TASK-058"]
 provides: ["verified-local-release"]
 consumes: ["release-scaffold"]
 write_scope: ["test/", "docs/specs/", "README.md", "docs/tasks/050-aceite-mvp-producao.md"]
-blockers: []
+blockers: ["BLOCK-007"]
 ---
 
 # 050 — Validar o código Phoenix e o release local
@@ -31,3 +31,11 @@ Antes de iniciar, conferir dependências integradas e specs prontas. Aplicar o f
 ## Reconciliação de R7 — 16/10/2026
 
 Aguardar a TASK-058 para usar os gates locais com isolamento corrigido, conforme [BLOCK-006](../blocks/006-isolamento-compose-teste.md). Dependências anteriores continuam alcançáveis pela cadeia; nenhuma implementação ou validação adicional nesta rodada.
+
+## Retomada e impedimento — 17/10/2026
+
+Base inspecionada: `fb9432377522049d66ff84dc810264a4e0871b1c`, árvore inicialmente limpa. TASK-058 integrada e BLOCK-006 resolvido; TASK-056 integrada com evidências de navegador. Inspeção inicial pelo implementador `/root/task050` identificou ausência de teste automatizado versionado e integrado para reinício do release sobre o mesmo banco, exigido por CA-008-03 e pelos critérios 1/3 desta tarefa.
+
+O smoke histórico da TASK-011 usou verificador temporário; a suíte atual de navegador cobre recargas, mas seu runner não reinicia o release. O ExUnit usa aplicação de teste com Sandbox. Criar teste de reinício da aplicação de teste não comprovaria reinício do artefato de produção. Integração de controle do ciclo de vida do release precisa de planejamento dos recursos fora de `write_scope`, conforme [BLOCK-007](../blocks/007-aceite-automatizado-reinicio-release.md).
+
+Execução interrompida na análise inicial, sem mudança de código ou novos testes/gates executados. Evidências históricas não foram reapresentadas como validação desta rodada. Critérios de aceite e autoavaliação técnica permanecem pendentes; não há aprovação nem entrega `in_review`. Preservados apenas estes registros documentais para o coordenador integrar e encaminhar ao planejador.
