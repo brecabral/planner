@@ -110,3 +110,8 @@ O [índice de tarefas](tasks/README.md) organiza entregas do MVP de produção; 
 A infraestrutura e os aceites estão em [D20](design.md#d20--e2e-em-navegador-real). Tarefas que alterem front (templates, estilos, navegação, formulários, LiveView ou hooks) devem criar/adaptar cenários E2E do comportamento afetado, usá-los durante a implementação e executar a suíte completa antes da entrega. Todo revisor de código deve executar a suíte completa, inclusive em mudanças de backend, e registrar alvo, resultado e artefatos; evidência de terceiros não substitui essa execução. Autoavaliação segue a mesma regra. Revisão exclusivamente documental usa validação documental.
 
 A exigência passa a ser executável com a integração da TASK-055; até lá, registrar a indisponibilidade como critério não verificado, sem declarar aprovação E2E. Falha ou impossibilidade de execução depois da integração impede aprovação e segue o protocolo de bloqueios. Exceções antigas de execução manual de navegador são históricas e não dispensam a nova política em entregas futuras. Isso não cria revisão independente automática. Operação e comandos ficam no README.
+
+
+## Identidade Just Three — decisão de 17/10/2026
+
+Nome público passa a **Just Three**. A marca usa três traços horizontais para remeter às três escolhas diárias. Remover o título redundante acima de Hoje; saída por ícone e temas abertos por ícone de quebra-cabeça, alinhados na barra. Contratos em SPEC-004 RN21–RN24 e SPEC-007 RN09–RN10; implementação planejada na TASK-059. Nomes técnicos e registros históricos mantêm Planner. “A fazer” é proposta de tradução de backlog, ainda sem adoção autorizada.

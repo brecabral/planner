@@ -43,3 +43,12 @@ Origem: responsável relata que os temas não funcionam e solicita seleção na 
 - CA-007-07: falha de persistência mantém opção e paleta anteriores, permite nova tentativa e anuncia erro; código inválido/não concedido não altera preferência. Logout retorna ao claro, e login de outra conta aplica somente a preferência dela. Preservar os cenários CA-007-02/03.
 
 Entrega corretiva: [TASK-054](../tasks/054-corrigir-temas-na-navbar.md). Reutilizar catálogo, concessões e preferência existentes, sem migration, novas paletas, tema do sistema, armazenamento global no navegador ou dependências adicionais. Sem dúvidas bloqueantes de produto; diagnóstico técnico faz parte da implementação.
+
+
+## Acionador por ícone — 17/10/2026
+
+Pedido explícito do responsável; substitui a apresentação permanentemente visível do seletor em RN07/CA-007-05, preservando RN01–RN06 e RN08. Planejado na TASK-059.
+
+- RN09: em `/tasks` e `/tasks/new`, mostrar ícone de peça de quebra-cabeça com nome acessível “Tema”, imediatamente antes do ícone de saída. Não mostrar permanentemente “Tema:”, listbox ou valor selecionado na barra. Acionar o ícone abre as opções concedidas “Claro” e “Escuro”, identificando a seleção atual. Acionar novamente, clicar fora ou pressionar Escape fecha sem alterar preferência. Escolher uma opção usa a persistência existente e fecha após sucesso; falha mantém opções abertas, última seleção confirmada e erro. Impedir seleção repetida durante gravação. Páginas públicas continuam sem seletor.
+- RN10: preservar operação por teclado e foco visível de RN07, nome traduzido e indicação de abertura no acionador; Escape devolve foco ao acionador. Usar ícones e componentes existentes, sem novas dependências ou paletas.
+- CA-007-08: autenticado, opções começam fechadas; clique ou teclado no quebra-cabeça abre Claro/Escuro com opção atual identificada. Repetir acionamento, clicar fora e Escape fecham sem gravação. Escolher tema aplica paleta após confirmação e fecha opções; recarga e navegação para cadastro preservam preferência. Executar alternância nas duas direções no navegador e manter CA-007-06/07, incluindo falha e isolamento entre contas.

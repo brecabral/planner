@@ -43,3 +43,6 @@ Arraste integrado na [TASK-040](../tasks/040-arrastar-tarefas.md), com aceite lo
 As versões históricas citadas nos aceites de 05/10 não atestam login, temas ou operações novas. SPEC-003 preserva data UTC/histórico; SPEC-006 preserva classificação, com novo proprietário autenticado integrado pela TASK-045.
 
 Correções solicitadas em 14/10/2026: SPEC-005 RN20/CA-005-18 define destaque do cadastro no login ([TASK-053](../tasks/053-destacar-criar-conta-login.md)); SPEC-007 RN07–RN08/CA-007-05–07 define seletor na navbar e regressão visual ([TASK-054](../tasks/054-corrigir-temas-na-navbar.md)). Implementações integradas; evidências nas tarefas. A reprodução visual original da TASK-054 permanece não verificada; cobertura autenticada de paletas está planejada na TASK-056.
+
+
+Identidade de 17/10/2026: SPEC-004 RN21–RN24/CA-004-17–18 e SPEC-007 RN09–RN10/CA-007-08 definem Just Three e controles por ícone. Contratos ready, entrega planejada na [TASK-059](../tasks/059-identidade-just-three.md). A proposta “A fazer” para backlog não faz parte do aceite confirmado.

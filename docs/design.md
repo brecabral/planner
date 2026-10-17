@@ -75,3 +75,8 @@ Tarefas de front mantêm cenários proporcionais ao comportamento alterado e usa
 ## D21 — Estrutura do banco e limites do aceite de persistência
 
 Decisão do responsável em 17/10/2026: criação e evolução de tabelas, índices e constraints pertencem às migrations do Ecto. O runtime consome a estrutura previamente migrada, sem mecanismos próprios para criar ou reparar essa estrutura. A aplicação continua lendo e gravando dados de negócio, aplicando validações, transações e isolamento previstos nas specs; isso não delega regras de negócio ao framework. Durabilidade do PostgreSQL e persistência após reinício não constituem aceites próprios da aplicação. CA-008-03 foi retirado, sem exigir nova infraestrutura de teste de reinício.
+
+
+## D22 — Identidade pública Just Three
+
+Decisão de 17/10/2026: marca Just Three com três linhas horizontais iguais, usando o sistema de ícones existente (por exemplo `hero-bars-3`), no lugar do check. Tema usa peça de quebra-cabeça e saída usa símbolo de encerramento de sessão. Preservar paletas semânticas, fontes e contratos de domínio. Os controles ficam lado a lado e centralizados na mesma altura. Detalhes observáveis em SPEC-004 RN21–RN24 e SPEC-007 RN09–RN10. Não renomear módulos, aplicação OTP, banco, rotas ou códigos `planner`/`planner_dark`: identidade pública não exige migração técnica. TASK-059 é a produtora única desta atualização de interface.

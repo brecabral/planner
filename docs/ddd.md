@@ -36,3 +36,8 @@ A tabela anterior descreve o MVP local. No incremento de produção, `Planner.Ac
 | Crédito | Unidade futura para compra de temas; regras de concessão e saldo ainda não definidas, fora do MVP de produção. |
 
 `Planner.Themes` possui catálogo/concessões; Accounts mantém identidade e referência da preferência. Nenhum contexto financeiro é introduzido neste MVP.
+
+
+## Nome público — 17/10/2026
+
+**Just Three** é a marca do produto, em referência às três escolhas diárias. `Planner` permanece namespace técnico. Backlog mantém seu significado e identificador; “A fazer” é apenas proposta editorial na SPEC-004, sem mudança de domínio.

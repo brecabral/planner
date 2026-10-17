@@ -121,3 +121,8 @@ Sequência 055 → 057 → 056 serializa README e configuração compartilhada. 
 ## Correção de R7 — planejamento de 16/10/2026
 
 [058 — Fixar isolamento do projeto Compose de teste](058-isolar-projeto-compose-teste.md) corrige a identidade herdada nas operações de teste e acrescenta regressão segura. Diagnóstico e condição de retomada no [BLOCK-006](../blocks/006-isolamento-compose-teste.md). O incremento parte das entregas 055/057 já integradas, sem exigir sua aprovação independente prévia. A TASK-058 precede TASK-056 e TASK-050; ambas aguardam a correção. A sequência anterior de tooling foi atualizada nos cabeçalhos, fonte única do grafo. Planejamento não encerra R7 nem comprova correção.
+
+
+## Identidade Just Three — plano de 17/10/2026
+
+[TASK-059 — Aplicar identidade Just Three e controles por ícone](059-identidade-just-three.md): nível `standard`, depende da TASK-056 integrada, com TASK-054 ancestral. Produtora única da marca, remoção do título redundante e controles de tema/saída. Elegível na base deste planejamento; ainda não implementada. “A fazer” permanece proposta editorial fora da tarefa.

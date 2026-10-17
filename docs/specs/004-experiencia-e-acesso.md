@@ -85,3 +85,19 @@ Este incremento substitui a home e o tema único de RN07/CA-004-07 após integra
 - CA-004-16: cancelar exclusão mantém tarefa; confirmar remove pendência e atualiza cota conforme a lista; concluídas não oferecem ação e evento forjado é rejeitado. Falha e ID antigo mostram erro sem falsa confirmação.
 
 Entregas: TASK-041, TASK-042, TASK-044, TASK-045 e TASK-048. Contratos antigos não comprovam implementação destes aceites.
+
+
+## Identidade Just Three — 17/10/2026
+
+Origem: pedido explícito do responsável para adotar Just Three, remeter às três tarefas diárias e simplificar o cabeçalho. Contrato pronto; substitui as referências visuais a Planner de RN07/CA-004-07 e das telas de entrada da SPEC-005, preservando seus comportamentos. Entrega planejada na TASK-059, ainda não implementada.
+
+- RN21: nome público do app é “Just Three”, sem tradução. Aplicar à marca da barra, home, login, cadastro `/join` e `/users/register`, confirmação de entrada e títulos de navegador onde houver nome do produto. Não modificar conteúdo escrito pelo usuário. Identificadores técnicos `Planner`, `PlannerWeb`, códigos de temas e rotas permanecem estáveis.
+- RN22: substituir o check da marca principal por três linhas horizontais de mesmo comprimento, remetendo às três escolhas diárias. Preservar o link da marca para `/`; o símbolo não abre menu de navegação. Reutilizar ícones vetoriais existentes, paletas claro/escuro e tipografia atual; esta mudança não redefine cores nem exige imagem gerada.
+- RN23: remover o título redundante “Planner” acima de Hoje, sem substituí-lo por “Just Three” nessa posição. Preservar “Hoje”, indicador de cota, listas e ação “Nova tarefa”.
+- RN24: substituir o texto visível “Sair” por ícone de saída, mantendo nome acessível traduzido “Sair” e a operação de encerramento de sessão existente. Tema e saída ficam lado a lado, com centros alinhados verticalmente na mesma altura e áreas de controle equivalentes. Essa interpretação de alinhamento vale em 320 e 1280 px, sem sobreposição; tema segue SPEC-007 RN09.
+- CA-004-17: ao visitar as telas de RN21, a marca pública e os títulos que nomeiam o produto usam Just Three; a marca tem três traços, não check. Acionar a marca conserva a navegação existente. Conteúdo de tarefas e labels com a palavra Planner permanece intacto.
+- CA-004-18: autenticado em `/tasks` e `/tasks/new`, não há título de marca acima de Hoje; Hoje, cota e Nova tarefa permanecem funcionais. Os ícones de tema e saída ficam na mesma altura nos dois tamanhos definidos em RN24. Acionar saída encerra a sessão e aplica o destino público e tema claro já contratados.
+
+### Tradução de backlog — proposta editorial, fora do aceite da TASK-059
+
+Recomendação: **A fazer**, por ser curto e natural para a lista de tarefas disponíveis para seleção. “Pendências” também abrangeria Hoje e Retry; “Reserva” pode sugerir algo opcional. A fazer ainda é uma categoria ampla, mas a separação visual de Hoje e Retry fornece contexto. Se aprovado, aplicar consistentemente ao título, estados vazios e ações (por exemplo, “Enviar para A fazer”), mantendo `backlog` no domínio. O pedido solicita avaliar uma tradução; não confirma uma escolha. Conservar a tradução atual nesta entrega; esta proposta não bloqueia a identidade e os controles.
