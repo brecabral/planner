@@ -1,6 +1,6 @@
 ---
 id: "TASK-059"
-status: in_review
+status: done
 execution_level: standard
 execution_rationale: "Integra marca, controles de layout, interação do tema e regressões E2E com contratos existentes e comportamento definido."
 specs: ["SPEC-004", "SPEC-007"]
@@ -49,3 +49,9 @@ Implementador `task059`, alvo: alterações locais dos 17 arquivos desta tarefa 
 Evidências E2E finais em `tmp/e2e/run-brmwsUod/`: relatório, logs e `exit-code.txt` igual a 0, incluindo coleta e limpeza. Primeira execução (`tmp/e2e/run-oI00MH4u/`) revelou que o flash de confirmação interceptava o clique inicial no cenário de tema; o teste passou a fechar a notificação pelo controle existente antes de interagir. Reexecução completa passou sem retries, skips ou cliques forçados. Na fase vermelha, testes de identidade/acionador falharam pelo comportamento ausente; execução isolada do teste de locale também expôs sua dependência do arquivo fixture, depois carregada normalmente pela suíte web/completa.
 
 Limites: falha de persistência é coberta por rejeição real no banco em ExUnit e pelo hook; não foi introduzido mecanismo de falha artificial no navegador. Cobertura de linhas não mede todos os estados JavaScript; estes têm testes próprios e E2E. Arquivos de catálogo tiveram referências de origem sincronizadas após formatação, sem mudança adicional de mensagens. Commit e estado `done` ficam para a conferência do coordenador; TASK-013/014 não iniciadas nesta entrega.
+
+### Conferência operacional — 17/10/2026
+
+Coordenador `/root`: entrega integrada na base local em `65b7698`, após conferência do registro, arquivos do escopo, autoavaliação e gates relatados aprovados (246 testes, cobertura 93,84%, E2E 9/9), sem impedimentos. Conclusão operacional registrada após commit bem-sucedido; não houve reprodução de testes pelo coordenador, revisão independente ou CI remoto nesta rodada.
+
+TASK-013 fica elegível, com TASK-045 e TASK-059 concluídas e integradas. Por solicitação do responsável para parar após a tarefa atual, a rodada termina nesta entrega; TASK-013 e TASK-014 permanecem planejadas, sem implementação de troca de idiomas. Sem publicação remota.
