@@ -1,6 +1,6 @@
 ---
 id: "TASK-056"
-status: "in_progress"
+status: "in_review"
 execution_level: "advanced"
 execution_rationale: "Prepara identidade isolada e valida interações reais entre hooks, LiveView e persistência."
 specs: ["SPEC-002", "SPEC-004", "SPEC-005", "SPEC-007"]
@@ -47,3 +47,22 @@ Preservados sete cenários autenticados em `assets/e2e/authenticated.spec.ts`, h
 Evidências relatadas: `just ci` e `just precommit` aprovados com 245 testes ExUnit e limiar de cobertura de 70% preservado. Rodada anterior E2E em `tmp/e2e/run-2WxStWAQ/` passou 9/9 antes dos últimos ajustes. Houve rodadas intermediárias com falhas nos testes, corrigidas dentro da suíte. Na rodada mais recente, `tmp/e2e/run-nWYOi4iy/tests.log` registra 9/9 e Playwright com saída zero; o encerramento foi solicitado durante a finalização do runner. Isso não comprova repetição completa da versão final nem aceite de todos os contratos. Não houve CI remoto.
 
 Retomada: conferir finalização/limpeza do último runner e evidências preservadas; concluir a repetição exigida pelo aceite 1, autoavaliação e conferência operacional. TASK-050 não foi iniciada. Este commit preserva progresso, sem liberar a suíte como entrega concluída.
+
+## Retomada e autoavaliação — 17/10/2026
+
+Implementador `/root/task056`, capacidade advanced. Alvo avaliado: `be7d1947d1eea0d8c4a52a47302adab86f01c36f`, comparado à base `e5bfb029d84762e82e8e849c3eb5ef8935d7789a`; nenhuma alteração adicional de código foi necessária. Dependências TASK-058/054/040 integradas, BLOCK-006 resolvido. Aplicado o fluxo de review como autoavaliação, sem revisão independente nem avanço do marco em `docs/review.md`.
+
+A finalização da rodada anterior foi confirmada: `tmp/e2e/run-nWYOi4iy/` contém 9/9 aprovados, `exit-code.txt` zero e remoção de containers, rede e volume em `cleanup.log`; consulta ao Docker não encontrou containers desse projeto. A repetição canônica `just e2e` nesta retomada também passou 9/9, sem retries ou skips, com saída zero e limpeza completa em `tmp/e2e/run-ejTEcLX1/`. O código dos cenários permaneceu idêntico entre as duas execuções completas. Cada execução preparou banco e contas novos.
+
+| Aceite | Evidência e resultado |
+| --- | --- |
+| 1 — isolamento e repetição | Fixture gera duas contas com UUID por cenário; os cenários não compartilham identidade nem dados. `daily planning` compara dados/cota de duas sessões e confirma ausência da tarefa privada da outra conta após recarga. Os dois cenários públicos mantêm redirecionamento ao login. Duas execuções completas aprovadas; independência de ordem sustentada pelo isolamento das fixtures, sem permutação adicional da ordem nesta rodada. |
+| 2 — planejamento | `daily planning` cadastra label, seleciona três, rejeita a quarta conservando listas, devolve/restaura escolha, seleciona novamente, conclui sem restituir e consulta histórico/label. Recarga confirma listas, cota e histórico. Aprovado. |
+| 3 — exclusão e ordem | `deletion` cancela e confirma exclusão de hoje, verifica preservação/remoção e restituição após recarga. `ordering` verifica menu e gesto com mouse; `touch ordering` usa eventos touch do Chromium em contexto móvel. Ambos conferem ordem persistida após recarga. Aprovados. |
+| 4 — temas | Cenários desktop/320 px acionam seletor por teclado, comparam cores computadas de fundo/navbar/painéis, recarregam, exercitam cadastro e alteração de planejamento, saem e entram com outra conta. Controles visíveis/acionáveis e ausência de rolagem horizontal verificados. Aprovados. |
+| 5 — diálogo | `task dialog` exercita título inválido, recuperação, histórico expandido durante patch, Escape com restauração do foco, formulário limpo ao reabrir e operação posterior de seleção. Sem sleeps fixos ou asserções limitadas a classes. Aprovado. |
+| 6 — operação e evidências | `just e2e` executou os nove cenários públicos/autenticados. Relatório HTML, logs e resultados coletados antes da limpeza. Falhas de asserção da rodada histórica `run-JcSKiA51` preservam `trace.zip`, screenshot e contexto de erro em `test-results/`, comprovando o contrato de evidências sem introduzir falha artificial na suíte final. README descreve fixtures Compose/release, cobertura e limites. |
+
+Gates desta retomada, após consulta a `mix help ci` e `mix help precommit`: `just ci` aprovado com 245 testes ExUnit, cobertura acima do mínimo inalterado de 70%, Credo sem achados, assets, oito testes JavaScript, auditoria npm e sete testes de tooling; `just precommit` aprovado com 245 testes. O CI emitiu avisos conhecidos de redefinição de módulos de migrations durante os testes e terminou com saída zero; nenhuma migration foi modificada. `git diff --check` aprovado. A cobertura ExUnit não mede os cenários Playwright; estes têm resultado próprio 9/9.
+
+Conclusão: **approved no escopo da autoavaliação**, sem achado bloqueante identificado. Estado `in_review`, pronto para conferência operacional e commit pelo coordenador. Somente este arquivo documental foi alterado na retomada; a suíte já está integrada no commit alvo. Limites: não houve CI remoto; o caminho `E2E_CONTAINER` foi inspecionado contra o workflow, sem execução no GitHub. Touch emulado não comprova hardware físico; fixtures não validam entrega real de e-mail; cores computadas não substituem avaliação estética. Nenhum código de produção foi alterado para facilitar autenticação ou contornar falhas.
