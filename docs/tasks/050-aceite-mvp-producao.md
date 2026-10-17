@@ -1,6 +1,6 @@
 ---
 id: "TASK-050"
-status: "in_review"
+status: "done"
 execution_level: "advanced"
 execution_rationale: "Consolida contratos transversais de autenticação, isolamento, tarefas e persistência no artefato local final."
 specs: ["SPEC-002", "SPEC-004", "SPEC-005", "SPEC-007", "SPEC-008"]
@@ -72,3 +72,7 @@ Autoavaliação pelo fluxo de review: **approved nos critérios vigentes**, sem 
 ExUnit/LiveViewTest e Swoosh comprovam os fluxos de cadastro e e-mail sem entrega externa; E2E autentica contas sintéticas pela confirmação normal, mas seus tokens são preparados pela fixture privada, sem provedor. Retry → backlog, concorrência, rollback e expiração têm evidência na suíte da aplicação, não gesto específico de retry no navegador. Chromium verifica mouse e eventos touch em contexto móvel, sem hardware físico, outros navegadores ou avaliação estética humana. Persistência após reinício e durabilidade do banco não integram o aceite vigente. CI remoto não executado; testes locais não comprovam publicação.
 
 Entrega `in_review`, aguardando conferência operacional e commit do coordenador. Nenhum staging/commit pelo implementador; arquivos próprios limitados a `README.md` e esta tarefa.
+
+## Conferência operacional — 17/10/2026
+
+Coordenador `/root`: conferidos escopo documental, matriz de evidências, autoavaliação e gates relatados (245 testes ExUnit e 9/9 E2E aprovados), sem impedimento pendente. Decisão de resolução do BLOCK-007 integrada em `50a50b7`; entrega desta tarefa integrada em `c60d719` na base local. Commit bem-sucedido e integração confirmada; TASK-050 concluída operacionalmente nos critérios vigentes. Nenhum teste reproduzido pelo coordenador, revisão independente, CI remoto ou publicação. As tarefas de evolução futura mantêm seus bloqueios de escopo e não são liberadas por este aceite.
