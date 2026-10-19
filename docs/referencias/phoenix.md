@@ -32,3 +32,12 @@ Na versão instalada, a ajuda de `phx.gen.auth`, `phx.gen.context`, `phx.gen.sch
 Em 11/10/2026, a ajuda local de `phx.gen.auth` e o template `schema_token.ex.eex` foram consultados na versão instalada (Phoenix 1.8.13). O gerador oferece LiveView, tokens, notifier e scope; o template de magic link usa 15 minutos. Preservar o protocolo gerado e revisar o código efetivamente instalado antes de adaptá-lo.
 
 Em base com Accounts/User existentes, geração não equivale a migration de dados pronta: conciliar schema/contexto, preservar IDs/FKs e converter criação da tabela existente em alteração aditiva. A geração é única na TASK-015; consumidoras não repetem o scaffold. A inclusão de senha pelo scaffold não autoriza expô-la quando o contrato é exclusivamente magic link.
+
+## Segurança de origem, templates e logs
+
+Consulta de planejamento em 19/10/2026, sem auditoria completa ou aprovação de código:
+
+- CORS abre exceções à política de mesma origem do navegador; não é autenticação, proteção anti-bot ou substituto de CSRF. A interface atual de mesma origem não precisa liberar CORS. Referência: [segurança Phoenix](https://phoenix.hexdocs.pm/security.html).
+- HEEx/Phoenix.HTML escapam conteúdo por padrão; `raw` e inserção HTML no DOM podem contornar essa proteção. Headers seguros padrão restringem `base-uri` e `frame-ancestors`, mas não estabelecem política restritiva de `script-src`. Referências: [Phoenix.HTML](https://phoenix-html.hexdocs.pm/Phoenix.HTML.html) e [headers Phoenix](https://phoenix.hexdocs.pm/Phoenix.Controller.html#put_secure_browser_headers/2).
+- Eventos LiveView não reexecutam plugs HTTP a cada ação. Proteção de frequência precisa estar no caminho do comando, com origem confiável fornecida pelo servidor. `connect_info[:x_headers]` só transporta headers com prefixo `x-`; não presumir que inclui `Fly-Client-IP`. Não confiar em IP de params do evento. Referência: [headers do proxy Fly](https://docs.fly.io/networking/request-headers/).
+- No Phoenix instalado, `Phoenix.Logger.phoenix_endpoint_start/4` registra `conn.request_path`. Filtrar params não mascara tokens inseridos no caminho da rota; considerar também logs de mount/evento LiveView e RequestLogger. Contrato de correção em SPEC-005 RN27, sem mudança de logging implementada por esta referência.

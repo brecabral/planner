@@ -10,6 +10,17 @@ O MVP local entregue contém o fluxo de planejamento com usuário padrão, pt-BR
 
 [TASK-061 — Usar DATABASE_URL em desenvolvimento](061-database-url-desenvolvimento.md): implementação da decisão D24, preservando campos do Compose, configuração separada de testes e partições. Depende da TASK-060 para serializar README e `.env.example`; não depende funcionalmente do Resend. Não inclui configuração Neon/TLS ou deploy.
 
+## TLS, healthcheck e proteção de autenticação — 19/10/2026
+
+| Entrega | Contrato |
+| --- | --- |
+| [062 — TLS verificado para PostgreSQL Neon](062-tls-postgresql-neon.md) | Configuração segura padrão e exceção explícita para banco E2E/CI. |
+| [063 — Healthcheck HTTP mínimo](063-healthcheck-minimo.md) | Somente status e `ok`, sem diagnóstico público ou consulta a serviços. |
+| [064 — Limites de e-mail e espera na mesma tela](064-limitar-envio-magic-link.md) | Limites por env, reservas no servidor e contagem na tela de login. |
+| [065 — Proteção de tokens em logs](065-proteger-tokens-logs.md) | Mascaramento de caminhos/params e política Referer de autenticação. |
+
+Cabeçalhos definem dependências: 061 → 062 → 063 → 064 → 065, com 014 também antes de 063 para serializar a área web. As tarefas preservam a operação Fly, compra/verificação de domínio e backups fora do desenvolvimento, conforme pedido do responsável. Contratos em SPEC-008 RN09–RN10 e SPEC-005 RN21–RN27; planejamento não é implementação ou aprovação de segurança.
+
 ## MVP
 
 MVP local encerrado em 05/10/2026: entregas integradas e revisão independente aprovada (histórico em `4ed2a47:docs/review.md`, seção `revalidação-de-prontidão-do-mvp--05102026`) no alvo `2b8ba19`, com R1 encerrado pela TASK-038. Gates reproduzidos pelo revisor: 139 testes aprovados, cobertura de 92,25% e Credo sem achados. A renovação da interface posterior ao MVP está registrada abaixo. A avaliação humana obrigatória foi retirada por [decisão do responsável](../prd.md#feedback-de-interface); registros anteriores de pendência são históricos.

@@ -61,6 +61,10 @@ Alterar credenciais no `.env` não altera um volume já inicializado: ajuste tam
 
 Decisão de 19/10/2026: Fly.io com uma única instância de aplicação, PostgreSQL no Neon e Resend via Swoosh. A escolha está registrada em [D24](docs/design.md#d24--flyio-neon-resend-e-configuração-por-url). Ainda faltam nome do app, região, domínio e remetente. Não há publicação ou integração remota comprovada por este registro.
 
+O responsável cuidará da Fly por fora do desenvolvimento. “App” é o identificador escolhido na Fly; região é a localização da aplicação e do banco Neon, preferencialmente próximas para reduzir latência. O domínio próprio será comprado posteriormente; a configuração pode usar inicialmente o host atribuído pela Fly. Credenciais ficam em Fly Secrets, não no repositório. Essas escolhas operacionais não impedem implementar/testar com valores sintéticos.
+
+Backup e recuperação também ficam na operação, sem tarefa de desenvolvimento. O Neon oferece recuperação dentro de uma janela de histórico que depende do plano/configuração; conferir a janela no projeto escolhido, sem pressupor retenção ilimitada. Referência: [restauração Neon](https://neon.com/docs/postgres/backup-restore/branch-restore).
+
 O `.env.example` inclui uma `DATABASE_URL` literal para a mudança do desenvolvimento planejada na [TASK-061](docs/tasks/061-database-url-desenvolvimento.md). **Hoje `config/database.exs` ainda usa os campos `POSTGRES_*`, não essa URL.** Quando a mudança for implementada, mantenha usuário, senha, porta e banco da URL alinhados aos campos usados pelo Compose; caracteres especiais nas credenciais devem ser codificados para URL. Testes continuarão com configuração própria e `MIX_TEST_PARTITION`, sem consumir a URL de desenvolvimento. O `.env` privado existente não é modificado por esta documentação.
 
 Os exemplos de produção estão comentados. O release lê variáveis do processo, não carrega o `.env` local. Na Fly, use Secrets para `DATABASE_URL`, `SECRET_KEY_BASE` e `RESEND_API_KEY`; valores públicos como `PHX_HOST`, `PORT` e remetente podem ficar no ambiente do app. `PHX_HOST` recebe apenas o host, sem esquema; `PORT` deve corresponder à porta interna do serviço Fly. A integração Neon ainda exige configurar TLS com verificação de certificado. Não usar as credenciais sintéticas de teste em produção.
@@ -68,6 +72,23 @@ Os exemplos de produção estão comentados. O release lê variáveis do process
 `SECRET_KEY_BASE` é o segredo do endpoint para derivar chaves criptográficas. Consulte `mix help phx.gen.secret` e gere-o com `mix phx.gen.secret`; mantenha o mesmo valor entre deploys. Sua troca invalida dados assinados com a chave anterior. Não copiar o segredo de desenvolvimento para produção.
 
 A integração Resend está planejada na [TASK-060](docs/tasks/060-configurar-resend.md): `RESEND_API_KEY`, `MAIL_FROM_EMAIL` e `MAIL_FROM_NAME` ainda não são lidas pelo código. A tarefa implementará o adapter e o remetente configuráveis; conta, credenciais e domínio verificado são preparados pelo responsável. Desenvolvimento permanece com mailbox local e testes sem envio externo.
+
+Preparação adicional ainda não implementada: [TLS Neon](docs/tasks/062-tls-postgresql-neon.md), [healthcheck](docs/tasks/063-healthcheck-minimo.md), [limites de e-mail](docs/tasks/064-limitar-envio-magic-link.md) e [proteção de tokens em logs](docs/tasks/065-proteger-tokens-logs.md). O healthcheck planejado é GET/HEAD `/health`, com 200 e corpo mínimo `ok` no GET, sem diagnóstico ou consulta ao banco/Resend; não comprova prontidão das dependências. Configurar o monitor Fly permanece operação externa.
+
+As variáveis abaixo são **contrato planejado**, ainda sem efeito no código. Serão lidas/validadas na inicialização, sem leitura por tentativa ou tick; mudar valores exige reiniciar a aplicação.
+
+| Variável | Padrão planejado | Efeito |
+| --- | --- | --- |
+| `DATABASE_SSL` | `true` em prod | TLS PostgreSQL verificado; `false` somente como exceção explícita para bancos isolados de teste. |
+| `AUTH_EMAIL_COOLDOWN_SECONDS` | `60` | Intervalo mínimo por e-mail. |
+| `AUTH_EMAIL_MAX_PER_HOUR` | `5` | Máximo por e-mail na janela móvel de uma hora. |
+| `AUTH_IP_MAX_PER_HOUR` | `20` | Máximo por IP na janela móvel de uma hora. |
+| `AUTH_EMAIL_MAX_PER_DAY` | `90` | Teto global de tentativas de entrega por dia UTC, incluindo falhas. |
+| `AUTH_TRUST_FLY_PROXY` | `false` | Habilitar somente com entrada exclusiva pelo Fly Proxy para obter IP validado de `Fly-Client-IP`. |
+
+Limites valem no servidor para cadastro/login e eventos LiveView; o botão e a contagem na mesma tela apenas apresentam a espera. Reserva no PostgreSQL persiste entre reinícios. IPs compartilhados por redes/NAT compartilham limite; teto diário protege o gasto, mas não garante disponibilidade sob abuso. Env de limites aceita somente inteiros positivos. A quota do provedor pode ser consumida por outros envios fora do app; limites Resend e erros 429 continuam aplicáveis ([documentação](https://resend.com/docs/api-reference/rate-limit)).
+
+Tokens também podem aparecer em logs de proxy e serviços externos: o responsável deve tratar esses sistemas na operação. A TASK-065 cobre somente logging/headers da aplicação, sem comprovar políticas externas.
 
 Instale a CLI pela [documentação oficial da Fly](https://docs.fly.io/flyctl/install). Na futura preparação do app, `fly launch --no-deploy --no-db` evita publicação imediata e banco Fly adicional. Revise os arquivos gerados preservando o Dockerfile existente. O `fly.toml` deverá configurar `release_command = "/app/bin/migrate"` na seção `[deploy]`; `fly deploy` construirá a imagem e executará essa etapa antes de atualizar a aplicação. Esses comandos criam ou alteram recursos remotos e não foram executados nesta rodada. Definir uma única instância explicitamente na operação; essa escolha não oferece redundância da aplicação.
 

@@ -103,6 +103,12 @@ Esta rodada registra escolhas e exemplos de configuração. Não comprova provis
 
 Pedido complementar autoriza planejar a integração Resend no código: [TASK-060](tasks/060-configurar-resend.md), com contrato em SPEC-008 RN06–RN08. A tarefa configura adapter e remetente por ambiente e valida sem envio externo; credenciais e verificação de domínio permanecem na operação. Não inclui a mudança de banco local para URL ou a configuração Fly/Neon.
 
+### Preparação de segurança — 19/10/2026
+
+O responsável cuidará da Fly e de backups/recuperação Neon fora do desenvolvimento. Autoriza planejar TLS verificado para PostgreSQL (TASK-062), healthcheck público mínimo sem informações do projeto (TASK-063) e limitação de e-mails de autenticação (TASK-064). Confirmou espera na mesma tela de login e limites configuráveis por ambiente, carregados na inicialização. O planejamento propõe padrões iniciais de 60 segundos entre tentativas por e-mail, 5 por e-mail/hora, 20 por IP/hora e teto global de 90 chamadas ao mailer/dia UTC, ajustáveis pelo responsável. Bloqueio é obrigatório no servidor, incluindo eventos LiveView e cadastro.
+
+A preparação identifica também exposição do token no caminho registrado pelo logger padrão; TASK-065 trata logs da aplicação e Referer. Preservar proteções Phoenix existentes de CSRF, origem e escape HTML. Não abrir CORS nem adicionar pacote genérico de segurança sem necessidade. CSP restritiva de scripts é defesa adicional a avaliar separadamente; a política padrão de headers não constitui proteção completa contra XSS. Não houve auditoria completa ou novo aceite de segurança nesta rodada documental.
+
 ## 8. Evolução após o MVP de produção
 
 - RF15: adição de créditos a usuários na TASK-049; loja, preços e compra de temas vêm depois. Propriedade futura aproveita as concessões da SPEC-007. Não há saldo, cobrança, pagamento ou loja no MVP de produção.

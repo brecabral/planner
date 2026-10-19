@@ -37,7 +37,7 @@ Arraste integrado na [TASK-040](../tasks/040-arrastar-tarefas.md), com aceite lo
 | [004 — Painel](004-experiencia-e-acesso.md) | Ready: menu à esquerda e novas ações; TASK-041/042/044. |
 | [005 — Contas](005-contas-e-acesso.md) | Ready: cadastro aberto, magic link, isolamento e dev; TASK-015/045/046/051. Página `/join` integrada na TASK-052. |
 | [007 — Temas](007-temas-e-creditos.md) | Ready: dois temas gratuitos, concessão e preferência por usuário; TASK-047/048. |
-| [008 — Código Phoenix e release local](008-producao.md) | Ready: empacotamento e aceite local; incremento Resend na TASK-060, sem envio externo no aceite. Infraestrutura e operação dos serviços sob responsabilidade do usuário. |
+| [008 — Código Phoenix e release local](008-producao.md) | Ready: aceite local; Resend (060), TLS PostgreSQL (062) e healthcheck mínimo (063) planejados. Infraestrutura e operação dos serviços sob responsabilidade do usuário. |
 | [009 — Créditos e compras](009-creditos-e-compras.md) | Draft: evolução futura; não bloqueia o MVP de produção. |
 
 As versões históricas citadas nos aceites de 05/10 não atestam login, temas ou operações novas. SPEC-003 preserva data UTC/histórico; SPEC-006 preserva classificação, com novo proprietário autenticado integrado pela TASK-045.
@@ -49,3 +49,5 @@ Identidade de 17/10/2026: SPEC-004 RN21–RN24/CA-004-17–18 e SPEC-007 RN09–
 
 
 SPEC-001: pt-BR fixo permanece entrega histórica; evolução de 17/10/2026 ready para tradução completa e engrenagem de idioma. Português/inglês, seleção pública no navegador e preferência por conta confirmados, com troca disponível durante o uso. TASK-013/014 aguardam somente integração das dependências. “A fazer” já está aprovado na TASK-059.
+
+Preparação de 19/10/2026: SPEC-005 RN21–RN27/CA-005-19–22 define limites de pedidos de e-mail configuráveis por ambiente, espera na mesma tela e proteção de tokens em logs/Referer (TASK-064/065). SPEC-008 RN09–RN10/CA-008-08–10 define TLS verificado e healthcheck público mínimo (TASK-062/063). Contratos prontos, implementação pendente; Fly e backups continuam na operação do responsável.

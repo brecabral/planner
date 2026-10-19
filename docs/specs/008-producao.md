@@ -39,6 +39,18 @@ O responsável escolheu Resend e solicitou uma tarefa de integração. Este incr
 
 TASK-060 produz este incremento, ainda não implementado; configuração Neon, mudança de banco local para URL e deploy ficam fora da tarefa.
 
+## TLS e healthcheck mínimo — 19/10/2026
+
+Pedido do responsável: configurar TLS para Neon e um healthcheck sem informações públicas do projeto. Operação Fly e backups permanecem fora do desenvolvimento.
+
+- RN09: produção conecta ao PostgreSQL com TLS e verificação de cadeia e hostname por padrão, usando as CAs do sistema. Não usar `verify_none` nem fallback após falha de certificado. `DATABASE_SSL` aceita somente `true` ou `false`, com padrão `true` em prod; `false` é exceção explícita para bancos isolados de E2E/CI sem TLS. Parâmetros da URL não podem enfraquecer a política; configuração contraditória deve falhar sem exibir a URL. Dev/test conservam o contrato local da TASK-061. O mesmo runtime atende migrations e servidor.
+- RN10: `GET /health` é público e responde status 200, corpo literal `ok`, tipo `text/plain` e `Cache-Control: no-store`; `HEAD /health` responde 200 sem corpo. Não consulta banco, e-mail ou serviços externos, não carrega sessão/conta, não emite cookie e não expõe versão, ambiente, commit, dependências, métricas, host, credenciais ou detalhes de erro. É sinal de processo HTTP respondendo, não de prontidão de dependências. A rota pode responder HTTP interno sem redirecionamento SSL; preservar HTTPS nas demais rotas.
+- CA-008-08: configuração prod padrão resulta em TLS com CA e verificação de hostname; flags inválidas e URL que tente desativar TLS são rejeitadas sem segredos. Exceção `DATABASE_SSL=false` permite os gates isolados existentes, explicitamente configurados, sem mudar o padrão seguro.
+- CA-008-09: testes versionados verificam as opções TLS efetivas e a rejeição da configuração conflitante; o release E2E continua iniciando/migrando com a exceção local explícita. Isso não comprova conexão a uma conta Neon real.
+- CA-008-10: GET/HEAD do healthcheck obedecem RN10 inclusive sem autenticação e com cookie inválido; a rota não chama Repo/Mailer e funciona sem depender deles durante a requisição. Teste no release confirma resposta mínima e ausência de redirecionamento no HTTP interno. Não exige parar o banco ou alterar o runner para simular infraestrutura caída.
+
+Entregas: TASK-062 (TLS) e TASK-063 (healthcheck). A configuração do monitor Fly é do responsável.
+
 ## Histórico da entrega local
 
 TASK-011 produz o release local; TASK-050 consolida o aceite do código e do artefato. TASK-033, TASK-034 e TASK-035 foram canceladas por retirada da operação remota do escopo, sem alegação de execução. Não há dúvida externa bloqueante neste contrato. Procedimentos efetivamente testados e pontos de configuração ficam exclusivamente no README.
