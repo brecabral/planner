@@ -57,6 +57,22 @@ O Compose usa PostgreSQL 17, publica a porta apenas em `127.0.0.1` e preserva da
 
 Alterar credenciais no `.env` não altera um volume já inicializado: ajuste também o usuário no banco existente. Para CI ou banco externo, exporte as variáveis de conexão de `.env.example` e use Mix diretamente; `PLANNER_SKIP_COMPOSE` foi removida. Produção usa `config/runtime.exs` e não inicia Compose automaticamente.
 
+## Publicação planejada na Fly.io com Neon e Resend
+
+Decisão de 19/10/2026: Fly.io com uma única instância de aplicação, PostgreSQL no Neon e Resend via Swoosh. A escolha está registrada em [D24](docs/design.md#d24--flyio-neon-resend-e-configuração-por-url). Ainda faltam nome do app, região, domínio e remetente. Não há publicação ou integração remota comprovada por este registro.
+
+O `.env.example` inclui uma `DATABASE_URL` literal para a mudança futura do desenvolvimento. **Hoje `config/database.exs` ainda usa os campos `POSTGRES_*`, não essa URL.** Quando a mudança for implementada, mantenha usuário, senha, porta e banco da URL alinhados aos campos usados pelo Compose; caracteres especiais nas credenciais devem ser codificados para URL. Testes continuarão com configuração própria e `MIX_TEST_PARTITION`, sem consumir a URL de desenvolvimento. O `.env` privado existente não é modificado por esta documentação.
+
+Os exemplos de produção estão comentados. O release lê variáveis do processo, não carrega o `.env` local. Na Fly, use Secrets para `DATABASE_URL`, `SECRET_KEY_BASE` e `RESEND_API_KEY`; valores públicos como `PHX_HOST`, `PORT` e remetente podem ficar no ambiente do app. `PHX_HOST` recebe apenas o host, sem esquema; `PORT` deve corresponder à porta interna do serviço Fly. A integração Neon ainda exige configurar TLS com verificação de certificado. Não usar as credenciais sintéticas de teste em produção.
+
+`SECRET_KEY_BASE` é o segredo do endpoint para derivar chaves criptográficas. Consulte `mix help phx.gen.secret` e gere-o com `mix phx.gen.secret`; mantenha o mesmo valor entre deploys. Sua troca invalida dados assinados com a chave anterior. Não copiar o segredo de desenvolvimento para produção.
+
+A integração Resend está planejada na [TASK-060](docs/tasks/060-configurar-resend.md): `RESEND_API_KEY`, `MAIL_FROM_EMAIL` e `MAIL_FROM_NAME` ainda não são lidas pelo código. A tarefa implementará o adapter e o remetente configuráveis; conta, credenciais e domínio verificado são preparados pelo responsável. Desenvolvimento permanece com mailbox local e testes sem envio externo.
+
+Instale a CLI pela [documentação oficial da Fly](https://docs.fly.io/flyctl/install). Na futura preparação do app, `fly launch --no-deploy --no-db` evita publicação imediata e banco Fly adicional. Revise os arquivos gerados preservando o Dockerfile existente. O `fly.toml` deverá configurar `release_command = "/app/bin/migrate"` na seção `[deploy]`; `fly deploy` construirá a imagem e executará essa etapa antes de atualizar a aplicação. Esses comandos criam ou alteram recursos remotos e não foram executados nesta rodada. Definir uma única instância explicitamente na operação; essa escolha não oferece redundância da aplicação.
+
+O script versionado é `rel/overlays/bin/migrate` (singular), copiado para `bin/migrate` no release e disponível como `/app/bin/migrate` na imagem. Ele chama `Planner.Release.migrate/0`, que usa `Ecto.Migrator` para aplicar as migrations pendentes de `priv/repo/migrations`. Phoenix não faz isso automaticamente ao iniciar o servidor; `bin/server` inicia a aplicação. Falha na etapa de release interrompe o deploy, mas não desfaz automaticamente migrations já aplicadas. Referência: [configuração da Fly](https://docs.fly.io/reference/configuration).
+
 ## Autenticação e dados por conta
 
 O cadastro é aberto por e-mail e o acesso usa exclusivamente magic link, sem senha. `/` leva visitantes a `/users/log-in`; contas autenticadas seguem para `/tasks`. O cadastro de tarefas em `/tasks/new` também exige sessão. Após confirmar o link, o usuário acessa seu planejamento; “Sair” encerra a sessão e retorna ao login. Links expiram em 15 minutos e só podem ser consumidos uma vez.

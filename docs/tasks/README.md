@@ -2,6 +2,10 @@
 
 O MVP local entregue contém o fluxo de planejamento com usuário padrão, pt-BR via Gettext, data corrente e recarga manual. O MVP de produção amplia esse contrato conforme o PRD e a seção própria abaixo. Cabeçalhos YAML são a fonte de status, dependências e bloqueios; convenções no [formato](formato.md). Cada tarefa informa scaffold e ajustes quando houver geração.
 
+## Preparação Resend — 19/10/2026
+
+[TASK-060 — Configurar Resend e remetente de produção](060-configurar-resend.md): integração do adapter Swoosh existente, variáveis de runtime e remetente, com testes sem envio externo e preservação do E2E. Contrato em SPEC-008 RN06–RN08/CA-008-05–07. A dependência TASK-013 serializa o escopo compartilhado de Accounts; as demais dependências e o estado constam do cabeçalho. Não inclui configuração Neon, mudança local para URL ou operação/publicação remota.
+
 ## MVP
 
 MVP local encerrado em 05/10/2026: entregas integradas e revisão independente aprovada (histórico em `4ed2a47:docs/review.md`, seção `revalidação-de-prontidão-do-mvp--05102026`) no alvo `2b8ba19`, com R1 encerrado pela TASK-038. Gates reproduzidos pelo revisor: 139 testes aprovados, cobertura de 92,25% e Credo sem achados. A renovação da interface posterior ao MVP está registrada abaixo. A avaliação humana obrigatória foi retirada por [decisão do responsável](../prd.md#feedback-de-interface); registros anteriores de pendência são históricos.

@@ -95,6 +95,14 @@ Dados do usuário padrão ficam preservados e isolados; não migrar automaticame
 
 O trabalho dos agentes termina no código Phoenix funcional e no release local validado. Hospedagem, domínio/HTTPS, provedor e remetente de e-mail, publicação e operação de backups são responsabilidade do usuário, fora desta entrega e sem constituir bloqueios da fila de código. O usuário pode configurar o provedor posteriormente usando a integração Swoosh existente; desenvolvimento e testes validam o fluxo sem envio externo. A expressão “MVP de produção” identifica o incremento com contas e temas, não uma obrigação de operar um ambiente remoto.
 
+### Escolhas para publicação — decisão de 19/10/2026
+
+O responsável escolheu Fly.io com uma única instância de aplicação, PostgreSQL no Neon e Resend para e-mails transacionais. A operação usará a CLI oficial da Fly. A decisão arquitetural está em [D24](design.md#d24--flyio-neon-resend-e-configuração-por-url); procedimentos e estado da preparação ficam no README.
+
+Esta rodada registra escolhas e exemplos de configuração. Não comprova provisionamento, integração Resend/Neon, envio externo ou publicação. O aceite local existente e a fronteira operacional acima permanecem válidos; as antigas tarefas de publicação não são reabertas por este registro. Nome do app, região, domínio e remetente ainda precisam ser definidos.
+
+Pedido complementar autoriza planejar a integração Resend no código: [TASK-060](tasks/060-configurar-resend.md), com contrato em SPEC-008 RN06–RN08. A tarefa configura adapter e remetente por ambiente e valida sem envio externo; credenciais e verificação de domínio permanecem na operação. Não inclui a mudança de banco local para URL ou a configuração Fly/Neon.
+
 ## 8. Evolução após o MVP de produção
 
 - RF15: adição de créditos a usuários na TASK-049; loja, preços e compra de temas vêm depois. Propriedade futura aproveita as concessões da SPEC-007. Não há saldo, cobrança, pagamento ou loja no MVP de produção.
