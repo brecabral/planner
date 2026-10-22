@@ -7,8 +7,20 @@
 # General application configuration
 import Config
 
+config :planner, :scopes,
+  user: [
+    default: true,
+    module: Planner.Accounts.Scope,
+    assign_key: :current_scope,
+    access_path: [:user, :id],
+    schema_key: :user_id,
+    schema_type: :id,
+    schema_table: :users,
+    test_data_fixture: Planner.AccountsFixtures,
+    test_setup_helper: :register_and_log_in_user
+  ]
+
 config :planner,
-  auto_create_default_user: false,
   ecto_repos: [Planner.Repo],
   generators: [timestamp_type: :utc_datetime]
 

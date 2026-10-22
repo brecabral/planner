@@ -382,7 +382,7 @@ defmodule Planner.TasksTest do
     assert {:ok, %{used_choices: 3}} = Tasks.snapshot(user, day)
   end
 
-  test "return_to_backlog rejects invalid owners, completion and expired selections", %{
+  test "return_to_backlog rejects invalid owners and completion", %{
     user: user
   } do
     day = ~D[2026-10-01]
@@ -397,9 +397,7 @@ defmodule Planner.TasksTest do
       assert {:error, :not_found} = Tasks.return_to_backlog(user, id, day)
     end
 
-    for id <- [expired.id, completed.id] do
-      assert {:error, :invalid_state} = Tasks.return_to_backlog(user, id, day)
-    end
+    assert {:error, :invalid_state} = Tasks.return_to_backlog(user, completed.id, day)
 
     assert Repo.get!(Task, completed.id) == completed
     assert Repo.get!(Task, foreign.id) == foreign
@@ -437,13 +435,53 @@ defmodule Planner.TasksTest do
     yesterday = ~D[2026-09-30]
     day = Date.add(yesterday, 1)
     task = task_fixture(user)
-    assert {:ok, selected} = Tasks.select_today(user, task.id, yesterday)
-    assert {:error, :invalid_state} = Tasks.return_to_backlog(user, task.id, day)
-    assert Repo.get_by(DailyPlan, user_id: user.id, day: day) == nil
-    assert Repo.get!(Task, task.id) == selected
-    assert {:ok, %{used_choices: 0, today: [], retry: [retry]}} = Tasks.snapshot(user, day)
-    assert retry.id == task.id
+    assert {:ok, _} = Tasks.select_today(user, task.id, yesterday)
+    assert {:ok, returned} = Tasks.return_to_backlog(user, task.id, day)
+    assert returned.kind == :backlog
+
+    assert {:ok, %{used_choices: 0, today: [], retry: [], backlog: [backlog]}} =
+             Tasks.snapshot(user, day)
+
+    assert backlog.id == task.id
     assert Repo.get_by!(DailyPlan, user_id: user.id, day: yesterday).used_choices == 1
+  end
+
+  test "concurrent retry drag and menu return serialize and preserve exhausted quota" do
+    with_committed_user(fn user ->
+      day = ~D[2026-10-02]
+      moving = task_fixture(user)
+      assert {:ok, _} = Tasks.select_today(user, moving.id, Date.add(day, -1))
+
+      for _ <- 1..3 do
+        task = task_fixture(user)
+        assert {:ok, _} = Tasks.select_today(user, task.id, day)
+      end
+
+      [drag, menu] =
+        race_planning_commands(user, day, [
+          fn ->
+            Tasks.move_task(
+              user,
+              %{
+                "task_id" => moving.id,
+                "from" => "retry",
+                "to" => "backlog",
+                "orders" => %{"retry" => [], "backlog" => [moving.id]}
+              },
+              day
+            )
+          end,
+          fn -> Tasks.return_to_backlog(user, moving.id, day) end
+        ])
+
+      assert match?({:ok, _}, drag) or drag == {:error, :invalid_state}
+      assert {:ok, _} = menu
+
+      assert {:ok, %{used_choices: 3, retry: [], backlog: [%{id: id, position: 1}]}} =
+               Tasks.snapshot(user, day)
+
+      assert id == moving.id
+    end)
   end
 
   test "concurrent returns refund the same task only once" do
@@ -492,6 +530,55 @@ defmodule Planner.TasksTest do
       assert Enum.map(snapshot.today, & &1.position) == Enum.to_list(1..length(snapshot.today))
       assert Enum.any?(snapshot.backlog, &(&1.id == returning.id))
     end)
+  end
+
+  test "concurrent deletion against deletion, return and completion preserves one refund or history" do
+    for operation <- [:delete, :return, :complete] do
+      with_committed_user(fn user ->
+        day = ~D[2026-10-02]
+        task = task_fixture(user)
+        assert {:ok, _} = Tasks.select_today(user, task.id, day)
+
+        competing =
+          case operation do
+            :delete -> fn -> Tasks.delete_pending_task(user, task.id, day) end
+            :return -> fn -> Tasks.return_to_backlog(user, task.id, day) end
+            :complete -> fn -> Tasks.complete_task(user, task.id, day) end
+          end
+
+        [deletion, other] =
+          race_planning_commands(user, day, [
+            fn -> Tasks.delete_pending_task(user, task.id, day) end,
+            competing
+          ])
+
+        if operation == :delete do
+          assert Enum.count([deletion, other], &match?({:ok, _}, &1)) == 1
+          assert {:error, :not_found} in [deletion, other]
+        end
+
+        assert {:ok, snapshot} = Tasks.snapshot(user, day)
+        assert snapshot.today == []
+        assert snapshot.backlog == []
+        assert snapshot.retry == []
+
+        if operation == :complete and match?({:ok, _}, other) do
+          assert deletion == {:error, :not_found}
+          assert [%{id: id}] = Tasks.list_history(user)
+          assert id == task.id
+          assert snapshot.used_choices == 1
+        else
+          assert match?({:ok, _}, deletion) or (operation == :delete and match?({:ok, _}, other))
+          assert other == {:error, :not_found} or match?({:ok, _}, other)
+          assert Repo.get(Task, task.id) == nil
+          assert snapshot.used_choices == 0
+          assert Tasks.list_history(user) == []
+        end
+
+        assert {:error, :not_found} = Tasks.delete_pending_task(user, task.id, day)
+        assert {:ok, ^snapshot} = Tasks.snapshot(user, day)
+      end)
+    end
   end
 
   defp with_committed_user(operation) do

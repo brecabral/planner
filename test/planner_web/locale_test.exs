@@ -8,7 +8,7 @@ defmodule PlannerWeb.LocaleTest do
       assert has_element?(view, "#locale", "pt_BR")
       assert has_element?(view, "#title[value='Keep my English title']")
       assert has_element?(view, "nav[aria-label='Navegação principal']")
-      assert has_element?(view, "nav a[href='/']", "Planner")
+      assert has_element?(view, "nav a[href='/']", "Just Three")
       assert html =~ "Tentando reconectar"
       GenServer.stop(view.pid)
     end

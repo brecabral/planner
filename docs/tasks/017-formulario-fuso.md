@@ -8,7 +8,7 @@ depends_on: ["TASK-008"]
 provides: ["timezone-settings"]
 consumes: ["verified-mvp"]
 write_scope: ["lib/planner/accounts.ex", "lib/planner_web/live/user_live/settings.ex", "priv/gettext/", "test/planner/accounts_test.exs", "test/planner_web/live/user_live/settings_test.exs"]
-blockers: ["Fora do MVP; revisar escopo e contratos antes de iniciar a evolução."]
+blockers: ["Fora do MVP de produção; revisar escopo e contratos antes de iniciar a evolução."]
 ---
 
 # 017 — Gerenciamento de fuso
@@ -18,3 +18,5 @@ blockers: ["Fora do MVP; revisar escopo e contratos antes de iniciar a evoluçã
 Integrar o formulário de fuso à conta real conforme política temporal futura.
 
 Fora do MVP. Não executável nem gate da entrega mínima. O contrato de produto e o aceite serão definidos ao retomar esta etapa; não aplicar o comportamento futuro às specs atuais do MVP.
+
+O plano de produção de 11/10/2026 mantém esta capacidade adiada. Reavaliar dependências diante da autenticação/temas quando o contrato for retomado; os cabeçalhos atuais não autorizam execução.

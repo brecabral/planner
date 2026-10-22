@@ -1,0 +1,18 @@
+name: planner-test
+
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: planner_test
+      POSTGRES_PASSWORD: local_test_only
+      POSTGRES_DB: planner_test
+    ports:
+      - "127.0.0.1:${PLANNER_TEST_PORT:-55432}:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U planner_test -d planner_test"]
+      interval: 2s
+      timeout: 5s
+      retries: 30

@@ -11,6 +11,17 @@ defmodule PlannerWeb.Layouts do
   # and other static content.
   embed_templates "layouts/*"
 
+  def authorized_theme(scope) do
+    themes = Planner.Themes.list_available_themes(scope)
+    selected = scope && scope.user.theme_code
+    if Enum.any?(themes, &(&1.code == selected)), do: selected, else: "planner"
+  end
+
+  def initial_theme(%{conn: %{request_path: path}, current_scope: scope})
+      when path in ["/tasks", "/tasks/new"], do: authorized_theme(scope)
+
+  def initial_theme(_assigns), do: "planner"
+
   @doc """
   Renders your app layout.
 
@@ -31,21 +42,36 @@ defmodule PlannerWeb.Layouts do
     default: nil,
     doc: "the current [scope](https://phoenix.hexdocs.pm/scopes.html)"
 
+  slot :theme_selector
   slot :inner_block, required: true
 
   def app(assigns) do
     ~H"""
     <header class="border-b border-base-300 bg-base-100">
       <nav
-        class="mx-auto flex max-w-6xl items-center px-4 py-5 sm:px-8"
+        class="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-5 sm:px-8"
         aria-label={gettext("Main navigation")}
       >
-        <.link href={~p"/"} class="flex items-center gap-3 text-lg font-semibold tracking-tight">
+        <.link
+          id="brand"
+          href={~p"/"}
+          class="mr-auto flex items-center gap-3 text-lg font-semibold tracking-tight"
+        >
           <span class="grid size-9 place-items-center rounded-xl bg-primary text-primary-content">
-            <.icon name="hero-check" class="size-5" />
+            <.icon name="hero-bars-3" class="size-5" />
           </span>
-          {gettext("Planner")}
+          Just Three
         </.link>
+        <div :if={@current_scope} class="ml-auto flex max-w-full items-center gap-3">
+          {render_slot(@theme_selector)}
+          <.link
+            id="log-out"
+            href={~p"/users/log-out"}
+            method="delete"
+            class="btn btn-ghost btn-square shrink-0"
+            aria-label={gettext("Log out")}
+          ><.icon name="hero-arrow-right-start-on-rectangle" class="size-5" /></.link>
+        </div>
       </nav>
     </header>
     <main class="mx-auto max-w-6xl px-4 py-8 sm:px-8 sm:py-12">

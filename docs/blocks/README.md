@@ -23,3 +23,6 @@ O coordenador só encerra o relatório quando a condição de retomada estiver c
 
 - [BLOCK-003 — Escopo do teste de rotas do painel](003-escopo-teste-rotas-painel.md).
 - [BLOCK-004 — Validação de acessibilidade em navegador](004-validacao-navegador-acessibilidade.md).
+- [BLOCK-005 — Delegação do release sem retorno](005-delegacao-release-sem-retorno.md).
+- [BLOCK-006 — Isolamento do projeto Compose de teste](006-isolamento-compose-teste.md).
+- [BLOCK-007 — Aceite automatizado de reinício do release](007-aceite-automatizado-reinicio-release.md).

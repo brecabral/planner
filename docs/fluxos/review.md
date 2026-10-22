@@ -20,6 +20,16 @@ Em revisões incrementais das entregas, consultar o front matter YAML de [docs/r
 
 Conferir a regra com estes casos: entrega aprovada avança o marco; falha de gate mantém o anterior; código local divergente não é atribuído a HEAD; histórico reescrito exige reconstrução da base; tarefa fora do escopo exige revisão própria mesmo antes do marco.
 
+## Manutenção do relatório atual
+
+Ao encerrar cada rodada, limpar `docs/review.md`: manter apenas achados abertos, limitações e aceites ainda relevantes ao contexto atual, além do alvo/base, marco de aprovação e evidências necessárias para interpretar a conclusão vigente. Conferir a resolução nas tarefas, entregas e decisões atuais antes de retirar um achado; ausência de menção não prova correção.
+
+Remover do relatório corrente questões resolvidas ou superadas, aprovações antigas, orientações de fila obsoletas e memória de conversa. Preservar o histórico no Git e as evidências pertinentes nas tarefas, sem acumular um arquivo de relatórios antigos dentro da review. Corrigir links para seções removidas, apontando para a evidência vigente ou para a versão histórica identificada por commit. Documentos temporários de retomada podem ser excluídos quando a tarefa já foi integrada e não guardam pendência ou decisão exclusiva ainda necessária.
+
+A limpeza não transforma `changes_requested` ou `blocked` em `approved`, não avança `last_approved_commit` e não atribui testes antigos a código novo. Em rodada exclusivamente documental, conservar o SHA efetivamente avaliado e identificar a limpeza separadamente. Não remover limitações ainda abertas só porque os testes passaram, nem reabrir entregas aceitas por apagar seu relato histórico.
+
+Validar a manutenção com estes casos: achado corrigido com evidência sai; achado sem resolução permanece; aprovação histórica sai sem apagar o marco; mudança de escopo remove recomendação superada sem simular implementação; link histórico continua consultável; retomada encerrada pode sair quando o registro da tarefa já sustenta a conclusão.
+
 ## Procedimento
 
 1. Relacionar cada critério de aceite a implementação e evidência. Procurar comportamento faltante, inventado ou incompatível com a spec; hipótese de produto não é fato para reprovar código.
@@ -27,7 +37,7 @@ Conferir a regra com estes casos: entrega aprovada avança o marco; falha de gat
 3. Conferir padrões Phoenix/Elixir do repositório, limites de contexto DDD, nomes, Gettext, configuração externa e uso das dependências estabelecidas. Avaliar tanto adição desnecessária quanto reimplementação indevida de capacidade crítica já disponível, como Req ou Gettext.
 4. Avaliar duplicação de regra de negócio, coesão, acoplamento, SOLID, DRY e padrões de projeto como instrumentos. Reportar problema concreto; não exigir abstração, padrão ou camada apenas por preferência estética. Semelhança textual isolada não prova duplicação de responsabilidade.
 5. Avaliar os testes: verificam intenção ou repetem a implementação? Cobrem rejeições e invariantes relevantes? Podem passar com comportamento errado? Conferir fixtures, isolamento e fragilidade.
-6. Executar verificações pelos aliases Mix documentados. Conferir a ajuda antes de usar opções novas. Usar ferramentas de diff, compilação, testes, cobertura e análise estática já disponíveis; para lacunas de ferramental, registrar proposta específica em vez de instalar dependências automaticamente.
+6. Executar verificações pelas entradas locais Just documentadas, usando Mix para tarefas Elixir/Phoenix. Conferir a ajuda antes de usar opções novas. Usar ferramentas de diff, compilação, testes, cobertura e análise estática já disponíveis; para lacunas de ferramental, registrar proposta específica em vez de instalar dependências automaticamente.
 7. Avaliar cobertura do código alterado e dos caminhos críticos. Registrar métrica disponível, escopo, ferramenta, versão/base quando relevantes e limitações. Comparar antes/depois quando mensurável; redução justificada pela remoção de código não é regressão automática. Cobertura de linhas não prova qualidade e não mede todos os ramos; se não houver métrica, informar a lacuna, nunca inventar um número.
 8. Fazer avaliação comportamental (eval) com os cenários de aceite. Em workflows de LLM/skills, quando alterados, usar casos representativos, saída esperada e rubrica de sucesso/erro; não introduzir framework de eval de LLM em uma mudança comum de código que não usa modelos.
 
@@ -46,3 +56,7 @@ Implementadores aplicam os mesmos critérios, registram resultados e encaminham 
 ## Tarefas humanas
 
 Verificar `execution_level` antes de executar. Se for `human`, ou existir pré-requisito humano incompleto, aplicar a [reserva do AGENTS.md](../../AGENTS.md#execução-exclusiva-por-humano): informar a intervenção necessária e recusar execução dessa tarefa. Explicação e inspeção de evidências em leitura são permitidas; execução parcial, delegação e reclassificação para contornar o bloqueio não são.
+
+## Avaliação E2E
+
+Todo revisor de código e toda autoavaliação devem executar a suíte E2E completa, inclusive para alterações sem front. Registrar alvo, cenários, resultado e artefatos. Aplicar a [política e transição do PRD](../prd.md#e2e-obrigatório--decisão-de-16102026), com operação no README. Falha ou indisponibilidade não é aprovação; validação exclusivamente documental não exige navegador.

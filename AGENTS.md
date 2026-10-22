@@ -49,6 +49,16 @@ Comece pela tarefa solicitada. Leia apenas os documentos e trechos necessários;
 - Ao encontrar impedimento, parar a tarefa, preservar o trabalho e registrar evidências em `docs/blocks`, conforme o [protocolo](docs/blocks/README.md). Comunicar ao coordenador; não ampliar o escopo para contornar o bloqueio.
 - Não considerar specs ou tarefas concluídas por estarem documentadas. Atualizar estados e registrar evidências reais; conclusão exige integração das dependências na base de trabalho.
 - Aplicar TDD enxuto para comportamento. Ler `mix help` antes de usar tarefas; finalizar alterações com `mix precommit` e corrigir problemas relevantes. O CI exige cobertura mínima de 70%; não reduzir esse limiar para aprovar mudanças.
+- Validar comportamento por testes automatizados versionados e integrados à suíte do projeto. Não realizar testes avulsos, manuais ou por scripts temporários fora da suíte para complementar o aceite. Se surgir necessidade de cobertura não prevista no escopo da tarefa, registrar um impedimento em `docs/blocks` para planejar a criação dos testes automatizados; não ampliar a validação por conta própria. Tarefas que já autorizam criar testes implementam essa cobertura na suíte.
+- Testar acessibilidade e conteúdo somente quando houver requisito explícito nas specs aplicáveis, vinculando as asserções ao requisito. Não acrescentar auditorias ou critérios de aceite de acessibilidade ou conteúdo por iniciativa do agente.
 - Usar dependências existentes: HTTP com `Req`. Não adicionar ferramentas ou camadas sem necessidade concreta.
 - Registrar descobertas reutilizáveis nas referências do conceito, decisões em `design.md` e progresso no arquivo da tarefa. Não duplicar uma memória de conversa.
 - Manter instruções operacionais somente no README. Ao mover documentos, corrigir os links e índices afetados.
+
+## Encerramento de rodada
+
+Todos os perfis, inclusive planejador e revisor, devem encerrar cada rodada com commit das próprias alterações, inclusive documentação e relatórios. Conferir o diff e selecionar arquivos explicitamente, preservando alterações preexistentes de terceiros. Sem alterações próprias, informar que não há commit necessário; não criar commit vazio. Commit de progresso ou de impedimento não significa aprovação, conclusão da tarefa ou publicação remota. Na revisão, o SHA avaliado continua sendo o código revisado, não o commit posterior do relatório.
+
+## Gate E2E
+
+Tarefas de front devem manter e usar cenários E2E para avaliar as mudanças. Todo revisor de código e toda autoavaliação executam a suíte completa, mesmo sem mudança de front. Aplicar a [política e transição](docs/prd.md#e2e-obrigatório--decisão-de-16102026); comandos no README. Validação exclusivamente documental permanece documental.

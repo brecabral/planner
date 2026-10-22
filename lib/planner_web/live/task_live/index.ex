@@ -1,25 +1,57 @@
 defmodule PlannerWeb.TaskLive.Index do
   use PlannerWeb, :live_view
 
-  alias Planner.Accounts
-  alias Planner.Tasks
+  alias Planner.Accounts.Scope
+  alias Planner.{Tasks, Themes}
 
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash}>
-      <.header>
-        {gettext("Planner")}
-        <:actions>
-          <.link
-            id="new-task"
-            patch={~p"/tasks/new"}
-            class="btn btn-primary"
+    <Layouts.app flash={@flash} current_scope={@current_scope}>
+      <:theme_selector>
+        <div
+          id="account-theme"
+          phx-hook="AccountTheme"
+          data-theme={@theme_code}
+          class="relative shrink-0"
+        >
+          <button
+            id="theme-toggle"
+            type="button"
+            class="btn btn-ghost btn-square"
+            aria-label={gettext("Theme")}
+            aria-expanded="false"
+            aria-controls="theme-options"
           >
-            <.icon name="hero-plus" /> {gettext("New task")}
-          </.link>
-        </:actions>
-      </.header>
+            <.icon name="hero-puzzle-piece" class="size-5" />
+          </button>
+          <div
+            id="theme-options"
+            hidden
+            class="absolute right-0 top-full z-30 w-48 rounded-box border border-base-300 bg-base-100 p-3 shadow-lg"
+          >
+            <.input
+              type="select"
+              id="theme-selector"
+              name="theme_code"
+              label={gettext("Theme")}
+              value={@theme_code}
+              options={Enum.map(@available_themes, &{theme_label(&1.code), &1.code})}
+              class="select select-sm w-full"
+              aria-describedby={if @theme_error, do: "theme-error"}
+            />
+            <span id="theme-saving" hidden role="status" class="text-xs">{gettext("Saving...")}</span>
+            <p :if={@theme_error} id="theme-error" role="alert" class="text-sm text-error">
+              {@theme_error}
+            </p>
+          </div>
+        </div>
+      </:theme_selector>
+      <div class="flex justify-end">
+        <.link id="new-task" patch={~p"/tasks/new"} class="btn btn-primary">
+          <.icon name="hero-plus" /> {gettext("New task")}
+        </.link>
+      </div>
       <p :if={@planning_error} id="planning-error" role="alert" class="alert alert-error">
         {@planning_error}
       </p>
@@ -71,17 +103,19 @@ defmodule PlannerWeb.TaskLive.Index do
               data-task-id={task.id}
               class="task-card"
             >
-              <.drag_handle task={task} />
-              <span
-                data-priority
-                class="mr-2 inline-grid size-8 place-items-center rounded-lg bg-primary/10 font-semibold text-primary"
-              >{task.position}.</span>
-              <span id={"task-title-#{task.id}"} data-task-title>{task.title}</span>
-              <.task_labels task={task} />
-              <div class="mt-3 flex flex-wrap gap-2">
-                <.planning_action task={task} action="complete" />
+              <div class="task-controls">
                 <.task_menu task={task} count={@today_count} />
+                <.drag_handle task={task} />
               </div>
+              <div class="task-content">
+                <span
+                  data-priority
+                  class="mr-2 inline-grid size-8 place-items-center rounded-lg bg-primary/10 font-semibold text-primary"
+                >{task.position}.</span>
+                <span id={"task-title-#{task.id}"} data-task-title>{task.title}</span>
+                <.task_labels task={task} />
+              </div>
+              <.planning_action task={task} action="complete" />
             </div>
           </div>
         </section>
@@ -108,10 +142,14 @@ defmodule PlannerWeb.TaskLive.Index do
                 data-task-id={task.id}
                 class="task-card"
               >
-                <.drag_handle task={task} />
-                <span id={"task-title-#{task.id}"} data-task-title>{task.title}</span>
-                <.task_labels task={task} />
-                <.task_menu task={task} count={@backlog_count} />
+                <div class="task-controls">
+                  <.task_menu task={task} count={@backlog_count} />
+                  <.drag_handle task={task} />
+                </div>
+                <div class="task-content">
+                  <span id={"task-title-#{task.id}"} data-task-title>{task.title}</span>
+                  <.task_labels task={task} />
+                </div>
               </div>
             </div>
           </section>
@@ -135,10 +173,14 @@ defmodule PlannerWeb.TaskLive.Index do
                 data-task-id={task.id}
                 class="task-card"
               >
-                <.drag_handle task={task} />
-                <span id={"task-title-#{task.id}"} data-task-title>{task.title}</span>
-                <.task_labels task={task} />
-                <.task_menu task={task} count={@retry_count} />
+                <div class="task-controls">
+                  <.task_menu task={task} count={@retry_count} />
+                  <.drag_handle task={task} />
+                </div>
+                <div class="task-content">
+                  <span id={"task-title-#{task.id}"} data-task-title>{task.title}</span>
+                  <.task_labels task={task} />
+                </div>
               </div>
             </div>
           </section>
@@ -183,6 +225,39 @@ defmodule PlannerWeb.TaskLive.Index do
           </div>
         </div>
       </section>
+      <section
+        :if={@deletion_task}
+        id="delete-confirmation"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="delete-heading"
+        aria-describedby="delete-description"
+        class="modal modal-open"
+      >
+        <.focus_wrap id="delete-focus" class="modal-box" phx-mounted={JS.focus(to: "#cancel-delete")}>
+          <h2 id="delete-heading" class="text-lg font-semibold">{gettext("Delete task")}</h2>
+          <p id="delete-description" class="mt-4 break-words">
+            {gettext("Permanently delete the task “%{title}”? This cannot be undone.",
+              title: @deletion_task.title
+            )}
+          </p>
+          <div class="modal-action">
+            <button id="cancel-delete" type="button" phx-click="cancel_delete" class="btn">
+              {gettext("Cancel")}
+            </button>
+            <form id="confirm-delete" phx-submit={JS.push("delete", page_loading: true)}>
+              <button
+                id="confirm-delete-button"
+                type="submit"
+                class="btn btn-error"
+                phx-disable-with={gettext("Saving...")}
+              >
+                {gettext("Delete permanently")}
+              </button>
+            </form>
+          </div>
+        </.focus_wrap>
+      </section>
       <.live_component
         :if={@live_action == :new}
         module={PlannerWeb.TaskLive.Form}
@@ -195,17 +270,21 @@ defmodule PlannerWeb.TaskLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    user = Accounts.resolve_default_user!()
+    user = socket.assigns.current_scope.user
     {:ok, snapshot} = Tasks.snapshot(user)
 
     {:ok,
      socket
+     |> assign(:theme_code, Layouts.authorized_theme(socket.assigns.current_scope))
+     |> assign(:available_themes, Themes.list_available_themes(socket.assigns.current_scope))
+     |> assign(:theme_error, nil)
      |> assign(:user, user)
-     |> assign(:page_title, gettext("Planner"))
+     |> assign(:page_title, "Just Three")
      |> assign(:planning_error, nil)
      |> assign(:planning_status, nil)
      |> assign(:status_version, 0)
      |> assign(:history_open, false)
+     |> assign(:deletion_task, nil)
      |> assign_snapshot(snapshot)}
   end
 
@@ -222,8 +301,49 @@ defmodule PlannerWeb.TaskLive.Index do
   end
 
   @impl true
+  def handle_event("select_theme", params, socket) do
+    case select_theme(socket.assigns.current_scope, params) do
+      {:ok, user} ->
+        {:noreply,
+         assign(socket,
+           theme_code: user.theme_code,
+           theme_error: nil,
+           current_scope: Scope.for_user(user),
+           user: user
+         )}
+
+      {:error, _reason} ->
+        {:noreply,
+         assign(socket, :theme_error, gettext("Could not save the theme. Please try again."))}
+    end
+  end
+
   def handle_event("toggle_history", _params, socket) do
     {:noreply, assign(socket, :history_open, !socket.assigns.history_open)}
+  end
+
+  def handle_event("request_delete", params, socket) do
+    task = pending_deletion_task(socket.assigns.user, Map.get(params, "task_id"))
+
+    if task do
+      {:noreply, assign(socket, deletion_task: task, planning_error: nil, planning_status: nil)}
+    else
+      finish_action(assign(socket, :deletion_task, nil), {:error, :not_found}, "delete")
+    end
+  end
+
+  def handle_event("cancel_delete", _params, socket) do
+    {:noreply, assign(socket, :deletion_task, nil)}
+  end
+
+  def handle_event("delete", _params, socket) do
+    result =
+      case socket.assigns.deletion_task do
+        nil -> {:error, :not_found}
+        task -> run_action("delete", socket.assigns.user, task.id)
+      end
+
+    finish_action(assign(socket, :deletion_task, nil), result, "delete")
   end
 
   def handle_event(action, params, socket) when action in ["select", "return", "complete"] do
@@ -242,6 +362,33 @@ defmodule PlannerWeb.TaskLive.Index do
     result = run_action("move_task", socket.assigns.user, params)
     {:noreply, socket} = finish_action(socket, result, "move_task")
     {:reply, %{ok: match?({:ok, _}, result)}, socket}
+  end
+
+  defp theme_label("planner"), do: gettext("Light")
+  defp theme_label("planner_dark"), do: gettext("Dark")
+
+  defp select_theme(scope, params) do
+    Themes.select_theme(scope, params)
+  rescue
+    _error in [
+      Ecto.ConstraintError,
+      Ecto.StaleEntryError,
+      Postgrex.Error,
+      DBConnection.ConnectionError
+    ] ->
+      {:error, :persistence_failed}
+  end
+
+  defp pending_deletion_task(user, id) do
+    with {:ok, id} when is_integer(id) <- Ecto.Type.cast(:id, id),
+         task = Tasks.get_task!(user, id),
+         true <- is_nil(task.completed_on) do
+      task
+    else
+      _ -> nil
+    end
+  rescue
+    _error in [Ecto.NoResultsError, Ecto.Query.CastError] -> nil
   end
 
   defp move_priority(ids, %{"task_id" => id, "direction" => direction})
@@ -293,6 +440,7 @@ defmodule PlannerWeb.TaskLive.Index do
     {:noreply, refresh_snapshot(socket)}
   end
 
+  defp success_message("delete"), do: gettext("Task deleted.")
   defp success_message("move_task"), do: gettext("Movement saved.")
   defp success_message("complete"), do: gettext("Task completed.")
   defp success_message("return"), do: gettext("Task returned to backlog.")
@@ -301,6 +449,9 @@ defmodule PlannerWeb.TaskLive.Index do
 
   defp run_action(action, user, id) do
     case action do
+      "delete" ->
+        Tasks.delete_pending_task(user, id)
+
       "select" ->
         Tasks.select_today(user, id)
 
@@ -374,7 +525,7 @@ defmodule PlannerWeb.TaskLive.Index do
     <button
       type="button"
       data-drag-handle
-      class="task-drag-handle btn btn-ghost btn-square"
+      class="task-drag-handle btn btn-ghost btn-square shrink-0"
       aria-label={gettext("Drag %{title}", title: @task.title)}
     >
       <.icon name="hero-bars-3" class="size-4" />
@@ -387,13 +538,27 @@ defmodule PlannerWeb.TaskLive.Index do
 
   defp task_menu(assigns) do
     ~H"""
-    <details id={"task-menu-#{@task.id}"} class="dropdown dropdown-end">
-      <summary class="btn btn-ghost" aria-label={gettext("Actions for %{title}", title: @task.title)}>
+    <details id={"task-menu-#{@task.id}"} class="dropdown dropdown-start shrink-0">
+      <summary
+        class="btn btn-ghost btn-square"
+        aria-label={gettext("Actions for %{title}", title: @task.title)}
+      >
         <.icon name="hero-ellipsis-horizontal" class="size-5" />
       </summary>
-      <div class="dropdown-content z-10 rounded-box bg-base-100 p-2 shadow-lg">
+      <div class="dropdown-content z-10 w-56 rounded-box bg-base-100 p-2 shadow-lg">
         <.planning_action task={@task} action={if @task.kind == :today, do: "return", else: "select"} />
-        <div class="flex">
+        <.planning_action :if={@task.kind == :retry} task={@task} action="return" />
+        <button
+          id={"delete-#{@task.id}"}
+          type="button"
+          phx-click="request_delete"
+          phx-disable-with={gettext("Saving...")}
+          phx-value-task_id={@task.id}
+          class="btn btn-ghost text-error"
+        >
+          {gettext("Delete task")}
+        </button>
+        <div class="flex gap-2">
           <.order_action task={@task} direction="up" disabled={@task.position == 1} />
           <.order_action task={@task} direction="down" disabled={@task.position == @count} />
         </div>
@@ -410,6 +575,7 @@ defmodule PlannerWeb.TaskLive.Index do
     ~H"""
     <form
       id={"move-#{@direction}-#{@task.id}"}
+      class="shrink-0"
       phx-submit={JS.push("reorder", page_loading: true) |> JS.focus(to: "##{@task.kind}-heading")}
     >
       <input type="hidden" name="task_id" value={@task.id} />
@@ -445,9 +611,17 @@ defmodule PlannerWeb.TaskLive.Index do
   defp planning_action(assigns) do
     {label, focus} =
       case assigns.action do
-        "select" -> {gettext("Bring to today"), "#today-heading"}
-        "return" -> {gettext("Return to backlog"), "#backlog-heading"}
-        "complete" -> {gettext("Complete task"), "#today-heading"}
+        "select" ->
+          {gettext("Bring to today"), "#today-heading"}
+
+        "return" ->
+          {if(assigns.task.kind == :retry,
+             do: gettext("Send to backlog"),
+             else: gettext("Return to backlog")
+           ), "#backlog-heading"}
+
+        "complete" ->
+          {gettext("Complete task"), "#today-heading"}
       end
 
     assigns = assign(assigns, label: label, focus: focus)
@@ -459,7 +633,7 @@ defmodule PlannerWeb.TaskLive.Index do
         JS.push(@action, page_loading: true)
         |> JS.focus(to: @focus)
       }
-      class="inline-flex"
+      class="inline-flex shrink-0"
     >
       <input type="hidden" name="task_id" value={@task.id} />
       <button

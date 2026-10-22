@@ -24,6 +24,7 @@ import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import {hooks as colocatedHooks} from "phoenix-colocated/planner"
 import topbar from "../vendor/topbar"
+import {AccountTheme} from "./account_theme"
 import {TaskDrag, taskDragDOM} from "./task_drag"
 
 const TaskDrawer = {
@@ -56,7 +57,7 @@ const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {...colocatedHooks, TaskDrawer, TaskDrag},
+  hooks: {...colocatedHooks, TaskDrawer, TaskDrag, AccountTheme},
   dom: taskDragDOM,
 })
 

@@ -35,3 +35,7 @@ O catálogo é gerado como contexto/schema; o vínculo é gerado como schema sem
 ## Implementação
 
 Catálogo, relação, cadastro atômico e formulário são etapas distintas no [mapa de entregas](../tasks/README.md), sem dividir este contrato de classificação em specs por operação.
+
+## Aplicação ao MVP de produção
+
+O proprietário deixa de ser o usuário padrão e passa a ser a conta autenticada da [SPEC-005](005-contas-e-acesso.md), sem mudar as regras de data UTC, consulta histórica ou nomes de labels. A integração de isolamento é entregue pela TASK-045 e não herda o aceite do MVP local. Exclusão de pendências segue SPEC-002 RN12–RN13: remove vínculos, preserva labels e não permite excluir concluídas.

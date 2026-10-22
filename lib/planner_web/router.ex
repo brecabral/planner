@@ -1,6 +1,8 @@
 defmodule PlannerWeb.Router do
   use PlannerWeb, :router
 
+  import PlannerWeb.UserAuth
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -8,6 +10,7 @@ defmodule PlannerWeb.Router do
     plug :put_root_layout, html: {PlannerWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :fetch_current_scope_for_user
   end
 
   pipeline :api do
@@ -18,8 +21,16 @@ defmodule PlannerWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
-    live "/tasks", TaskLive.Index, :index
-    live "/tasks/new", TaskLive.Index, :new
+  end
+
+  scope "/", PlannerWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :authenticated_user,
+      on_mount: [{PlannerWeb.UserAuth, :require_authenticated}] do
+      live "/tasks", TaskLive.Index, :index
+      live "/tasks/new", TaskLive.Index, :new
+    end
   end
 
   # Other scopes may use custom stacks.
@@ -42,5 +53,22 @@ defmodule PlannerWeb.Router do
       live_dashboard "/dashboard", metrics: PlannerWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
+  end
+
+  ## Authentication routes
+
+  scope "/", PlannerWeb do
+    pipe_through [:browser]
+
+    live_session :current_user,
+      on_mount: [{PlannerWeb.UserAuth, :mount_current_scope}] do
+      live "/join", UserLive.Registration, :new
+      live "/users/register", UserLive.Registration, :legacy
+      live "/users/log-in", UserLive.Login, :new
+      live "/users/log-in/:token", UserLive.Confirmation, :new
+    end
+
+    post "/users/log-in", UserSessionController, :create
+    delete "/users/log-out", UserSessionController, :delete
   end
 end

@@ -1,20 +1,18 @@
 ---
 id: "TASK-035"
-status: "planned"
+status: "cancelled"
 execution_level: "standard"
-execution_rationale: "A capacidade deverá ser reavaliada quando o contrato desta evolução estiver definido."
-specs: []
-depends_on: ["TASK-008"]
-provides: ["database-recovery-verified"]
-consumes: ["verified-mvp"]
-write_scope: ["README.md", "docs/tasks/035-validar-restauracao.md"]
-blockers: ["Fora do MVP; revisar escopo e contratos antes de iniciar a evolução."]
+execution_rationale: "Verifica recuperação em base isolada com procedimento definido e preservação de relações."
+specs: ["SPEC-008"]
+depends_on: []
+provides: []
+consumes: []
+write_scope: []
+blockers: []
 ---
 
-# 035 — Backup e restauração
+# 035 — Validar backup e restauração do MVP de produção
 
-## Evolução futura
+## Cancelamento por escopo — 13/10/2026
 
-Definir necessidade e procedimento de recuperação no ambiente de produção.
-
-Fora do MVP. Não executável nem gate da entrega mínima. O contrato de produto e o aceite serão definidos ao retomar esta etapa; não aplicar o comportamento futuro às specs atuais do MVP.
+O responsável limitou a entrega dos agentes ao código Phoenix funcional e ao release local validado. Esta tarefa de configuração/operação remota foi retirada da fila; sua responsabilidade pertence ao usuário, fora deste plano. Não foi executada nem concluída. O ID e o nível anterior são preservados como histórico, sem contrato executável ou recurso prometido. O contrato vigente está na [SPEC-008](../specs/008-producao.md).

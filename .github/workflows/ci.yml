@@ -13,15 +13,39 @@ jobs:
   quality:
     name: quality
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
     env:
       MIX_ENV: test
+      POSTGRES_USER: planner_ci
+      POSTGRES_PASSWORD: ci_only_password
+      POSTGRES_DB: planner_ci_e2e
+      POSTGRES_TEST_DB: planner_ci_test
+      POSTGRES_HOST: 127.0.0.1
+      POSTGRES_PORT: "5432"
+      DATABASE_URL: ecto://planner_ci:ci_only_password@127.0.0.1:5432/planner_ci_e2e
+      SECRET_KEY_BASE: ci_only_not_a_production_secret_0123456789abcdefghijklmnopqrstuvwxyz
+      PHX_HOST: localhost
+      PORT: "4000"
+      E2E_CONTAINER: planner-ci-${{ github.run_id }}-${{ github.run_attempt }}
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: planner_ci
+          POSTGRES_PASSWORD: ci_only_password
+          POSTGRES_DB: planner_ci_e2e
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U planner_ci -d planner_ci_e2e"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 30
     steps:
       - uses: actions/checkout@v7
-      - name: Configure test database
-        run: |
-          cp .env.example .env
-          sed -i "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=$(openssl rand -hex 24)/" .env
       - uses: erlef/setup-beam@v1
         with:
           otp-version: "29"
@@ -33,5 +57,62 @@ jobs:
           node-version: "24"
           cache: npm
           cache-dependency-path: assets/package-lock.json
-      - name: Run quality gate
-        run: mix ci
+      - name: Compile with warnings as errors
+        run: mix compile --warnings-as-errors
+      - name: Check formatting
+        run: mix format --check-formatted
+      - name: Static analysis
+        run: mix credo --strict
+      - name: ExUnit with minimum coverage
+        run: mix test --warnings-as-errors --cover
+      - name: Build Phoenix assets
+        run: |
+          mix assets.setup
+          mix assets.build
+      - name: JavaScript tests and dependency audit
+        run: |
+          node --test assets/test/task_drag.test.mjs assets/js/account_theme.test.mjs
+          npm --prefix assets audit --audit-level=high
+      - name: Local runner contract tests
+        run: python3 scripts/e2e_runner_test.py
+      - name: Install Chromium
+        working-directory: assets
+        run: npx --no-install playwright install --with-deps chromium
+      - name: Build E2E release
+        run: |
+          mkdir -p tmp/ci-e2e
+          docker build -t planner-ci:${{ github.run_id }}-${{ github.run_attempt }} . 2>&1 | tee tmp/ci-e2e/build.log
+      - name: Migrate E2E database and start release
+        run: |
+          docker run --rm --network host \
+            -e DATABASE_URL -e SECRET_KEY_BASE -e PHX_HOST -e PORT \
+            planner-ci:${{ github.run_id }}-${{ github.run_attempt }} /app/bin/migrate 2>&1 | tee tmp/ci-e2e/migrate.log
+          docker run -d --name "$E2E_CONTAINER" --init --network host \
+            -e DATABASE_URL -e SECRET_KEY_BASE -e PHX_HOST -e PORT \
+            planner-ci:${{ github.run_id }}-${{ github.run_attempt }}
+          timeout 180 bash -c 'until curl --fail --silent http://localhost:4000/users/log-in > /dev/null; do sleep 2; done'
+      - name: Complete browser suite
+        timeout-minutes: 10
+        working-directory: assets
+        run: npx --no-install playwright test
+      - name: Collect logs and remove release container
+        if: always()
+        run: |
+          mkdir -p tmp/ci-e2e
+          if docker container inspect "$E2E_CONTAINER" > /dev/null 2>&1; then
+            result=0
+            docker logs "$E2E_CONTAINER" > tmp/ci-e2e/app.log 2>&1 || result=$?
+            docker rm -f "$E2E_CONTAINER" > tmp/ci-e2e/cleanup.log 2>&1 || result=$?
+            exit "$result"
+          fi
+      - name: Upload E2E evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            tmp/ci-e2e/
+            assets/playwright-report/
+            assets/test-results/

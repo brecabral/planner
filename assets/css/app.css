@@ -53,6 +53,41 @@
   --noise: 0;
 }
 
+@plugin "daisyui/packages/bundle/daisyui-theme" {
+  name: "planner_dark";
+  default: false;
+  prefersdark: false;
+  color-scheme: "dark";
+  --color-base-100: oklch(24% 0.012 285);
+  --color-base-200: oklch(20% 0.012 285);
+  --color-base-300: oklch(33% 0.016 285);
+  --color-base-content: oklch(94% 0.006 285);
+  --color-primary: oklch(76% 0.14 277);
+  --color-primary-content: oklch(20% 0.04 277);
+  --color-secondary: oklch(72% 0.04 264);
+  --color-secondary-content: oklch(20% 0.02 264);
+  --color-accent: oklch(82% 0.10 190);
+  --color-accent-content: oklch(20% 0.02 190);
+  --color-neutral: oklch(38% 0.017 285);
+  --color-neutral-content: oklch(94% 0.006 285);
+  --color-info: oklch(76% 0.12 250);
+  --color-info-content: oklch(20% 0.04 250);
+  --color-success: oklch(78% 0.13 165);
+  --color-success-content: oklch(20% 0.04 165);
+  --color-warning: oklch(84% 0.15 85);
+  --color-warning-content: oklch(25% 0.04 85);
+  --color-error: oklch(75% 0.16 20);
+  --color-error-content: oklch(20% 0.04 20);
+  --radius-selector: 0.25rem;
+  --radius-field: 0.75rem;
+  --radius-box: 1rem;
+  --size-selector: 0.21875rem;
+  --size-field: 0.21875rem;
+  --border: 1.5px;
+  --depth: 1;
+  --noise: 0;
+}
+
 /* Add variants based on LiveView classes */
 @custom-variant phx-click-loading (.phx-click-loading&, .phx-click-loading &);
 @custom-variant phx-submit-loading (.phx-submit-loading&, .phx-submit-loading &);
@@ -81,6 +116,24 @@
   border-radius: var(--radius-field);
   background: var(--color-base-100);
 }
+
+/* Controls occupy their own row, independent of user text length. */
+.task-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.task-content { min-width: 0; }
+.task-content [data-label] {
+  max-width: 100%;
+  height: auto;
+  min-height: 1.5rem;
+  white-space: normal;
+}
+
+.task-content + form { margin-top: 0.75rem; }
 
 .btn, a, input, textarea, summary {
   transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;

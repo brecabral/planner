@@ -1,20 +1,18 @@
 ---
 id: "TASK-033"
-status: "planned"
-execution_level: "standard"
-execution_rationale: "A capacidade deverá ser reavaliada quando o contrato desta evolução estiver definido."
-specs: []
-depends_on: ["TASK-008"]
-provides: ["production-runtime"]
-consumes: ["verified-mvp"]
-write_scope: ["config/runtime.exs", ".env.example", "README.md", "test/planner/"]
-blockers: ["Fora do MVP; revisar escopo e contratos antes de iniciar a evolução."]
+status: "cancelled"
+execution_level: "advanced"
+execution_rationale: "Integra configuração de release, domínio e entrega de autenticação sem expor segredos ou dados."
+specs: ["SPEC-008", "SPEC-005"]
+depends_on: []
+provides: []
+consumes: []
+write_scope: []
+blockers: []
 ---
 
-# 033 — Runtime de produção
+# 033 — Configurar runtime e envio real de magic link
 
-## Evolução futura
+## Cancelamento por escopo — 13/10/2026
 
-Definir configuração externa e serviços necessários à autenticação final.
-
-Fora do MVP. Não executável nem gate da entrega mínima. O contrato de produto e o aceite serão definidos ao retomar esta etapa; não aplicar o comportamento futuro às specs atuais do MVP.
+O responsável limitou a entrega dos agentes ao código Phoenix funcional e ao release local validado. Esta tarefa de configuração/operação remota foi retirada da fila; sua responsabilidade pertence ao usuário, fora deste plano. Não foi executada nem concluída. O ID e o nível anterior são preservados como histórico, sem contrato executável ou recurso prometido. O contrato vigente está na [SPEC-008](../specs/008-producao.md).
